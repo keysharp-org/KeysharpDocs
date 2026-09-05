@@ -38,6 +38,7 @@
 
 <h3 id="Linux">Linux</h3>
 <p><strong>X11:</strong> Results can differ between applications.</p>
+<p><strong>Wayland:</strong> Script-owned windows are invalidated through the GUI toolkit. Wayland compositors cannot ask another application's client to redraw, so targeting a foreign window causes an <a href="Error.htm#OSError">OSError</a>.</p>
 
 <h3 id="macOS">macOS</h3>
 <p>This function does not request a redraw. If the target exists, the call succeeds without changing the window.</p>
