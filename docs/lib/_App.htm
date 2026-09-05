@@ -29,6 +29,7 @@
   <tr><td id="GuiTheme">GuiTheme</td><td>String</td><td><code>Classic</code>, <code>System</code> or <code>Dark</code>: the initial <code>A_GuiTheme</code>, which also applies to error dialogs shown before or during the auto-execute section, but not to compile-time errors.</td></tr>
   <tr><td id="ConsoleApp">ConsoleApp</td><td>Boolean</td><td>Builds a <a href="../Program.htm#cmd">compiled executable</a> as a console application, so a shell waits for it and its standard streams are the terminal's, as the <a href="../misc/Ahk2ExeDirectives.htm#ConsoleApp">Ahk2Exe ConsoleApp directive</a> does. It affects only a Windows executable.</td></tr>
   <tr><td id="HookMutexName">HookMutexName</td><td>String</td><td>The name of the mutex objects used to detect keyboard and mouse hooks in other scripts. The default is <code class="no-highlight">Keysharp</code>.</td></tr>
+  <tr><td id="DesktopEntry">DesktopEntry</td><td>String</td><td>The installed Linux desktop file name, with or without its <code class="no-highlight">.desktop</code> suffix. It selects each Wayland window's application ID and the application-wide <a href="Taskbar.htm">Taskbar</a> target. The <code class="no-highlight">DESKTOP_ENTRY</code> environment variable overrides it; without either setting, Keysharp uses <code class="no-highlight">keysharp.desktop</code>.</td></tr>
   <tr><td id="Files">Files</td><td>Array of Strings</td><td>Relative paths of files embedded into the compiled script for <a href="FileInstall.htm">FileInstall</a> to extract. <code>*</code> and <code>?</code> wildcards are allowed in the file-name segment only. Only listed files are embedded.</td></tr>
 </table>
 
@@ -50,6 +51,7 @@
     Version: "1.0.0",
     Icon: "snippets.ico",
     GuiTheme: "Dark",
+    DesktopEntry: "com.acme.Snippets",
     Files: ["snippets-default.json"],
 }
 

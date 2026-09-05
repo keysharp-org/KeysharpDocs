@@ -128,9 +128,10 @@ Taskbar.<span class="func">SetProgressState</span>(State)</pre>
   <tr><td>macOS</td><td><em>Text</em> as dock tile badge text</td><td>A bar drawn on the dock tile</td><td>The whole application</td></tr>
 </table>
 <p class="note"><strong>Note:</strong> On macOS, the dock icon bounces when progress completes or fails, until the application is activated.</p>
-<p>On Linux, the badge and progress appear only in docks which implement the Unity LauncherEntry protocol, such as Ubuntu's dock, Dash to Dock, Plank and Latte; other docks ignore them.</p>
-<p id="desktop-entry">The launcher icon a Linux dock decorates is the one named by the <code class="no-highlight">DESKTOP_ENTRY</code> environment variable, defaulting to Keysharp's own entry. An application which installs its own <code class="no-highlight">.desktop</code> file should set it in its launcher, or from the script before its first call:</p>
-<pre>EnvSet("DESKTOP_ENTRY", "myapp.desktop")</pre>
+<p>Linux uses the Unity LauncherEntry protocol, which carries a number and a progress fraction rather than an icon. Plasma's task manager, Ubuntu Dock, Dash to Dock, Plank and Latte consume it directly. The <code class="no-highlight">keysharp-desktop</code> extension maps the same signal onto GNOME's stock overview dash and Cinnamon's grouped-window-list. A shell or dock which does not implement it ignores the request silently.</p>
+<p id="desktop-entry">The launcher icon a Linux shell decorates is selected by the <code class="no-highlight">DESKTOP_ENTRY</code> environment variable, then <a href="_App.htm#DesktopEntry">#App DesktopEntry</a>, then Keysharp's own entry. An application which installs its own <code class="no-highlight">.desktop</code> file should normally declare the same name in its script:</p>
+<pre>#App { DesktopEntry: "com.acme.MyApp" }</pre>
+<p>The suffix is optional. The selected name also becomes each Wayland window's application ID, so the window, installed icon and Taskbar state use one identity. A launcher or packager may instead set <code class="no-highlight">DESKTOP_ENTRY</code>; that override must exist before the first window is shown and the first Taskbar call.</p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExProgress">
