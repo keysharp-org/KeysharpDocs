@@ -6,11 +6,11 @@
 <meta name="ahk:equiv-v1" content="lib/FileMoveDir.htm" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="../static/theme.css" rel="stylesheet" type="text/css" />
-<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="../static/content.js" type="text/javascript"></script>
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>DirMove</h1>
 
@@ -29,7 +29,7 @@
   <dt>Dest</dt>
   <dd>
       <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-      <p>The new path and name of the directory (with no trailing baskslash), which is assumed to be in <a href="../Variables.htm#WorkingDir">A_WorkingDir</a> if an absolute path isn't specified. For example: D:\My Folder.</p>
+      <p>The new path and name of the directory (with no trailing baskslash), which is assumed to be in <a href="../Variables.htm#WorkingDir">A_WorkingDir</a> if an absolute path isn't specified. For example: <code>"D:\My Folder"</code></p>
       <p class="note"><strong>Note:</strong> <em>Dest</em> is the actual path and name that the directory will have after it is moved; it is <em>not</em> the directory into which <em>Source</em> is moved (except for the known limitation mentioned below).</p>
   </dd>
 

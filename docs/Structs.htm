@@ -6,11 +6,11 @@
 <meta name="ahk:equiv-v1" content="lib/DllCall.htm#struct" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="static/theme.css" rel="stylesheet" type="text/css" />
-<link href="static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="static/content.js" type="text/javascript"></script>
+<link href="static/theme.css" rel="stylesheet" />
+<link href="static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>Structures</h1>
 <p>A structure or <em>struct</em> is a collection of <em>members</em> (fields) stored adjacently in memory.</p>
@@ -87,9 +87,6 @@ MsgBox AB().Size
   <li>The <a href="lib/Struct.htm#At">At</a> method creates a boxed pointer.</li>
 </ul>
 <p>Each instance has a property named __Value of the type represented by the class. This is typically invoked by the <a href="Variables.htm#deref">dereference operator</a> or when using the instance as a <a href="Functions.htm#virtual-reference">virtual reference</a>. For example, <code>MouseGetPos(Int32.at(pt.ptr))</code> would store the X coordinate at the beginning of the struct <code>pt</code>.</p>
-
-<h3 id="sized">Untyped Binary Data</h3>
-<p>If a property's type specifier is an integer, it is interpreted as the size of the property, in bytes. When the property is evaluated, the address of the property itself is returned, rather than any value contained by the property. This is generally only useful when defining an abstract type, such as a fixed-size string or array.</p>
 
 <h2 id="nested-structs">Nested Structs</h2>
 <p>Nested structs are constructed in order of definition, prior to initialization of the outer struct. The nested struct's own field initializers are evaluated and <a href="Objects.htm#Custom_NewDelete">__New</a> is called (without parameters) before before any initializers in the outer struct.</p>
@@ -250,9 +247,7 @@ MsgBox(
 CString(n, cp:="UTF-16") {
     c := Class(Struct)
     unitSize := StrPut("", cp)  <em>; Size in bytes of a single "character".</em>
-    totalSize := n * unitSize  <em>; Total size of any field of this type.</em>
-    DefineProp(c.Prototype, 'Ptr', {type: totalSize})  <em>; See Untyped Binary Data.</em>
-    DefineProp(c.Prototype, 'Size', {value: totalSize})
+    DefineProp(c.Prototype, '_chars', {type: unitSize=2 ? UInt16[n] : Int8[n]})
     DefineProp(c.Prototype, '__value', {
         get: (this)        =&gt; StrGet(this,, cp),
         set: (this, value) =&gt; StrPut(value, this,, cp)

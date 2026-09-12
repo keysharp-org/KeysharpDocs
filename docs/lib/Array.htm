@@ -6,11 +6,11 @@
 <meta name="ahk:equiv-v1" content="lib/Object.htm" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="../static/theme.css" rel="stylesheet" type="text/css" />
-<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="../static/content.js" type="text/javascript"></script>
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>Array Object</h1>
 <pre class="NoIndent">class Array extends Object</pre>
@@ -65,7 +65,7 @@ MsgBox users[1]</pre>
   </li>
   <li><a href="#Properties">Properties</a>:
     <ul>
-      <li><a href="#Length">Length</a>: Gets or sets the length of an array.</li>
+      <li><a href="#Length">Length</a>: Gets or sets the number of items in an array.</li>
       <li><a href="#Capacity">Capacity</a>: Gets or sets the current capacity of an array.</li>
       <li><a href="#Default">Default</a>: Sets the default value returned when an element with no value is requested.</li>
       <li><a href="#__Item">__Item</a>: Gets or sets the value of an array element.</li>
@@ -327,7 +327,7 @@ Lowest := ArrayObj.<span class="func">MinIndex</span>()</pre>
 <h2 id="Properties">Properties</h2>
 
 <div class="methodShort" id="Length"><h3>Length</h3>
-<p>Gets or sets the length of an array.</p>
+<p>Gets or sets the number of items in an array.</p>
 <pre class="Syntax">Length := ArrayObj.<span class="func">Length</span></pre>
 <pre class="Syntax">ArrayObj.<span class="func">Length</span> := Length</pre>
 <p>The length includes elements which have no value. Increasing the length changes which indices are considered valid, but the new elements have no value (as indicated by <a href="#Has">Has</a>). Decreasing the length truncates the array.</p>

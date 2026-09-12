@@ -5,11 +5,11 @@
 <meta name="description" content="Notable script-visible changes in recent Keysharp releases, and the AutoHotkey version this documentation targets." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="static/theme.css" rel="stylesheet" type="text/css" />
-<link href="static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="static/content.js" type="text/javascript"></script>
+<link href="static/theme.css" rel="stylesheet" />
+<link href="static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 <h1>Recent Changes</h1>
 
 <p>This page summarizes the script-visible changes in recent Keysharp releases, so that a script written against an earlier version can be brought up to date. The <a href="https://github.com/keysharp-org/Keysharp/releases">release page</a> holds the authoritative notes and the downloads for each version.</p>
@@ -19,7 +19,7 @@
 <table class="info">
   <tr><th>Property</th><th>Value</th></tr>
   <tr><td>Keysharp version described here</td><td>0.0.0.17</td></tr>
-  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.31</td></tr>
+  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.32</td></tr>
 </table>
 <p>A compatibility target states which AutoHotkey language and library reference these pages describe. It does not mean that every described feature is implemented identically, or that it behaves the same on every platform. See <a href="KeysharpDifferences.htm">Changes from AutoHotkey to Keysharp</a> for the differences, <a href="Platforms.htm">Platform Support</a> for per-platform availability, and the platform remarks on each affected reference page.</p>
 <p>The corresponding upstream language changes are described in <a href="v2.1-changes.htm">Changes from v2.0 to v2.1</a>.</p>
@@ -129,7 +129,7 @@
   <li><a href="lib/Clr.htm">Clr</a> accepts an Integer where a .NET enum is expected, including undeclared flag combinations.</li>
   <li>Built-in objects which stand in front of a CLR object expose it through a uniform <a href="lib/Clr.htm#ToClr">ToClr()</a> method returning an ordinary <a href="lib/Clr.htm">Clr</a> object: <a href="lib/Task.htm#ToClr">Task</a>, <a href="lib/Gui.htm#ToClr">Gui</a>, <a href="lib/GuiControl.htm#ToClr">Gui.Control</a>, <a href="lib/Menu.htm#ToClr">Menu</a> and <a href="lib/Image.htm#Output">Image</a>. <a href="lib/Map.htm#ToClr">Map</a> is a CLR <code class="no-highlight">IDictionary&lt;object, object&gt;</code> and <a href="lib/Array.htm#ToClr">Array</a> an <code class="no-highlight">IList</code>, so a CLR API declaring one accepts them directly, and their ToClr() exposes their full CLR surface late-bound. Inline C# holding a Clr wrapper reads the raw object from its <code class="no-highlight">Native</code> property.</li>
   <li><a href="Variables.htm#A_ProcessArch">A_ProcessArch</a> and <a href="Variables.htm#A_OSArch">A_OSArch</a> report CPU architecture. Interop code should branch on these rather than <a href="Variables.htm#PtrSize">A_PtrSize</a>, which cannot tell X64 and ARM64 apart.</li>
-  <li>The compatibility target moved to <a href="v2.1-changes.htm">v2.1-alpha.31</a>. The preceding alpha.30 update in this release added typed signatures for <a href="lib/CallbackCreate.htm">CallbackCreate</a>, <a href="lib/Object.htm#SetBase">ObjSetBase</a>, the numeric type classes and further <a href="Structs.htm">struct</a> members.</li>
+  <li>The compatibility target moved to <a href="v2.1-changes.htm">v2.1-alpha.32</a>, adding <a href="lib/Gui.htm#FontHandle">Gui.FontHandle</a> to the compatibility contract. The property is not yet implemented by Keysharp. The preceding alpha.30 update in this release added typed signatures for <a href="lib/CallbackCreate.htm">CallbackCreate</a>, <a href="lib/Object.htm#SetBase">ObjSetBase</a>, the numeric type classes and further <a href="Structs.htm">struct</a> members.</li>
   <li><a href="lib/Send.htm#Click">Send {Click X Y Count}</a> moves the pointer once before repeating the click. Successful output operations now store a blank value when no result exists, and a ListView column-header <a href="lib/GuiOnEvent.htm#ContextMenu">ContextMenu</a> event reports <em>Item</em> as 0.</li>
   <li><a href="Modules.htm#KS_FileCreateTemp">Ks.FileCreateTemp</a> creates an empty temporary file and returns its path.</li>
 </ul>

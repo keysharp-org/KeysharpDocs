@@ -5,12 +5,12 @@
 <meta name="description" content="Describes issues relating to DPI scaling." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="../static/theme.css" rel="stylesheet" type="text/css" />
-<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="../static/content.js" type="text/javascript"></script>
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
 </head>
 
-<body>
+<body><script>site.init();</script>
 <h1>DPI Scaling</h1>
 
 <p class="note"><strong>Note:</strong> The Windows build is Per-Monitor-v2-aware and supports <a href="../lib/Gui.htm#DPIResize">DPIResize</a> for individual controls; the GUI option sets the default for controls added afterward. Keysharp also exposes a cross-platform <a href="../lib/GuiOnEvent.htm#DPIChange">DPIChange</a> event for custom layout. Linux and macOS use native toolkit logical coordinates and toolkit-managed display scaling, which individual controls cannot opt out of.</p>

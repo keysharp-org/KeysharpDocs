@@ -1,593 +1,598 @@
 @import url('content.css');
 
 body {
-background:#fff;
-color:#000;
-margin:.72em;
-padding:0px;
-counter-reset: ex_number;
+  background: #fff;
+  color: #000;
+  margin: .72em;
+  padding: 0px;
+  counter-reset: ex_number;
 }
 
 html {
-font:.9em/1.6 Arial,sans-serif;
-margin:0px;
-padding:0px
+  font: .9em/1.6 Arial, sans-serif;
+  margin: 0px;
+  padding: 0px;
 }
 
 h1 {
-font-size:2em;
-font-weight:700;
-border-bottom-color:#FFF;
-border-bottom-width:2px;
-margin-top:8px;
-color:#5B32A3;
-word-wrap:break-word;
-overflow-wrap:break-word
+  font-size: 2em;
+  font-weight: 700;
+  border-bottom-color: #FFF;
+  border-bottom-width: 2px;
+  margin-top: 8px;
+  color: #5B32A3;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 h2 {
-margin-top:1.1em;
-margin-bottom:.5em;
-color:#6D3FC0
+  margin-top: 1.1em;
+  margin-bottom: .5em;
+  color: #6D3FC0;
 }
 
 h3 {
-margin-top:1.5em;
-margin-bottom:.5em;
-color:#18794E
+  margin-top: 1.5em;
+  margin-bottom: .5em;
+  color: #18794E;
 }
 
 h4.func_section {
-margin-bottom: -.2em;
-margin-top: -.2em;
-font-weight: normal;
-color: #6D3FC0;
-border-bottom: 1px solid #eee;
+  margin-bottom: -.2em;
+  margin-top: -.2em;
+  font-weight: normal;
+  color: #6D3FC0;
+  border-bottom: 1px solid #eee;
 }
 
 h2:first-child {
-margin-top:0
+  margin-top: 0;
 }
 
-h1,h2,h3,h4 {
-border-bottom:1px solid #ddd;
-counter-reset: ex_number;
+h1,
+h2,
+h3,
+h4 {
+  border-bottom: 1px solid #ddd;
+  counter-reset: ex_number;
 }
 
 a {
-text-decoration:none
+  text-decoration: none;
+  color: #5B32A3;
 }
 
-a:link,a:visited,a:visited:hover {
-color:#5B32A3
-}
-
-a:hover,a:active {
-text-decoration:underline
+a:hover,
+a:active {
+  text-decoration: underline;
 }
 
 hr {
-border-color: #e0e0e0;
-background-color: #e0e0e0;
-height: 2px;
-border: 0;
+  border-color: #e0e0e0;
+  background-color: #e0e0e0;
+  height: 2px;
+  border: 0;
 }
 
 img {
-max-width:100%;
-height:auto;
-width:auto\9; /*IE8*/
-border:none
+  max-width: 100%;
+  height: auto;
+  border: none;
 }
 
 #keysharplogo {
-align-items:center;
-display:flex;
-gap:1em;
-margin:20px 0;
-max-width:32em;
-text-decoration:none
+  align-items: center;
+  display: flex;
+  gap: 1em;
+  margin: 20px 0;
+  max-width: 32em;
+  text-decoration: none;
 }
 
 #keysharplogo img {
-height:112px;
-width:112px
+  height: 112px;
+  width: 112px;
 }
 
-/* The wordmark is the page's h1, so the generic heading rules (border-bottom and margins) are cleared
-   here to keep it looking like a logo rather than a section heading. */
 #keysharplogo .ks-wordmark {
-color:#5B32A3;
-font-size:2.5em;
-font-weight:700;
-letter-spacing:-.04em;
-line-height:1;
-border:0;
-margin:0;
-padding:0
+  border: 0;
+  color: #5B32A3;
+  font-size: 2.5em;
+  font-weight: 700;
+  letter-spacing: -.04em;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
 }
 
 #keysharplogo small {
-display:block;
-font-size:.42em;
-font-weight:600;
-letter-spacing:.08em;
-margin-top:.5em;
-text-transform:uppercase
+  display: block;
+  font-size: .42em;
+  font-weight: 600;
+  letter-spacing: .08em;
+  margin-top: .5em;
+  text-transform: uppercase;
 }
 
-/* The measure is capped for readability. 70em at this font size is around 1290px, which on a wide
-   window is no constraint at all and leaves lines of well over 100 characters. */
 .ks-lead {
-font-size:1.15em;
-line-height:1.65;
-max-width:42em
+  font-size: 1.15em;
+  line-height: 1.65;
+  max-width: 42em;
 }
 
-/* Sits directly under the logo as a header strip, ruled above and below. The rules stand in for the
-   heading border that used to separate the masthead from the page. The padding is deliberately
-   generous: with a tight band the two rules read as a squeeze rather than a deliberate strip. */
 .ks-project-links {
-display:flex;
-flex-wrap:wrap;
-gap:.5em 1.5em;
-border-top:1px solid #ddd;
-border-bottom:1px solid #ddd;
-padding:.9em 0;
-margin:1.6em 0 1.8em
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5em 1.5em;
+  margin: 1.6em 0 1.8em;
+  padding: .9em 0;
 }
 
 .ks-disclaimer {
-background:#f5f0ff;
-border-left:.35em solid #6D3FC0;
-box-sizing:border-box;
-color:#38245d;
-margin:1em 0;
-padding:.65em .9em
+  background: #f5f0ff;
+  border-left: .35em solid #6D3FC0;
+  box-sizing: border-box;
+  color: #38245d;
+  margin: 1em 0;
+  padding: .65em .9em;
 }
 
 /* pre: code blocks, code: inline code, .Syntax: syntax definition (block/pre or inline/span) */
 
-pre,code {
-background-color:#eff0f1
+pre,
+code {
+  background-color: #eff0f1;
 }
 
-pre,code,table.info .code {
-font-family:Consolas,Monaco,Courier New,monospace
+pre,
+code,
+table.info .code {
+  font-family: Consolas, Monaco, Courier New, monospace;
 }
 
 .Syntax {
-background-color:#FFA;
-border:solid 1px #E8E89A
+  background-color: #FFA;
+  border: solid 1px #E8E89A;
 }
 
 .Syntax span.func {
-font-weight:700;
-color:#605428
+  font-weight: 700;
+  color: #605428;
 }
 
 .Syntax span.optional:before {
-content:"[";
-color:orange;
-font:130% serif;
-line-height:0
+  content: "[";
+  color: orange;
+  font: 130% serif;
+  line-height: 0;
 }
 
 .Syntax span.optional:after {
-content:"]";
-color:orange;
-font:130% serif;
-line-height:0
+  content: "]";
+  color: orange;
+  font: 130% serif;
+  line-height: 0;
 }
 
 code {
-padding: 0 .2em;
-line-height: normal;
-white-space: pre-wrap;
-word-break: break-word;
+  padding: 0 .2em;
+  line-height: normal;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 span.Syntax {
-padding:0 1px
+  padding: 0 1px;
 }
 
 pre {
-line-height:120%;
-margin:1em 1.5em;
-padding:.7em 0 .7em .7em;
-white-space:pre-wrap; /* works in IE8 but apparently not CHM viewer */
-word-wrap:break-word; /* works in CHM viewer */
-word-break:break-word; /* Chrome: breaks long words in tables */
-tab-size:4
+  line-height: 120%;
+  margin: 1em 1.5em;
+  padding: .7em 0 .7em .7em;
+  white-space: pre-wrap; /* works in IE8 but apparently not CHM viewer */
+  word-wrap: break-word; /* works in CHM viewer */
+  word-break: break-word; /* Chrome: breaks long words in tables */
+  tab-size: 4;
 }
 
 pre.Syntax {
-margin:1em 0 1em;
-line-height:150%
+  margin: 1em 0 1em;
+  line-height: 150%;
 }
 
 pre.Syntax.Indent {
-margin:1em 1.5em
+  margin: 1em 1.5em;
 }
 
 .NoIndent {
-margin-left:0
+  margin-left: 0;
 }
 
 /* comments */
 
-pre em,code em {
-color:green;
-font-style:normal
+pre em,
+code em {
+  color: green;
+  font-style: normal;
 }
 
 /* tables */
 
 table.info {
-margin-top:1em;
-margin-bottom:1em;
-border-collapse:collapse;
-width:100%
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 table.info td {
-border:solid 1px silver;
-padding: .3em .5em;
+  border: solid 1px silver;
+  padding: .3em .5em;
 }
 
 table.info td *:first-child {
-margin-top:0
+  margin-top: 0;
 }
 
 table.info td *:last-child {
-margin-bottom:0
+  margin-bottom: 0;
 }
 
 table.info th {
-border: solid 1px silver;
-background-color:#F6F6F6;
-padding: 0 .5em;
-text-align: left;
-white-space: nowrap;
+  border: solid 1px silver;
+  background-color: #F6F6F6;
+  padding: 0 .5em;
+  text-align: left;
+  white-space: nowrap;
 }
 
 table.info tr.sep_below {
-border-bottom: 3px solid silver;
+  border-bottom: 3px solid silver;
 }
 
 table.info .center {
-text-align: center;
+  text-align: center;
 }
 
 table.info .right {
-text-align: right;
+  text-align: right;
 }
 
 table.info .wrap {
-white-space: normal;
+  white-space: normal;
 }
 
 table.info .bold {
-font-weight: bold;
+  font-weight: bold;
 }
 
 /* heading note / version number/requirement tag */
 
-h1 .headnote,h2 .headnote,h3 .headnote,h1 .ver,h2 .ver,h3 .ver {
-font-size:65%;
-font-weight:400;
-margin-left:1em
+h1 .headnote,
+h2 .headnote,
+h3 .headnote,
+h1 .ver,
+h2 .ver,
+h3 .ver {
+  font-size: 65%;
+  font-weight: 400;
+  margin-left: 1em;
 }
 
-h4 .headnote,h4 .ver,dt .ver {
-font-weight:400
+h4 .headnote,
+h4 .ver,
+dt .ver {
+  font-weight: 400;
 }
 
-.headnote,.ver,.dull {
-color:gray
+.headnote,
+.ver,
+.dull {
+  color: gray;
 }
 
-a.ver:hover,a.ver:focus {
-text-decoration:none
+a.ver:hover,
+a.ver:focus {
+  text-decoration: none;
 }
 
 /* emphases */
 
 .red {
-color:red
+  color: red;
 }
 
 .blue {
-color:blue
+  color: blue;
 }
 
 .note {
-border-left:2px solid #9B9;
-background-color:#E6FFE6;
-color:#050;
-padding:.5em 1em
+  border-left: 2px solid #9B9;
+  background-color: #E6FFE6;
+  color: #050;
+  padding: .5em 1em;
 }
 
 .warning {
-border-left:2px solid #FFA000;
-background-color:#FFF8E6;
-color:#C05500;
-padding:.5em 1em
+  border-left: 2px solid #FFA000;
+  background-color: #FFF8E6;
+  color: #C05500;
+  padding: .5em 1em;
 }
 
 blockquote {
-border-left:2px solid #4080f0;
-background-color:#f8f8f8;
-margin:.7em 1.5em;
-padding:.7em 0 .7em .7em;
+  border-left: 2px solid #4080f0;
+  background-color: #f8f8f8;
+  margin: .7em 1.5em;
+  padding: .7em 0 .7em .7em;
 }
 
 /* styles for briefly documenting multiple methods on one page: */
 
 .methodShort {
-border:solid thin silver;
-padding:.5em;
-margin-bottom:1em
+  border: solid thin silver;
+  padding: .5em;
+  margin-bottom: 1em;
 }
 
-.methodShort h2, .methodShort h3 {
-margin-top: 0;
-color: inherit;
-border-bottom: 0;
+.methodShort h2,
+.methodShort h3 {
+  margin-top: 0;
+  color: inherit;
+  border-bottom: 0;
 }
 
 .methodShort h4 {
-margin-bottom: -.1em;
-margin-top: -.1em;
+  margin-bottom: -.1em;
+  margin-top: -.1em;
 }
 
 .methodShort table.info {
-border:none
+  border: none;
 }
 
 .methodShort > table.info td {
-border:none;
-vertical-align:text-top
+  border: none;
+  vertical-align: text-top;
 }
 
 .methodShort:target { /* non-essential, but helpful if it works */
-border-color: inherit;
+  border-color: inherit;
 }
 
 /* function parameters */
 
 dt { /* param name */
-color:#5B32A3;
-margin-left:.5em;
-font-weight:bold
+  color: #5B32A3;
+  margin-left: .5em;
+  font-weight: bold;
 }
 
 dd {
-margin-left:1.5em;
-padding-left:1em;
-border-left:.3em solid #e0e0e0;
-margin-bottom:1em
+  margin-left: 1.5em;
+  padding-left: 1em;
+  border-left: .3em solid #e0e0e0;
+  margin-bottom: 1em;
 }
 
 dd > p:first-child {
-margin-top:.3em
+  margin-top: .3em;
 }
 
 /* keyboard keys */
 
 kbd {
-border:1px solid #ccc;
-border-radius:3px;
-box-shadow:0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #fff inset;
-color:#333;
-background-color: #fff;
-display:inline-block;
-font-family:Consolas,Monaco,Courier New,monospace;
-line-height: 1;
-padding: 2px 4px;
-text-shadow:0 1px 0 #fff;
-white-space:nowrap
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #fff inset;
+  color: #333;
+  background-color: #fff;
+  display: inline-block;
+  font-family: Consolas, Monaco, Courier New, monospace;
+  line-height: 1;
+  padding: 2px 4px;
+  text-shadow: 0 1px 0 #fff;
+  white-space: nowrap;
 }
 
 /* example frames */
 
 .ex {
-border:1px solid #d1d1d1;
-margin-bottom:0.7em
+  border: 1px solid #d1d1d1;
+  margin-bottom: 0.7em;
 }
 
 .ex .ex_number:before {
-counter-increment: ex_number;
-content: "#" counter(ex_number) ":";
+  counter-increment: ex_number;
+  content: "#" counter(ex_number) ":";
 }
 
 .ex pre {
-margin:.2em
+  margin: .2em;
 }
 
-.ex pre+pre {
-margin-top:0.7em
+.ex pre + pre {
+  margin-top: 0.7em;
 }
 
 .ex p {
-margin:0.2em 0.2em
+  margin: 0.2em 0.2em;
 }
 
 /* RegEx */
 
 .regex {
-background-color:#FFEED3;
-font-weight:bold;
-font-family: Consolas,Monaco,Courier New,monospace;
-word-break: break-word;
+  background-color: #FFEED3;
+  font-weight: bold;
+  font-family: Consolas, Monaco, Courier New, monospace;
+  word-break: break-word;
 }
 
 .subj {
-background-color:#DDFFDD
+  background-color: #DDFFDD;
 }
 
 /* indented list */
 
 ul.indent {
-list-style-type: none;
-padding-left: 0;
+  list-style-type: none;
+  padding-left: 0;
 }
 
 ul.indent ul {
-list-style-type: disc;
+  list-style-type: disc;
 }
 
-
-/* ---- Download button (index.htm) ---- */
-
+/* Keysharp homepage and installer controls */
 .ks-download {
-margin:1em 0 .8em
+  margin: 1em 0 .8em;
 }
 
-/* The :link/:visited pseudo-classes are needed here: the generic "a:link,a:visited" rule above is
-   more specific than a bare class selector, and would otherwise paint the label the same purple as
-   this button's background. */
-a.ks-download-btn, a.ks-download-btn:link, a.ks-download-btn:visited {
-display:inline-flex;
-flex-direction:column;
-background:#5B32A3;
-color:#fff;
-font-size:1.15em;
-font-weight:700;
-padding:.6em 1.6em;
-border-radius:8px;
-text-decoration:none
+a.ks-download-btn,
+a.ks-download-btn:link,
+a.ks-download-btn:visited {
+  background: #5B32A3;
+  border-radius: 8px;
+  color: #fff;
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 1.15em;
+  font-weight: 700;
+  padding: .6em 1.6em;
+  text-decoration: none;
 }
 
-a.ks-download-btn:hover, a.ks-download-btn:focus, a.ks-download-btn:visited:hover {
-background:#4a2887;
-color:#fff;
-text-decoration:none
+a.ks-download-btn:hover,
+a.ks-download-btn:focus,
+a.ks-download-btn:visited:hover {
+  background: #4a2887;
+  color: #fff;
+  text-decoration: none;
 }
 
 .ks-download-sub {
-font-size:.72em;
-font-weight:400;
-opacity:.9
+  font-size: .72em;
+  font-weight: 400;
+  opacity: .9;
 }
 
-/* ---- Download picker (howto/Install.htm) ---- */
-
 .dl-grid {
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(9em,1fr));
-gap:.8em;
-/* Without a cap the three cards stretch across the whole content column, which on a wide window
-   makes them far larger than the choice they represent. */
-max-width:32em;
-margin:1.3em 0 .6em;
-align-items:stretch
+  align-items: stretch;
+  display: grid;
+  gap: .8em;
+  grid-template-columns: repeat(auto-fit, minmax(9em, 1fr));
+  margin: 1.3em 0 .6em;
+  max-width: 32em;
 }
 
 .dl-col {
-display:flex;
-flex-direction:column
+  display: flex;
+  flex-direction: column;
 }
 
 .dl-card {
-display:flex;
-flex:1;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-position:relative; /* contains the visually hidden "your system" label */
-border:2px solid #ddd6ea;
-border-radius:10px;
-padding:1em .7em;
-background:#fff;
-color:inherit;
-text-decoration:none;
-transition:border-color .15s, box-shadow .15s, transform .15s
+  align-items: center;
+  background: #fff;
+  border: 2px solid #ddd6ea;
+  border-radius: 10px;
+  color: inherit;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1em .7em;
+  position: relative;
+  text-decoration: none;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
 }
 
-/* Stated on the children too, so the card keeps its stacked, centred layout even where the flex
-   rules are not honoured. */
-.dl-card, .dl-card > span, .dl-card .dl-os {
-text-align:center
+.dl-card,
+.dl-card > span,
+.dl-card .dl-os {
+  text-align: center;
 }
 
 .dl-card > span {
-display:block;
-width:100%
+  display: block;
+  width: 100%;
 }
 
-.dl-card:hover, .dl-card:focus {
-border-color:#5B32A3;
-box-shadow:0 4px 14px rgba(91,50,163,.18);
-transform:translateY(-2px);
-text-decoration:none;
-color:inherit
+.dl-card:hover,
+.dl-card:focus {
+  border-color: #5B32A3;
+  box-shadow: 0 4px 14px rgba(91, 50, 163, .18);
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-2px);
 }
 
 .dl-icon {
-display:block;
-width:32px;
-height:32px;
-margin:0 auto .35em;
-color:#5B32A3
+  color: #5B32A3;
+  display: block;
+  height: 32px;
+  margin: 0 auto .35em;
+  width: 32px;
 }
 
 .dl-os {
-font-size:1.05em;
-font-weight:700;
-line-height:1.2;
-color:#5B32A3
+  color: #5B32A3;
+  font-size: 1.05em;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
-/* The filled card conveys "this is your system" visually, which a screen reader cannot perceive, so
-   the wording is kept and hidden rather than dropped. */
 .dl-card .dl-detected {
-position:absolute;
-width:1px;
-height:1px;
-overflow:hidden;
-clip:rect(0 0 0 0);
-clip-path:inset(50%);
-white-space:nowrap
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 .dl-card[aria-current="true"] {
-border-color:#5B32A3;
-background:#5B32A3
+  background: #5B32A3;
+  border-color: #5B32A3;
 }
 
-.dl-card[aria-current="true"] .dl-icon, .dl-card[aria-current="true"] .dl-os {
-color:#fff
+.dl-card[aria-current="true"] .dl-icon,
+.dl-card[aria-current="true"] .dl-os {
+  color: #fff;
 }
 
-.dl-card[aria-current="true"]:hover, .dl-card[aria-current="true"]:focus {
-background:#4a2887;
-border-color:#4a2887
+.dl-card[aria-current="true"]:hover,
+.dl-card[aria-current="true"]:focus {
+  background: #4a2887;
+  border-color: #4a2887;
 }
 
 .dl-alt {
-text-align:center;
-font-size:.82em;
-margin:.5em 0 0
+  font-size: .82em;
+  margin: .5em 0 0;
+  text-align: center;
 }
 
 .dl-alt a {
-display:inline-block;
-border:1px solid #d3cbe4;
-border-radius:999px;
-padding:.2em .85em;
-margin:.15em .1em;
-text-decoration:none
+  border: 1px solid #d3cbe4;
+  border-radius: 999px;
+  display: inline-block;
+  margin: .15em .1em;
+  padding: .2em .85em;
+  text-decoration: none;
 }
 
-.dl-alt a:hover, .dl-alt a:focus {
-border-color:#5B32A3;
-background:#f3eefb;
-text-decoration:none
+.dl-alt a:hover,
+.dl-alt a:focus {
+  background: #f3eefb;
+  border-color: #5B32A3;
+  text-decoration: none;
 }
 
 .dl-status {
-font-size:.85em;
-color:#555;
-margin:.2em 0 1.2em
+  color: #555;
+  font-size: .85em;
+  margin: .2em 0 1.2em;
 }

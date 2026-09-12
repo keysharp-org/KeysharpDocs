@@ -162,13 +162,7 @@ ScanFiles()
     s .= "var SearchTitles = ["
     for i, t in stitles
         s .= Format('"{1}",', StrReplace(t, '"', '\"'))
-    s := SubStr(s,1,-1) "]`n`n"
-    
-    s .= "
-    (
-    if (window.onReceiveSearchIndex)
-        $(window.onReceiveSearchIndex); // $() for local IE8.
-    )"
+    s := SubStr(s,1,-1) "]`n"
     
     FileDelete "static\source\data_search.js"
     FileAppend s, "static\source\data_search.js"
@@ -195,6 +189,11 @@ ScanFile(filename)
         sleep 10
     }
     
+    if doc.querySelector('meta[name|="ahk:build-search-skip"]') {
+        D("skipping file by meta tag: " filename)
+        return
+    }
+
     if doc.title = "" {
         D("skipping file with no title: " filename)
         return
