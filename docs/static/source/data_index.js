@@ -1187,6 +1187,7 @@ indexData = [
   ["OnRestore property (WinEvent)","lib/WinEvent.htm#OnRestore",7],
   ["OnTitleChange property (WinEvent)","lib/WinEvent.htm#OnTitleChange",7],
   ["open file","lib/FileOpen.htm"],
+  ["Operator overloading","Objects.htm#Custom_Classes_operators"],
   ["operators in expressions","Variables.htm#Operators"],
   ["Opt method (Gui)","lib/Gui.htm#Opt",7],
   ["Opt method (Gui.Control)","lib/GuiControl.htm#Opt",7],

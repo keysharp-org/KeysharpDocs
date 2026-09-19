@@ -374,6 +374,38 @@ Method()
 <p><a href="Variables.htm#fat-arrow">Fat arrow syntax</a> can be used to define a single-line method which returns an expression:</p>
 <pre>Method() =&gt; <i>Expression</i></pre>
 
+<h4 id="Custom_Classes_operators">Operator Overloading</h4>
+<p>An <em>operator definition</em> allows a class or <a href="Structs.htm">struct class</a> to define how an operator acts on its instances or on the class itself. This is a Keysharp extension.</p>
+<pre>class Example
+{
+    Value := 10
+    static Value := 100
+
+    +(Right) =&gt; this.Value + Right
+    static +(Right) =&gt; this.Value + Right
+    -() =&gt; -this.Value
+}
+
+A := Example() + 2  <em>; 12</em>
+B := Example + 2    <em>; 102</em>
+C := -Example()     <em>; -10</em></pre>
+<p>An instance operator is used when the left operand is an instance of the class. A static operator is defined by preceding the symbol with the keyword <code>static</code>, and is used when the left operand is the class itself. In either case, <code>this</code> contains the left operand.</p>
+<p>A binary operator definition has one required parameter, which receives the right operand. A unary operator definition has no parameters. Optional, <a href="Functions.htm#ByRef">ByRef</a> and variadic parameters are not permitted. Either a block body or <a href="Variables.htm#fat-arrow">fat arrow syntax</a> can be used.</p>
+<p>The following operators can be overloaded:</p>
+<ul>
+  <li><strong>Binary:</strong> <code>+ - * / // ** &amp; | ^ &lt;&lt; &gt;&gt; &gt;&gt;&gt; &lt; &lt;= &gt; &gt;= = == != !== . ~= !~=</code></li>
+  <li><strong>Unary:</strong> <code>+ - ~ ! ++ -- ?</code></li>
+</ul>
+<p>The unary and binary forms of <code>+</code> and <code>-</code> are separate, and can both be defined in the same class. Static and instance forms are also separate. Defining the same form more than once is an error.</p>
+<p>For a binary operation, only the left operand is checked for an operator definition. If none is found, the normal built-in behavior applies. There is no fallback to an operator defined by the right operand.</p>
+<p>Operator definitions are inherited from the class's declared base class and can be overridden. Instance and static definitions are inherited separately. When a static definition is inherited, <code>this</code> contains the derived class.</p>
+<p>An operator can return any value except <em>unset</em>. Returning <em>unset</em> raises <a href="lib/Error.htm#UnsetError">UnsetError</a>, and any other error raised by the operator is passed on to its caller.</p>
+<p>The definitions are fixed when the class is defined. Changing <code>Base</code> or <code>Prototype</code>, or defining a property whose name is an operator symbol, does not change them.</p>
+<p><strong>Equality:</strong> <code>=</code> and <code>!=</code> must be defined together in the same class and scope, as must <code>==</code> and <code>!==</code>. This also applies when overriding an inherited definition. Each operator is called independently; for example, <code>!=(Right) =&gt; !(this = Right)</code> can be used when inequality is intended to negate equality.</p>
+<p><strong>Truth testing:</strong> <code>?()</code> defines how an object is interpreted by <a href="lib/If.htm">If</a>, the ternary operator, <code>&amp;&amp;</code>, <code>||</code> and <a href="lib/Boolean.htm#Call">Boolean()</a>. Its return value is converted to true or false by the same rules, so returning another object can invoke that object's <code>?()</code>. The script must avoid infinite recursion. An object without <code>?()</code> is true.</p>
+<p><code>!()</code> separately defines the result of <code>!</code> and <code>not</code>. If it is not defined, logical negation uses the result of normal truth testing. Methods named <code>True</code> and <code>False</code> have no special meaning. Overloading truth testing does not change the short-circuit behavior or return values of <code>&amp;&amp;</code> and <code>||</code>.</p>
+<p><strong>Increment and decrement:</strong> <code>++()</code> and <code>--()</code> are used in preference to binary addition or subtraction with 1. The result is assigned back to the variable or property. Prefix returns the assigned result, while postfix returns the previous value. If the previous value is an object, it is not cloned. To update a class object, first assign it to a variable such as <code>Alias := Example</code>.</p>
+<p>Compound assignments use the corresponding binary operator definition. When the target is a property or index, its receiver, indices and getter are evaluated only once.</p>
 <h4 id="Custom_Classes_super">Super</h4>
 <p>Inside a method or a property getter/setter, the keyword <code>super</code> can be used in place of <code>this</code> to access the superclass versions of methods or properties which are overridden in a derived class. For example, <code>super.Method()</code> in the class defined above would typically call the version of <em>Method</em> which was defined within <em>BaseClassName</em>. Note:</p>
 <ul>

@@ -57,8 +57,8 @@ MsgBox &apos;She said, "An apple a day."&apos;</pre>
 <p><strong>Empty strings:</strong> To specify an empty string in an expression, use an empty pair of quotes. For example, the statement <code>if (MyVar != "")</code> would be true if <em>MyVar</em> is not blank.</p>
 <p><strong>Storing the result of an expression:</strong> To assign a result to a variable, use the <a href="#AssignOp">colon-equal operator (:=)</a>. For example:</p>
 <pre>NetPrice := Price * (1 - Discount/100)</pre>
-<p id="Boolean"><strong>Boolean values:</strong> When an expression is required to evaluate to true or false (such as an IF-statement), a blank or zero result is considered false and all other results are considered true. For example, the statement <code>if ItemCount</code> would be false only if ItemCount is blank or 0. Similarly, the expression <code>if not ItemCount</code> would yield the opposite result.</p>
-<p>Operators such as NOT/&gt;/=/&lt; automatically produce a true or false value: they yield 1 for true and 0 for false. However, the AND/OR operators always produce one of the input values. For example, in the following expression, the variable <em>Done</em> is assigned 1 if A_Index is greater than 5 or the value of <em>FoundIt</em> in all other cases:</p>
+<p id="Boolean"><strong>Boolean values:</strong> When an expression is required to evaluate to true or false (such as an IF-statement), a blank or zero result is considered false. An object is true unless its class defines the <a href="Objects.htm#Custom_Classes_operators"><code>?()</code> operator</a>, in which case the operator's return value is converted by the same rules. All other nonzero, nonblank results are true. For example, the statement <code>if ItemCount</code> would be false only if ItemCount is blank or 0. Similarly, the expression <code>if not ItemCount</code> would yield the opposite result.</p>
+<p>Built-in operators such as NOT/&gt;/=/&lt; automatically produce a true or false value: they yield 1 for true and 0 for false. However, the AND/OR operators always produce one of the input values. For example, in the following expression, the variable <em>Done</em> is assigned 1 if A_Index is greater than 5 or the value of <em>FoundIt</em> in all other cases:</p>
 <pre>Done := A_Index &gt; 5 or FoundIt</pre>
 <p>As hinted above, a variable can be used to hold a false value simply by making it blank or assigning 0 to it. To take advantage of this, the shorthand statement <code>if Done</code> can be used to check whether the variable Done is true or false.</p>
 <p><span id="True"></span><span id="False"></span>In an expression, the keywords <em>true</em> and <em>false</em> resolve to 1 and 0. They can be used to make a script more readable as in these examples:</p>
@@ -72,6 +72,7 @@ MsgBox(1.00)  <em>; Shows 1.0</em></pre>
 
 <h2 id="Operators">Operators in Expressions</h2>
 <p class="note">See <a href="Language.htm#operators">Operators</a> for general information about operators.</p>
+<p>Classes and struct classes can define how many of these operators act on their instances or class objects. See <a href="Objects.htm#Custom_Classes_operators">Operator Overloading</a>.</p>
 <p>Except where noted below, any blank value (empty string) or non-numeric value involved in a math operation is <strong>not</strong> assumed to be zero. Instead, a <a href="lib/Error.htm#TypeError">TypeError</a> is thrown. If <a href="lib/Try.htm">Try</a> is not used, the unhandled exception causes an error dialog by default.</p>
 
 <h3 id="operators">Expression Operators (in descending precedence order)</h3>
@@ -117,8 +118,9 @@ MsgBox(1.00)  <em>; Shows 1.0</em></pre>
     <td class="center bold">++<br>
     --</td>
     <td>
-      <p><strong>Pre- and post-increment/decrement</strong>. Adds or subtracts 1 from a variable. The operator may appear either before or after the variable's name. If it appears <em>before</em> the name, the operation is performed and its result is used by the next operation (the result is a variable reference in this case). For example, <code>Var := ++X</code> increments X and then assigns its value to <em>Var</em>. Conversely, if the operator appears <em>after</em> the variable's name, the result is the value of X prior to performing the operation. For example, <code>Var := X++</code> increments X but <em>Var</em> receives the value X had before it was incremented.</p>
-      <p>These operators can also be used with a property of an object, such as <code>myArray.Length++</code> or <code>--myArray[i]</code>. In these cases, the result of the sub-expression is always a number, not a variable reference.</p>
+      <p><strong>Pre- and post-increment/decrement</strong>. Adds or subtracts 1 from a variable. If the variable contains an object with a <a href="Objects.htm#Custom_Classes_operators"><code>++()</code> or <code>--()</code> definition</a>, that definition is used. Otherwise, an object uses its binary addition or subtraction definition with 1. The result is assigned back to the variable.</p>
+      <p>The operator may appear either before or after the variable's name. If it appears <em>before</em> the name, the operation is performed and its result is used by the next operation. For example, <code>Var := ++X</code> increments X and then assigns its value to <em>Var</em>. Conversely, if the operator appears <em>after</em> the variable's name, the result is the value X had before it was incremented. For example, <code>Var := X++</code> increments X but <em>Var</em> receives the previous value of X.</p>
+      <p>These operators can also be used with a property of an object, such as <code>myArray.Length++</code> or <code>--myArray[i]</code>. The receiver, indices and getter are evaluated only once. If the previous value is an object, postfix returns a reference to that object rather than a copy, so any mutation performed by the operator is visible through both references.</p>
     </td>
   </tr>
   <tr id="pow">
@@ -229,7 +231,8 @@ Var := "The color is " FoundColor    <em>; Auto-concat</em>
       !=<br>
       !==</td>
     <td>
-      <p><strong>Case-insensitive equal (=) / not-equal (!=)</strong> and <strong>case-sensitive equal (==) / not-equal (!==)</strong>. The <strong>==</strong> operator behaves identically to <strong>=</strong> except when either of the inputs is not numeric (or both are strings), in which case <strong>==</strong> is always case-sensitive and <strong>=</strong> is always case-insensitive. The <strong>!=</strong> and <strong>!==</strong> behave identically to their counterparts without <strong>!</strong>, except that the result is inverted.</p>
+      <p><strong>Case-insensitive equal (=) / not-equal (!=)</strong> and <strong>case-sensitive equal (==) / not-equal (!==)</strong>. The <strong>==</strong> operator behaves identically to <strong>=</strong> except when either of the inputs is not numeric (or both are strings), in which case <strong>==</strong> is always case-sensitive and <strong>=</strong> is always case-insensitive. The built-in <strong>!=</strong> and <strong>!==</strong> behave identically to their counterparts without <strong>!</strong>, except that the result is inverted.</p>
+      <p>For <a href="Objects.htm#Custom_Classes_operators">operator definitions</a>, <code>=</code> and <code>!=</code> must be declared together, as must <code>==</code> and <code>!==</code>. Each definition is called independently; inequality is not automatically produced by inverting equality.</p>
       <p>The <strong>==</strong> and <strong>!==</strong> operators can be used to compare strings which contain binary zero. All other comparison operators except <strong>~=</strong> compare only up to the first binary zero.</p>
       <p>For case-insensitive comparisons, only the ASCII letters A-Z are considered equivalent to their lowercase counterparts. To instead compare according to the rules of the current user's locale, use <a href="lib/StrCompare.htm">StrCompare</a> and specify "Locale" for the <em>CaseSense</em> parameter.</p>
     </td>

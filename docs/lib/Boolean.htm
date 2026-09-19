@@ -14,7 +14,7 @@
 <h1>Boolean</h1>
 <pre class="NoIndent">class Boolean extends Integer</pre>
 
-<p>The type of a truth value. Every operator that yields one yields a Boolean: a comparison, a negation, and <a href="Map.htm#Has">Map.Has</a>. The <code class="no-highlight">true</code> and <code class="no-highlight">false</code> keywords are Boolean values too.</p>
+<p>The type of a truth value. Built-in comparisons and logical negation yield a Boolean, as does <a href="Map.htm#Has">Map.Has</a>. The <code class="no-highlight">true</code> and <code class="no-highlight">false</code> keywords are Boolean values too. An <a href="../Objects.htm#Custom_Classes_operators">overloaded operator</a> may return any value.</p>
 
 <p>A Boolean behaves as the <a href="../Concepts.htm#numbers">Integer</a> 1 or 0 in every other respect.</p>
 
@@ -59,17 +59,20 @@ MsgBox 1 is Integer          <em>; 1</em></pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#values">Any</a></p>
     <p>The value to convert.</p>
+    <p>If the value is an object with a <a href="../Objects.htm#Custom_Classes_operators"><code>?()</code> definition</a>, the operator is called and its return value is converted by the same rules. This process repeats if another such object is returned. An object without <code>?()</code> is true.</p>
   </dd>
 </dl>
 
 <h3 id="Call_Return_Value">Return Value</h3>
 <p>Type: <a href="Boolean.htm">Boolean</a></p>
 <p>Returns true if <em>Expression</em> is truthy, else false.</p>
+<h3 id="Call_Error_Handling">Error Handling</h3>
+<p>An unset expression or an unset result from <code>?()</code> raises <a href="Error.htm#UnsetError">UnsetError</a>. Any other error raised by <code>?()</code> is passed on to the caller. The script must ensure that recursive truth tests terminate.</p>
 
 <h2 id="Examples">Examples</h2>
 
 <div class="ex" id="ExOperators">
-<p><a class="ex_number" href="#ExOperators"></a> Every truth-valued operator produces a Boolean.</p>
+<p><a class="ex_number" href="#ExOperators"></a> Built-in comparisons and logical negation produce Booleans.</p>
 <pre>#Import "Ks" { Boolean }
 
 MsgBox (1 &gt; 0) is Boolean              <em>; 1</em>
