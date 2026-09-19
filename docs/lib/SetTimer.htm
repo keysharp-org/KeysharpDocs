@@ -43,7 +43,7 @@
   <dt>Priority</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p>If omitted, it defaults to 0. Otherwise, specify an integer from 0 to 4 to indicate this timer's thread priority. See <a href="../misc/Threads.htm">Threads</a> for details.</p>
+    <p>If omitted, it defaults to 0. Otherwise, specify an integer between -2147483648 and 2147483647 (or an <a href="../Variables.htm#Expressions">expression</a>) to indicate this timer's thread priority. See <a href="../misc/Threads.htm">Threads</a> for details.</p>
     <p>To change the priority of an existing timer without affecting it in any other way, omit <em>Period</em>.</p>
   </dd>
 
@@ -54,8 +54,7 @@
 <p>Although timers may give the illusion that the script is performing more than one task simultaneously, this is not the case. Instead, timed functions are treated just like other threads: they can interrupt or be interrupted by another thread, such as a <a href="../Hotkeys.htm">hotkey subroutine</a>. See <a href="../misc/Threads.htm">Threads</a> for details.</p>
 <p>Whenever a timer is created or updated with a new period, its function will not be called right away; its time period must expire first. If you wish the timer's first execution to be immediate, call the timer's function directly (however, this will not start a new thread like the timer itself does; so settings such as <a href="SendMode.htm">SendMode</a> will not start off at their defaults).</p>
 <p id="reset"><strong>Reset:</strong> If SetTimer is used on an existing timer, the timer is reset (unless <em>Priority</em> is specified and <em>Period</em> is omitted); in other words, the entirety of its period must elapse before its function will be called again.</p>
-<p id="Precision"><strong>Timer precision:</strong> Due to the granularity of the OS's time-keeping system, <em>Period</em> is typically rounded up to the nearest multiple of 10 or 15.6 milliseconds (depending on the type of hardware and drivers installed). A shorter delay may be achieved via Loop+Sleep as demonstrated at <a href="Sleep.htm#ExShorterSleep">DllCall+timeBeginPeriod+Sleep</a>.</p>
-<p id="Reliability"><strong>Reliability:</strong> A timer might not be able to run at the expected time under the following conditions:</p>
+<p id="Precision"><strong>Timer precision:</strong> Due to the granularity of the OS's time-keeping system, <em>Period</em> is typically rounded up to the nearest multiple of 10 or 15.6 milliseconds (depending on the type of hardware and drivers installed). A shorter delay may be achieved via Loop+Sleep as demonstrated at <a href="Sleep.htm#ExShorterSleep">DllCall+timeBeginPeriod+Sleep</a>.</p><p id="Reliability"><strong>Reliability:</strong> A timer might not be able to run at the expected time under the following conditions:</p>
 <ol>
   <li>Other applications are putting a heavy load on the CPU.</li>
   <li>The timer's function is still running when the timer period expires again.</li>
@@ -63,8 +62,8 @@
   <li>The timer has been interrupted by another <a href="../misc/Threads.htm">thread</a>, namely another timed function, <a href="../Hotkeys.htm">hotkey subroutine</a>, or <a href="Menu.htm">custom menu item</a> (this can be avoided via <a href="Critical.htm">Critical</a>). If this happens and the interrupting thread takes a long time to finish, the interrupted timer will be effectively disabled for the duration. However, any other timers will continue to run by interrupting the <a href="../misc/Threads.htm">thread</a> that interrupted the first timer.</li>
   <li>The script is uninterruptible as a result of <a href="Critical.htm">Critical</a> or <a href="Thread.htm">Thread Interrupt/Priority</a>. During such times, timers will not run. Later, when the script becomes interruptible again, any overdue timer will run once as soon as possible and then resume its normal schedule.</li>
 </ol>
-<p>Although timers will operate when the script is <a href="Suspend.htm">suspended</a>, they will not run if the <a href="../misc/Threads.htm">current thread</a> has <a href="Thread.htm#NoTimers">Thread NoTimers</a> in effect. Displaying or navigating a script menu does not disable timers.</p>
-<p>When a timer callback begins, <a href="../Variables.htm#EventInfo">A_EventInfo</a> is set to the function object used to create that timer. The callback can pass this object back to SetTimer to modify or delete itself.</p>
+<p>Although timers will operate when the script is <a href="Suspend.htm">suspended</a>, they will not run if the <a href="../misc/Threads.htm">current thread</a> has <a href="Thread.htm#NoTimers">Thread NoTimers</a> in effect. In addition, they do not operate when the user is navigating through one of the script's menus (such as the <a href="../Program.htm#tray-icon">tray icon</a> menu or a menu bar).</p>
+<p>When a timer callback begins, <a href="../Variables.htm#EventInfo">A_EventInfo</a> is set to the function object used to create that timer.</p>
 <p>Because timers operate by temporarily interrupting the script's current activity, their functions should be kept short (so that they finish  quickly) whenever a long interruption would be undesirable.</p>
 <p id="otherremarks"><strong>Other remarks:</strong> A temporary timer might often be disabled by its own function (see examples at the bottom of this page).</p>
 <p>Whenever a function is called by a timer, it starts off fresh with the default values for settings such as <a href="SendMode.htm">SendMode</a>. These defaults can be changed during <a href="../Scripts.htm#auto">script startup</a>.</p>

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>IsComponentAvailable | Keysharp</title>
+<meta name="description" content="The IsComponentAvailable function reports whether an optional first-party scripting unit is installed or embedded, compatible and loadable." />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="../static/theme.css" rel="stylesheet" type="text/css" />
+<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" type="text/javascript"></script>
+</head>
+<body>
+
+<h1>IsComponentAvailable</h1>
+<p>Reports whether the optional parser or compiler component is available.</p>
+<p>This function is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
+<pre class="Syntax">IsAvailable := <span class="func">IsComponentAvailable</span>(Capability)</pre>
+
+<h2 id="Parameters">Parameters</h2>
+<dl>
+  <dt>Capability</dt>
+  <dd>
+    <p>Type: <a href="../Concepts.htm#strings">String</a></p>
+    <p>Specify <code class="no-highlight">"parser"</code> or <code class="no-highlight">"compiler"</code>. <code class="no-highlight">"parsing"</code> and <code class="no-highlight">"compilation"</code> are accepted as synonyms. The name is not case-sensitive.</p>
+  </dd>
+</dl>
+
+<h2 id="Return_Value">Return Value</h2>
+<p>Type: <a href="../Concepts.htm#boolean">Integer (Boolean)</a></p>
+<p>Returns 1 if the installed or embedded unit is compatible and can be loaded, otherwise 0. Checking a component loads it.</p>
+
+<h2 id="Error_Handling">Error Handling</h2>
+<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>Capability</em> is not a recognised name.</p>
+
+<h2 id="Remarks">Remarks</h2>
+<p>A compiled script which statically calls <a href="RunScript.htm">RunScript</a>, <a href="ValidateScript.htm#CompileScript">CompileScript</a> or <a href="ValidateScript.htm">ValidateScript</a> includes the component it needs. Use <code class="no-highlight">--without-compiler</code> when the script should run without dynamic compilation; see <a href="../Program.htm#components">Optional Scripting Components</a>.</p>
+
+<h2 id="Examples">Examples</h2>
+<div class="ex" id="ExCompiler">
+<p><a class="ex_number" href="#ExCompiler"></a> Uses dynamic compilation only when the compiler is present.</p>
+<pre>#Import "Ks" { IsComponentAvailable, RunScript }
+
+if IsComponentAvailable("compiler")
+    RunScript('FileAppend "compiled dynamically``n", "*"')
+else
+    FileAppend "compiler not installed`n", "*"</pre>
+</div>
+
+<h2 id="Related">Related</h2>
+<p><a href="ValidateScript.htm">ValidateScript and CompileScript</a>, <a href="RunScript.htm">RunScript</a>, <a href="../Program.htm#cmd">Command-Line Options</a></p>
+
+</body>
+</html>

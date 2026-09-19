@@ -37,7 +37,6 @@ Boolean := <span class="func">IsSetRef</span>(&amp;Ref)</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#variable-references">VarRef</a></p>
     <p>An indirect reference to the variable. This would usually not be passed directly, as in <code>IsSetRef(&amp;MyVar)</code>, but indirectly, such as to check a parameter <em>containing</em> a VarRef prior to <a href="../Variables.htm#deref">dereferencing</a> it. </p>
-    <p>This must be an actual VarRef; anything else throws a <a href="Error.htm#TypeError">TypeError</a>. A <a href="../Functions.htm#virtual-reference">virtual reference</a> may stand in for a variable wherever one is written to, but whether a <em>variable</em> has been assigned is a question only a real reference answers.</p>
   </dd>
 
 </dl>

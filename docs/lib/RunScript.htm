@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<title>RunScript and ProcessInfo | Keysharp</title>
+<title>RunScript and ScriptProcess | Keysharp</title>
 <meta name="description" content="Compiles and runs source code dynamically and provides process I/O and status." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,51 +14,58 @@
 <h1>RunScript</h1>
 <p>Dynamically parses, compiles and runs source code.</p>
 <p>This function is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
-<p class="note"><strong>Note:</strong> This function requires the optional compiler component in the calling process. A compiled artifact which calls RunScript includes that component automatically unless it is explicitly excluded. See <a href="ComponentAvailable.htm">ComponentAvailable</a>.</p>
-<pre class="Syntax">Process := <span class="func">RunScript</span>(Code <span class="optional">, CallbackOrAsync, Name := "*", Executable, Options</span>)</pre>
+<p class="note"><strong>Note:</strong> Running source code requires the optional compiler component in the calling process; running an already-compiled script does not. See <a href="../Program.htm#components">Optional Scripting Components</a> and <a href="IsComponentAvailable.htm">IsComponentAvailable</a>.</p>
+<pre class="Syntax">Process := <span class="func">RunScript</span>(Code <span class="optional">, Async := false, Callback, Name := "*", Executable, Options</span>)</pre>
 
 <h2 id="Parameters">Parameters</h2>
 <dl>
   <dt>Code</dt>
-  <dd><p>Type: String</p><p>The source code to compile and execute.</p></dd>
-  <dt>CallbackOrAsync</dt>
-  <dd><p>If this is a function object, it is called with the ProcessInfo after the script exits. Any other non-zero, non-unset value starts the run asynchronously without a callback. If omitted or zero, execution is synchronous.</p></dd>
+  <dd><p>Type: String</p><p>The source code to compile and execute, or the path of a script file. If a file of that name exists it is used. A <code class="no-highlight">.cks</code> or <code class="no-highlight">.dll</code> file is taken as an already-compiled script and run without being compiled.</p></dd>
+  <dt>Async</dt>
+  <dd><p>If true, the function returns as soon as the child starts. If false or omitted, it waits until the child exits. A synchronous call drains standard output and standard error concurrently while it waits, so filling either pipe does not block the child.</p>
+    <p>For an asynchronous call, read both <a href="#StdOut">StdOut</a> and <a href="#StdErr">StdErr</a> while a verbose child is running so neither pipe fills.</p></dd>
+  <dt>Callback</dt>
+  <dd><p>Type: <a href="Func.htm">Func</a></p><p>An optional function called with the ScriptProcess as its only parameter once the child exits. It is called on the <a href="RealThread.htm">real thread</a> which called RunScript, and a pending callback keeps the script running.</p></dd>
   <dt>Name</dt>
-  <dd><p>The script name. The default <code class="no-highlight">"*"</code> indicates that source is supplied through standard input rather than loaded from a file.</p></dd>
+  <dd><p>The script name. The default is <code class="no-highlight">"*"</code>.</p></dd>
   <dt>Executable</dt>
   <dd><p>An executable path used to run the compiled assembly. If omitted, the current executable is used.</p>
   </dd>
   <dt>Options</dt>
   <dd><p>Type: String or Array</p>
     <p><a href="../Program.htm#cmd">Command-line switches</a> for this script. A string is split on whitespace, with double quotes grouping an argument which contains spaces and being removed:</p>
-    <pre>RunScript(src, , , , '--define:FEATURE_X --include "My include.ahk"')</pre>
+    <pre>RunScript(src, , , , , '--define:FEATURE_X --include "My include.ahk"')</pre>
     <p>An Array supplies each argument separately, which needs no quoting and is the reliable form when a value may contain quotes or trailing backslashes:</p>
-    <pre>RunScript(src, , , , ["--define:FEATURE_X", "--include", "My include.ahk"])</pre>
-    <p>Nothing is inherited from the calling script; this is a separate compilation in a separate process, so it states what it needs.</p>
-    <p><code class="no-highlight">--define</code> is applied to the compilation this function performs, because the child process receives an already-compiled assembly and a symbol given to it would arrive after the conditionals were resolved. It is therefore rejected when <em>Code</em> names a <code class="no-highlight">.cks</code> or <code class="no-highlight">.dll</code>, which was compiled beforehand. Every other switch is passed to the child process.</p>
+    <pre>RunScript(src, , , , , ["--define:FEATURE_X", "--include", "My include.ahk"])</pre>
+    <p>No switches are inherited from the calling script.</p>
+    <p><code class="no-highlight">--define</code> applies to the compilation of <em>Code</em>; every other switch is passed to the child process.</p>
   </dd>
 </dl>
 
 <h2 id="Return_Value">Return Value</h2>
-<p>Type: ProcessInfo</p>
-<p>Returns an object which encapsulates the child process and its I/O. Compilation and assembly data are cached, making repeated calls faster than manually starting processes and writing source to standard input.</p>
+<p>Type: ScriptProcess</p>
+<p>Returns an object which encapsulates the child process and its I/O.</p>
 
-<h2 id="ProcessInfo">Process Object (ProcessInfo)</h2>
+<h2 id="Error_Handling">Error Handling</h2>
+<p>An <a href="Error.htm">Error</a> is thrown if the compiler component is needed but not installed, or if <em>Code</em> fails to compile; its message contains the compiler's report.</p>
+<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>Options</em> contains an invalid <code class="no-highlight">--define</code>, or any <code class="no-highlight">--define</code> when <em>Code</em> names an already-compiled script.</p>
+
+<h2 id="ScriptProcess">Process Object (ScriptProcess)</h2>
 <p>The object returned by RunScript encapsulates the child process and its redirected I/O. This object has the following methods and properties:</p>
 <p id="HasExited"><strong>Process.HasExited:</strong> Returns 1 if the process has exited and 0 while it is still running.</p>
-<p id="ExitCode"><strong>Process.ExitCode:</strong> Returns the process exit code. This is meaningful only once the process has exited.</p>
-<p id="ExitTime"><strong>Process.ExitTime:</strong> Returns the time the process exited, in <a href="../Variables.htm#YYYY">YYYYMMDDHH24MISS</a> form.</p>
+<p id="ExitCode"><strong>Process.ExitCode:</strong> Returns the process exit code, or an empty string while the process is still running.</p>
+<p id="ExitTime"><strong>Process.ExitTime:</strong> Returns the time the process exited, in <a href="../Variables.htm#YYYY">YYYYMMDDHH24MISS</a> form, or an empty string while it is still running.</p>
 <p id="StdOut"><strong>Process.StdOut:</strong> Returns the process's standard output as a <a href="File.htm">File</a> object, for reading.</p>
 <p id="StdErr"><strong>Process.StdErr:</strong> Returns the process's standard error as a <a href="File.htm">File</a> object, for reading.</p>
-<p id="StdIn"><strong>Process.StdIn:</strong> Returns the process's standard input as a <a href="File.htm">File</a> object, for writing.</p>
+<p id="StdIn"><strong>Process.StdIn:</strong> Returns the process's standard input as a <a href="File.htm">File</a> object, for writing. Call <code>Close()</code> on this File when the child reads until end-of-file.</p>
 <p id="Kill"><strong>Process.Kill():</strong> Terminates the process.</p>
-<p id="Close"><strong>Process.Close():</strong> Closes the redirected streams and releases the process's resources. It does not terminate a running process; use <a href="#Kill">Kill</a> for that.</p>
-<p>The three stream properties are created on first access and are the same object on every subsequent access, so a partially consumed stream keeps its position.</p>
+<p id="Close"><strong>Process.Close():</strong> Closes the redirected streams, cancels a pending exit callback and releases the process's resources. It does not terminate a running process; use <a href="#Kill">Kill</a> for that.</p>
+<p>A stream property returns the same object on every access after the first, so a partially read StdOut keeps its position.</p>
 
 <h2 id="Examples">Examples</h2>
 <pre>#Import "Ks" { RunScript }
 Process := RunScript('FileAppend "hello``n", "*"')
-MsgBox Process.StdOut</pre>
+MsgBox Process.StdOut.Read()</pre>
 
 </body>
 </html>

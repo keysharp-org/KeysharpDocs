@@ -98,7 +98,7 @@ MsgBox "This line is not commented out."
 MsgBox "This line is not commented out."
 </pre>
 <p>In AutoHotkey, excluding tabs and spaces, <code><em>/*</em></code> must appear at the start of the line, while <code><em>*/</em></code> can appear only at the start or end of a line. It is also valid to omit <code><em>*/</em></code>, in which case the remainder of the file is commented out.</p>
-<p>Keysharp accepts <code><em>/*</em></code> anywhere on a line and treats the comment as whitespace, so <code>x := 1<em>/*c*/</em>23</code> reads as <code class="no-highlight">1 23</code> and produces the string <code class="no-highlight">"123"</code> by <a href="Variables.htm#concat">concatenation</a>, where AutoHotkey reports a missing operand. Because it is whitespace and not nothing, it separates what it sits between: <code>a<em>/*c*/</em>.5</code> is the member access <code>a .5</code>, not a concatenation with <code class="no-highlight">0.5</code>. A block comment which spans lines acts as a line break instead, so an expression continues across it only through <a href="Scripts.htm#continuation-line">operator continuation</a>. An unterminated <code><em>/*</em></code> comments out the remainder of the file, as in AutoHotkey.</p>
+<p>In Keysharp, <code><em>/*</em></code> can appear anywhere on a line. A comment which ends on the same line acts as whitespace, so <code>x := 1<em>/*c*/</em>23</code> produces the string <code class="no-highlight">"123"</code> by <a href="Variables.htm#concat">concatenation</a>. A comment which spans lines acts as a line break. An unterminated <code><em>/*</em></code> also comments out the remainder of the file.</p>
 <p>Since comments are filtered out when the script is read from file, they do not impact performance or memory utilization.</p>
 
 <h2 id="expressions">Expressions</h2>
@@ -187,25 +187,24 @@ MsgBox "This line is not commented out."
 <p>Although a function call expression usually begins with a literal function name, the target of the call can be any expression which produces a <a href="misc/Functor.htm">function object</a>. In the expression <code>GetKeyState("Shift")</code>, <em>GetKeyState</em> is actually a variable reference, although it usually refers to a read-only variable containing a built-in function.</p>
 
 <h4 id="named-parameters">Named Parameters</h4>
-<p class="note"><strong>Keysharp extension.</strong> This syntax does not exist in AutoHotkey v2.</p>
+<p>Named arguments are a Keysharp extension.</p>
 <p>An argument can name the parameter it is for, instead of relying on its position:</p>
 <pre>Picture.Search(needle, Variation: 20)
 MsgBox("Save changes?", Options: "YesNoCancel", Title: "Confirm")
 RegExMatch(haystack, needle, OutputVar: &amp;match)
 MsgBox "text", Options: "OK"  <em>; function call statements too</em></pre>
-<p>This is most useful for skipping over optional parameters. <code>SubStr(s, StartingPos: 2)</code> says what <code>SubStr(s, 2)</code> does not, and <code>Picture.Search(needle, Variation: 20)</code> replaces counting commas in <code>Picture.Search(needle, , , , , 20)</code>.</p>
-<p>The name is matched against the callee's parameter names, case-insensitively, as they appear in this documentation. <strong>A name that does not match any parameter is an error</strong> &mdash; it is never silently ignored, which is the main advantage over passing an options object.</p>
+<p>This is most useful for skipping over optional parameters.</p>
+<p>The name is matched against the callee's parameter names, case-insensitively, as they appear in this documentation. A name which matches no parameter is an error, which <a href="lib/_Warn.htm#NamedArg">#Warn NamedArg</a> also reports before the script runs when the function being called can be identified from its name.</p>
 <h5 id="named-parameter-rules">Rules</h5>
 <ul>
   <li>Named arguments must come after all positional ones. A positional argument, a <a href="Functions.htm#VariadicCall">variadic</a> <code>*</code> argument, or an omitted argument may not follow a named one.</li>
   <li>The same parameter may not be supplied twice, whether by two names or by position and name together. An <em>omitted</em> argument supplied nothing, so a name may fill that parameter: <code>f(, Alpha: 1)</code> supplies the first parameter by name.</li>
   <li>A parameter skipped over is unset, exactly as if it had been left blank.</li>
-  <li>The name may be written literally, or computed by <a href="Variables.htm#deref">dereferencing</a> &mdash; <code>%Variable%: value</code>, or in part, <code>Prefix%Variable%: value</code> &mdash; exactly as an <a href="Objects.htm#object-literal">object literal</a> forms a key. A computed name cannot be checked before the script runs, so <a href="lib/_Warn.htm#NamedArg">#Warn NamedArg</a> passes over it and only the run-time check reports a mistake; and two that produce the same name keep the last, as two object-literal keys would, rather than being reported as supplying a parameter twice.</li>
-  <li>A quoted string is not a name: <code>"Name": value</code> is an error. Parameters are named by identifiers, and one bracket away the same text means a <a href="lib/Map.htm">Map</a> entry.</li>
+  <li>The name may be written literally, or computed by <a href="Variables.htm#deref">dereferencing</a> &mdash; <code>%Variable%: value</code>, or in part, <code>Prefix%Variable%: value</code> &mdash; exactly as an <a href="Objects.htm#object-literal">object literal</a> forms a key. <a href="lib/_Warn.htm#NamedArg">#Warn NamedArg</a> does not check a computed name, and when two computed names are the same, the last one is used.</li>
+  <li>A quoted string is not a name: <code>"Name": value</code> is an error.</li>
   <li>Named arguments are not available in <code>[]</code>, where <code>[Key: Value]</code> already creates a <a href="lib/Map.htm">Map</a>.</li>
-  <li>The <a href="Functions.htm#Variadic">variadic</a> parameter cannot be named &mdash; a variadic tail is positional by nature &mdash; and neither can the object a method is called on.</li>
+  <li>The <a href="Functions.htm#Variadic">variadic</a> parameter cannot be named, and neither can the object a method is called on.</li>
   <li>Any <a href="Functions.htm#Variadic">variadic</a> function accepts a name it does not declare: the argument is collected into the variadic parameter as an ordinary trailing element (see <a href="#named-parameter-forwarding">forwarding</a>) rather than reported. A wrapper relays it onward, where the eventual target reports a misspelling; a variadic function that instead consumes its collected arguments as values (<a href="lib/Format.htm">Format</a>, <a href="lib/Array.htm#Push">Push</a>, <a href="lib/Math.htm#Max">Max</a>) receives them as one <a href="lib/NamedArgs.htm">NamedArgs</a> value.</li>
-  <li>Whether a <a href="lib/NamedArgs.htm">NamedArgs</a> binds by name is decided by its position at the callee: only the <em>last</em> argument does. One that is followed by a positional argument &mdash; for example one a spread re-emitted in <code>f(args*, y)</code> &mdash; is passed as an ordinary positional value instead.</li>
 </ul>
 
 <h5 id="named-parameter-forwarding">Forwarding through a wrapper</h5>
@@ -215,23 +214,10 @@ MsgBox "text", Options: "OK"  <em>; function call statements too</em></pre>
     OldMsgBox(Params*)
 }
 _MsgBox("Save changes?", Title: "Confirm")  <em>; Title reaches OldMsgBox</em></pre>
-<p>This works because a call's named arguments are a first-class value: a single <a href="lib/NamedArgs.htm">NamedArgs</a> object, a case-insensitive <a href="lib/Map.htm">Map</a> whose keys are the names, which the variadic parameter collects as an ordinary trailing element and a <a href="Functions.htm#VariadicCall">variadic call</a> re-emits. The collected names are countable and inspectable like any other element:</p>
-<pre>Peek(Params*) {
-    MsgBox Params.Length            <em>; 2</em>
-    MsgBox Params[2]["Title"]      <em>; "Confirm"</em>
-}
-Peek("Save changes?", Title: "Confirm")</pre>
-<p>Because the two directions are symmetric, constructing a NamedArgs by hand is how a named call is made dynamically &mdash; wherever one ends an argument list, it <em>is</em> the call's named arguments:</p>
-<pre>#Import "Ks" { NamedArgs }
-MsgBox("Save changes?", NamedArgs("Title", "Confirm"))
-args := ["Save changes?", NamedArgs("Title", "Confirm")]
-MsgBox(args*)</pre>
-<p>NamedArgs derives from <a href="lib/Map.htm">Map</a>, and the type itself carries the meaning, as with a <a href="Concepts.htm#variable-references">VarRef</a>: one passed last is always read as the call's named arguments. That position is therefore <em>reserved</em> for the role &mdash; a NamedArgs cannot be passed as data (<code>Type(na)</code> reports that <em>na</em>'s names are not parameters of Type). Inspect one through the ordinary Map interface, which takes it as the object being operated <em>on</em> rather than as an argument (<code>na["Title"]</code>, <code>na.Has("Title")</code>, <code>for Name, Value in na</code>); to pass one as data, put it in an <a href="lib/Array.htm">Array</a> or an object property.</p>
-<p>A name the eventual target does not declare is still reported &mdash; by that target, which is where the useful message is, rather than by the wrapper that merely passed it along.</p>
+<p>The variadic parameter receives the named arguments as a trailing <a href="lib/NamedArgs.htm">NamedArgs</a> element, which a variadic call passes on as named arguments. See <a href="lib/NamedArgs.htm">NamedArgs</a> for inspecting them or building a named call at run time.</p>
 <h5 id="named-parameter-targets">What can be called this way</h5>
-<p>Script functions and methods, built-in functions, class constructors (the name refers to a parameter of <a href="Objects.htm#Custom_NewDelete">__New</a>) &mdash; built-in classes included, using their documented constructor parameters (<code>Buffer(ByteCount: 16)</code>, <code>Error(Message: "failed")</code>, <code>InputHook(Options: "V")</code>) &mdash; <a href="lib/Func.htm#Bind">bound functions</a>, <a href="lib/ComObject.htm">COM</a> objects, and <a href="lib/Clr.htm">Clr</a> calls. For a COM object the names are resolved by the object itself through IDispatch; for a Clr call they also select which overload is used, so <code>Clr.System.Convert.ToString(Value: 255, ToBase: 16)</code> picks the two-argument overload.</p>
+<p>Script functions and methods, built-in functions, class constructors (the name refers to a parameter of <a href="Objects.htm#Custom_NewDelete">__New</a>) &mdash; built-in classes included, using their documented constructor parameters (<code>Buffer(ByteCount: 16)</code>, <code>Error(Message: "failed")</code>, <code>InputHook(Options: "V")</code>) &mdash; <a href="lib/Func.htm#Bind">bound functions</a>, <a href="lib/ComObject.htm">COM</a> objects, and <a href="lib/Clr.htm">Clr</a> calls. For a COM object the names are resolved by the object itself; for a Clr call they also select which overload is used, so <code>Clr.System.Convert.ToString(Value: 255, ToBase: 16)</code> picks the two-argument overload.</p>
 <p><a href="lib/Func.htm#Params">Func.Params</a> reports the names a given function accepts.</p>
-<p>A misspelled name is reported at build time by <a href="lib/_Warn.htm">#Warn NamedArg</a> whenever the function being called can be identified from its name, and always raises an error when the call runs.</p>
 <h4 id="function-call-statements">Function Call Statements</h4>
 <p>If the return value of the function is not needed and the function name is written at the start of the line (or in other contexts which allow a <a href="Concepts.htm#statement">statement</a>, such as following <code>else</code> or a <a href="Hotkeys.htm">hotkey</a>), the parentheses can be omitted. In this case, the remainder of the line is taken as the function's parameter list. For example:</p>
 <pre>result := MsgBox("This one requires parentheses.",, "OKCancel")
@@ -239,7 +225,6 @@ MsgBox "This one doesn't. The result was " result "."</pre>
 <p>Parentheses can also be omitted when calling a <a href="Concepts.htm#methods">method</a> in this same context, but only when the target object is either a variable or a directly named property, such as <code>myVar.myMethod</code> or <code>myVar.myProp.myMethod</code>.</p>
 <p>As with function call expressions, the target of a function call statement does not have to be a predefined function; it can instead be a variable containing a <a href="misc/Functor.htm">function object</a>.</p>
 <p>A function call statement can <a href="Scripts.htm#continuation">span multiple lines</a>.</p>
-<p>The name must be followed by whitespace, a <code>(</code>, or the end of the line. A comma written immediately after it is a syntax error &mdash; <em>function calls require a space or "(" &mdash; use a comma only between parameters</em> &mdash; which catches the AutoHotkey&nbsp;v1 command form <code class="no-highlight">MsgBox, "a"</code>. With a space before it the comma omits the first parameter instead, so <code class="no-highlight">MsgBox , "a"</code> passes <code class="no-highlight">"a"</code> as the second. The error applies to any name that begins a statement, including a bare variable (<code class="no-highlight">x, y := 2</code>) and a member chain (<code class="no-highlight">obj.Method, 1</code>); a name that indexes or calls before the comma is an <a href="#expression-statements">expression statement</a> and is unaffected (<code class="no-highlight">arr[1], x := 4</code>).</p>
 <p>Function call statements have the following limitations:</p>
 <ul>
   <li>If there is a return value, it is always discarded.</li>

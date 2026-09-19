@@ -23,8 +23,8 @@
   <dt>X2, Y2</dt>
   <dd><p>Type: Integer</p><p>The coordinates of the opposite corner, in screen coordinates. This corner is exclusive: a cursor confined by <code>ClipCursor(0, 0, 100, 100)</code> can reach x&nbsp;99 but not x&nbsp;100.</p></dd>
 </dl>
-<p>Pass either all four coordinates or none. Passing some but not all of them throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
-<p>The corners may be given in any order; the region is normalized before it is applied.</p>
+<p>Passing some but not all of the coordinates throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+<p>The corners may be given in any order.</p>
 
 <h2 id="Return_Value">Return Value</h2>
 <p>This function does not return a meaningful value.</p>
@@ -32,22 +32,19 @@
 <h2 id="Remarks">Remarks</h2>
 <p>Calling ClipCursor with no parameters releases any active confinement:</p>
 <pre>ClipCursor()  <em>; The cursor can move freely again.</em></pre>
-<p>Only physical mouse movement is confined. Movement produced by the script, such as <a href="MouseMove.htm">MouseMove</a> or <a href="Click.htm">Click</a>, passes through the region boundary, so a script can still place the cursor anywhere on the screen while a confinement is active.</p>
-<p>If the cursor is outside the region when ClipCursor is called, it is moved inside immediately rather than waiting for the next movement.</p>
-<p>The confinement is enforced through the mouse hook, which is installed automatically if it is not already running and is left installed after the confinement is released. This mirrors the behavior of <a href="BlockInput.htm">BlockInput</a>'s <code>MouseMoveOff</code> mode.</p>
-<p>A confinement belongs to the running script, not to a window. It stays in effect regardless of which window is active, until it is released or the script exits. Because a confined cursor is easy to mistake for a frozen system, release it as soon as it is no longer needed.</p>
-
-<h3 id="Windows">Windows</h3>
-<p>Cursor confinement is available through the low-level mouse hook and requires no additional setup.</p>
+<p>Only physical mouse movement is confined. Movement produced by the script, such as <a href="MouseMove.htm">MouseMove</a> or <a href="Click.htm">Click</a>, passes through the region boundary.</p>
+<p>If the cursor is outside the region when ClipCursor is called, it is moved inside immediately.</p>
+<p>ClipCursor installs the mouse hook if it is not already installed; the hook remains installed after the confinement is released.</p>
+<p>The confinement stays in effect regardless of which window is active, until it is released or the script exits. Because a confined cursor is easy to mistake for a frozen system, release it as soon as it is no longer needed.</p>
 
 <h3 id="Linux">Linux</h3>
 <p>Cursor confinement requires the <code class="no-highlight">keysharp-input</code> mouse hook and a <code class="no-highlight">keysharp-desktop</code> backend which can both query and move the cursor. If either is unavailable, the function throws an <a href="Error.htm#OSError">OSError</a>. See <a href="../howto/Install.htm#Linux">Installing on Linux</a> and <a href="../Platforms.htm#Linux">Linux Platform Support</a>.</p>
 
 <h3 id="macOS">macOS</h3>
-<p>Cursor confinement is implemented by monitoring and suppressing out-of-bounds physical movement. It requires both Input Monitoring and Accessibility permission. If the global mouse hook cannot be activated, the function throws an <a href="Error.htm#OSError">OSError</a>. See <a href="../Platforms.htm#macOS_Permissions">macOS Permissions</a>.</p>
+<p>Cursor confinement requires both Input Monitoring and Accessibility permission. If the global mouse hook cannot be activated, the function throws an <a href="Error.htm#OSError">OSError</a>. See <a href="../Platforms.htm#macOS_Permissions">macOS Permissions</a>.</p>
 
 <h2 id="Related">Related</h2>
-<p><a href="MouseGetPos.htm">MouseGetPos</a>, <a href="MouseMove.htm">MouseMove</a>, <a href="BlockInput.htm">BlockInput</a>, <a href="../Modules.htm#KS">KS module</a></p>
+<p><a href="MouseGetPos.htm">MouseGetPos</a>, <a href="MouseMove.htm">MouseMove</a>, <a href="BlockInput.htm">BlockInput</a></p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExBasic">

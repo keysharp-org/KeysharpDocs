@@ -46,8 +46,9 @@ MsgBox g        <em>; Without the declaration, the above assigned to a local "g"
     <p id="Unreachable"><strong>Unreachable:</strong> Before the script starts to run, show a warning for each line that immediately follows a <code>Return</code>, <code>Break</code>, <code>Continue</code>, <code>Throw</code> or <code>Goto</code> at the same nesting level, unless that line is the target of a label. Any such line would never be executed.</p>
     <p>If the code is intended to be unreachable - such as if a <code>return</code> has been used to temporarily disable a block of code, or a hotkey or hotstring has been temporarily disabled by commenting it out - consider commenting out the unreachable code as well. Alternatively, the warning can be suppressed by defining a <a href="../misc/Labels.htm">label</a> above the first unreachable line.</p>
     <p id="NamedArg"><strong>NamedArg:</strong> <span class="ver">[Keysharp]</span> Before the script starts to run, show a warning for a <a href="../Language.htm#named-parameters">named argument</a> whose name is not a parameter of the function being called. Also warns when a parameter is supplied both positionally and by name, and when a name refers to something that cannot be supplied as an argument (the <a href="../Functions.htm#Variadic">variadic</a> parameter, or the object a method is called on).</p>
-    <p>Only calls whose target can be identified at build time are checked: a function named directly, and constructors of classes defined in the script. A call through a variable or on an object is checked when it runs, since which function that is cannot be known until then. Either way the call raises an error if the name is wrong; this warning only reports it sooner.</p>
+    <p>Only calls to a function or class by name are checked. Any call with an unknown parameter name raises an error when it runs.</p>
     <p>The one false positive to expect is a script that reassigns a function name and then calls the replacement by name. Use <code>#Warn NamedArg, Off</code> in that case.</p>
+    <p id="Experimental"><strong>Experimental:</strong> <span class="ver">[Keysharp]</span> Report a compiler warning once per experimental class resolved through an import, including an explicit import that is unused. Applies to <a href="Image.htm">Image</a>, <a href="Audio.htm">Audio</a>, <a href="Monitor.htm#KS">Monitor</a>, <a href="Clr.htm">Clr</a> and <a href="Overlay.htm">Overlay</a>. These classes and their nested types may change or be removed without deprecation. Dynamic object access is not checked. The warning is reported when the script is compiled, as <a href="KeysharpDirectives.htm#Error">#Warning</a> is, whichever mode enables it.</p>
     <p><strong>All:</strong> Apply the given <em>WarningMode</em> to all supported warning types.</p>
   </dd>
 
@@ -69,15 +70,15 @@ MsgBox g        <em>; Without the declaration, the above assigned to a local "g"
 <p>This warning uses the default output mode, and cannot be disabled except by setting the default mode to Off.</p>
 
 <h2 id="Remarks">Remarks</h2>
-	<p>If this directive is unspecified in the script, all warnings are enabled and use the MsgBox mode, except for LocalSameAsGlobal, which is disabled. NamedArg is enabled by default.</p>
+	<p>If this directive is unspecified in the script, all warnings are enabled and use the MsgBox mode, except for LocalSameAsGlobal and Experimental, which are disabled.</p>
 <p><span class="ver">[v2.1-alpha.12+]</span>: Each <a href="../Modules.htm">module</a> has its own warning settings. Modules defined with <a href="_Module.htm">#Module</a> default to the same settings as the previous module. For the default module and modules loaded by <a href="_Import.htm">#Import</a>, VarUnset and Unreachable default to On and LocalSameAsGlobal defaults to Off.</p>
 <p><span class="ver">[v2.1-alpha.12+]</span>: A program-wide default mode can be set by using <code>#Warn <i>WarningMode</i></code>, with any mode except On. The last such directive affects all warnings which are enabled by default, and all warnings for which <em>WarningMode</em> was set to On. <code>#Warn Off</code> causes those warnings to be ignored. The following special cases also exist:</p>
 <ul>
-  <li><code>#Warn</code>: Turns on VarUnset, Unreachable and NamedArg and turns off LocalSameAsGlobal for the current module.</li>
+  <li><code>#Warn</code>: Turns on VarUnset, Unreachable and NamedArg and turns off LocalSameAsGlobal for the current module. Experimental is unchanged.</li>
   <li><code>#Warn On</code>: Turns on VarUnset, Unreachable and NamedArg for the current module.</li>
 </ul>
 <p>The checks which produce VarUnset, LocalSameAsGlobal and Unreachable warnings are performed after all directives have been parsed, but before the script executes. Therefore, the location within a module is not significant (and, like other directives, #Warn cannot be executed conditionally).</p>
-<p>However, the ordering of multiple #Warn directives is significant when <em>WarningType</em> is specified: the last occurrence that sets a given warning determines the mode for that warning.  So, for example, the two statements below have the combined effect of enabling all warnings except LocalSameAsGlobal (which is also the default configuration):</p>
+<p>However, the ordering of multiple #Warn directives is significant when <em>WarningType</em> is specified: the last occurrence that sets a given warning determines the mode for that warning.  So, for example, the two statements below have the combined effect of enabling all warnings except LocalSameAsGlobal:</p>
 <pre>#Warn All
 #Warn LocalSameAsGlobal, Off
 </pre>

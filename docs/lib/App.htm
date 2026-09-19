@@ -20,95 +20,62 @@
 <pre>#Import "Ks" { App }
 MsgBox App.Title " " App.Version</pre>
 
-<p>Importing the module instead of the member reaches the same class through it:</p>
-
-<pre>#Import "Ks"
-MsgBox Ks.App.Title " " Ks.App.Version</pre>
-
-<p class="note"><strong>Note:</strong> There is one application per process, so this class has no instances and every member is used directly on the class. Calling <code class="no-highlight">App()</code> throws an <a href="Error.htm">Error</a>. Every member is read-only; assigning to one throws a <a href="Error.htm#PropertyError">PropertyError</a>.</p>
-
-<p><a href="_App.htm">#App</a> declares what must be fixed before the application starts; <code>App</code> reports the running assembly. Not every <code>#App</code> key has an <code>App</code> member; see <a href="#NoMember">Settings With No App Member</a>.</p>
+<p class="note"><strong>Note:</strong> This class has no instances; its members are used directly on the class. Calling <code class="no-highlight">App()</code> throws an <a href="Error.htm">Error</a>. Every member is read-only; assigning to one throws a <a href="Error.htm#PropertyError">PropertyError</a>.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
   <li><a href="#Metadata">Assembly Metadata</a></li>
   <li><a href="#Invocation">Invocation</a></li>
   <li><a href="#Exit">Exit State</a></li>
-  <li><a href="#NoMember">Settings With No App Member</a></li>
   <li><a href="#Remarks">Remarks</a></li>
   <li><a href="#Examples">Examples</a></li>
 </ul>
 
 <h2 id="Metadata">Assembly Metadata</h2>
 <pre class="Syntax">Value := App.<span class="func">Title</span></pre>
-<p>Nine strings, each read from the .NET assembly attribute the matching <a href="_App.htm#Keys">#App key</a> sets.</p>
+<p>Each is the value of the matching <a href="_App.htm#Keys">#App key</a>.</p>
 <table class="info">
   <tr><th style="width:12em">Property</th><th abbr="Descr">Description</th></tr>
   <tr id="Name"><td><code>App.Name</code></td><td>The assembly's identity, which always has a value: without the <code>Name</code> key it is the script's file name without its extension, or <code class="no-highlight">*</code> when the script was compiled from standard input.</td></tr>
-  <tr id="Title"><td><code>App.Title</code></td><td>The application title: assembly metadata, shown on Windows in a compiled executable's file properties. It is <em>not</em> the default dialog or window title, which remains <a href="../Variables.htm#ScriptName">A_ScriptName</a>.</td></tr>
+  <tr id="Title"><td><code>App.Title</code></td><td>The application title: assembly metadata, shown on Windows in a compiled executable's file properties.</td></tr>
   <tr id="Description"><td><code>App.Description</code></td><td>The application description.</td></tr>
   <tr id="Configuration"><td><code>App.Configuration</code></td><td>The build configuration label, such as <code class="no-highlight">Release</code>.</td></tr>
   <tr id="Company"><td><code>App.Company</code></td><td>The company name.</td></tr>
   <tr id="Product"><td><code>App.Product</code></td><td>The product name.</td></tr>
   <tr id="Copyright"><td><code>App.Copyright</code></td><td>The copyright notice.</td></tr>
   <tr id="Trademark"><td><code>App.Trademark</code></td><td>The trademark notice.</td></tr>
-  <tr id="Version"><td><code>App.Version</code></td><td>The application's own version, which the <code>Version</code> key stamps onto both the assembly and the file version. See <a href="#Versions">Three versions</a>.</td></tr>
+  <tr id="Version"><td><code>App.Version</code></td><td>The application's version.</td></tr>
 </table>
 
-<p>A key which was never declared reads as an empty string, in both <a href="_Requires.htm#CompatMode">compatibility modes</a>, rather than raising. <code>App.Name</code> is never blank.</p>
-
-<p class="note"><strong>Note:</strong> <code>App.Company != ""</code> is the supported test for whether a key was declared, since <a href="_App.htm">#App</a> rejects an empty declared string at compile time. <a href="Object.htm#HasOwnProp">HasOwnProp</a> is not: it reports every declared property present, so <code>App.HasOwnProp("Company")</code> is true whether or not the key was ever set.</p>
-
-<h3 id="Versions">Three versions</h3>
-<p>Three separate versions are readable, and only the first is the application's.</p>
-<table class="info">
-  <tr><th style="width:14em">Value</th><th abbr="Descr">Reports</th></tr>
-  <tr><td><code>App.Version</code></td><td>The version of the application itself, declared by <a href="_App.htm#Keys">#App</a>.</td></tr>
-  <tr><td><a href="../Variables.htm#AhkVersion">A_AhkVersion</a></td><td>The AutoHotkey compatibility level targeted.</td></tr>
-  <tr><td><a href="../Variables.htm#A_KsVersion">Ks.A_KsVersion</a></td><td>The Keysharp engine build.</td></tr>
-</table>
-<p><code>App.Version</code> is an assembly version: two to four decimal components, each from 0 through 65534. That format has no room for a semantic-versioning prerelease tag such as <code class="no-highlight">1.2.0-beta.1</code>.</p>
+<p>A key which was never declared reads as an empty string.</p>
 
 <h2 id="Invocation">Invocation</h2>
 
 <h3 id="CommandLine">CommandLine</h3>
 <pre class="Syntax">Line := App.<span class="func">CommandLine</span></pre>
-<p>The command line this <em>process</em> was launched with: the host executable followed by every argument, with any token containing a space wrapped in quotes. Quoting is normalized rather than preserved byte for byte.</p>
+<p>The command line this <em>process</em> was launched with: the host executable followed by every argument, with any token containing a space wrapped in quotes. Quoting is normalized.</p>
 <p>In an interpreted run, token 0 is the Keysharp executable &mdash; the same path as <a href="../Variables.htm#AhkPath">A_AhkPath</a> &mdash; and any <a href="../Program.htm#cmd">engine switches</a> precede the script path:</p>
 <pre class="no-highlight">"C:\Program Files\Keysharp\Keysharp.exe" --errorstdout C:\Tool.ks report.csv</pre>
-<p>Only the last token came from the script's own caller. A compiled application reports its own executable. The script's own arguments are <a href="../Variables.htm#Args">A_Args</a>.</p>
+<p>A compiled application reports its own executable. The script's own arguments are <a href="../Variables.htm#Args">A_Args</a>.</p>
 
 <h2 id="Exit">Exit State</h2>
-<p>Both members report an exit in progress to code which is <em>not</em> an <a href="OnExit.htm">OnExit</a> callback &mdash; a <a href="../Objects.htm#Custom_NewDelete">__Delete</a>, a timer, a library &mdash; and stay readable through the whole teardown.</p>
+<p>Both members report an exit in progress to code outside an <a href="OnExit.htm">OnExit</a> callback, such as a <a href="../Objects.htm#Custom_NewDelete">__Delete</a> method which runs during teardown.</p>
 
 <h3 id="ExitReason">ExitReason</h3>
 <pre class="Syntax">Reason := App.<span class="func">ExitReason</span></pre>
 <p>Why the application is exiting: the same string an <a href="OnExit.htm">OnExit</a> callback receives as its first parameter, from the <a href="OnExit.htm#ExitReason">list of exit reasons</a>.</p>
-<p>It is non-empty from the moment the exit begins, including while the OnExit callbacks run, and an empty string when no exit is in progress or once a callback cancels one.</p>
+<p>It is set once every OnExit callback has run without cancelling the exit, and stays set through the rest of teardown. Before then, including while the callbacks run, it is an empty string.</p>
 
 <h3 id="ExitCode">ExitCode</h3>
 <pre class="Syntax">Code := App.<span class="func">ExitCode</span></pre>
 <p>The exit status this process will return to whoever launched it, as an Integer. <a href="Exit.htm">Exit</a> and <a href="ExitApp.htm">ExitApp</a> are how a script sets it; the runtime also picks it on the script's behalf, using 2 for a critical error and 1 for a failed auto-execute section or an uncaught exception.</p>
-<p>Inside an OnExit callback, the pending code for that exit is the callback's <em>second parameter</em>. <code>App.ExitCode</code> reports the status currently armed, which within a callback is still the previous value, since the callback may yet cancel the exit. After the callbacks, it is the status the process will return.</p>
-
-<h2 id="NoMember">Settings With No App Member</h2>
-<p>The remaining <a href="_App.htm">#App</a> keys, and the startup directives stored alongside them, have no <code>App</code> member.</p>
-<table class="info">
-  <tr><th style="width:14em">Declared by</th><th abbr="Descr">Read instead</th></tr>
-  <tr><td><code>#App</code> <code>Icon</code>, <a href="_TrayIcon.htm">#TrayIcon</a>, <a href="_NoTrayIcon.htm">#NoTrayIcon</a></td><td><a href="../Variables.htm#IconFile">A_IconFile</a>, <a href="../Variables.htm#IconNumber">A_IconNumber</a>, <a href="../Variables.htm#IconHidden">A_IconHidden</a> and <a href="../Variables.htm#A_NoTrayIcon">Ks.A_NoTrayIcon</a>, which report a run-time override. A_IconFile is blank while the declared or embedded icon is in use, so the declared icon is not readable from a script.</td></tr>
-  <tr><td><code>#App</code> <code>GuiTheme</code></td><td><a href="../Variables.htm#A_GuiTheme">Ks.A_GuiTheme</a>, which reports the theme windows are drawn with and can also be assigned. The key only chooses what it starts as.</td></tr>
-  <tr><td><code>#App</code> <code>ConsoleApp</code>, <a href="_ErrorStdOut.htm">#ErrorStdOut</a></td><td>Nothing. These are compiler decisions and leave no runtime state.</td></tr>
-  <tr><td><a href="_SingleInstance.htm">#SingleInstance</a></td><td>Nothing. <code class="no-highlight">--force</code> and <code class="no-highlight">--restart</code> override the declared mode, and the guard exists only when the directive is present.</td></tr>
-  <tr><td><code>#App</code> <code>HookMutexName</code></td><td>Nothing. It is a cross-process identifier which no script consumes, and an undeclared one is the literal <code class="no-highlight">Keysharp</code>.</td></tr>
-  <tr><td><code>#App</code> <code>Files</code></td><td>Nothing. Payloads are embedded only when compiling to a <code class="no-highlight">.cks</code> or an executable; <a href="FileInstall.htm">FileInstall</a> copies the live file otherwise.</td></tr>
-</table>
-<p>The declared values themselves, including these, can be read without running the script: a compiled assembly carries them as the <a href="_App.htm#Remarks">Keysharp.App.json resource</a>.</p>
+<p>Within an OnExit callback, it is the status from before that exit began; the exit's pending code is the callback's <em>second parameter</em>.</p>
 
 <h2 id="Remarks">Remarks</h2>
 
-<p class="warning"><strong>Under a host which supplies its own assembly, the nine metadata members can report that host's attributes.</strong> When Keysharp is embedded in another .NET application there may be no script assembly to read, and the members return the host's values or the Keysharp runtime's own. Nothing distinguishes that from a declared value, and the empty-string test does not catch it. This does not arise when a script is run or compiled normally.</p>
+<p>When Keysharp is embedded in another .NET application, the metadata members can report the host application's attributes.</p>
 
-<p>A local variable shadows an imported class name, and variable names are not case-sensitive, so <code>app := Gui()</code> in a function makes every later <code>App.Title</code> in that scope read the local instead. Importing the module and reaching the class as <code>Ks.App</code> avoids it.</p>
+<p>A local variable named <code>app</code> hides this class within its function; there, use <code>Ks.App</code> after <code>#Import "Ks"</code>.</p>
 
 <h2 id="Examples">Examples</h2>
 

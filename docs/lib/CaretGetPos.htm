@@ -17,7 +17,7 @@
 <p>Retrieves the current position of the caret (text insertion point).</p>
 
 <pre class="Syntax">CaretFound := <span class="func">CaretGetPos</span>(<span class="optional">&amp;OutputVarX, &amp;OutputVarY</span>)</pre>
-<p class="note"><strong>Note:</strong> On Linux, foreign-application caret lookup uses AT-SPI; Wayland coordinate normalization also requires a compositor backend which exposes active-window geometry. On macOS, caret lookup uses the Accessibility API and requires Accessibility permission.</p>
+<p class="note"><strong>Note:</strong> On Linux, foreign-application caret lookup uses AT-SPI; Wayland coordinate normalization also requires a compositor backend which exposes active-window geometry. On macOS, this function requires Accessibility permission.</p>
 <h2 id="Parameters">Parameters</h2>
 <dl>
   <dt>&amp;OutputVarX, &amp;OutputVarY</dt>

@@ -13,7 +13,6 @@
 
 <h1>ComObjQuery</h1>
 <p>Queries a COM object for an interface or service.</p>
-<p class="note"><strong>Notice:</strong> On macOS this selects a scripting suite, which plays the part an IID plays on Windows.</p>
 <pre class="Syntax">InterfaceComObj := <span class="func">ComObjQuery</span>(ComObj, SID, IID)
 InterfaceComObj := <span class="func">ComObjQuery</span>(ComObj, IID)</pre>
 
@@ -30,6 +29,7 @@ InterfaceComObj := <span class="func">ComObjQuery</span>(ComObj, IID)</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>An interface identifier (GUID) in the form "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}".</p>
+    <p>On Linux, the name of a D-Bus interface, such as <code>"org.freedesktop.DBus.Properties"</code>; on macOS, the name of a scripting suite. The returned object addresses the same target with member lookup restricted to that interface or suite.</p>
   </dd>
 
   <dt>SID</dt>
@@ -66,9 +66,6 @@ InterfaceComObj := <span class="func">ComObjQuery</span>(ComObj, IID)</pre>
 <h2 id="Remarks">Remarks</h2>
 <p>In its two-parameter mode, this function is equivalent to <a href="https://learn.microsoft.com/windows/win32/api/unknwn/nf-unknwn-iunknown-queryinterface(refiid_void)">IUnknown::QueryInterface</a>. When SID and IID are both specified, it internally queries for the <a href="https://learn.microsoft.com/previous-versions/windows/internet-explorer/ie-developer/platform-apis/cc678965(v=vs.85)">IServiceProvider</a> interface, then calls <a href="https://learn.microsoft.com/previous-versions/windows/internet-explorer/ie-developer/platform-apis/cc678966(v=vs.85)">IServiceProvider::QueryService</a>.</p>
 <p><a href="ComCall.htm">ComCall</a> can be used to call native interface methods.</p>
-
-<h3 id="Linux">Linux</h3>
-<p>Returns a new object bound to the same service and object path, with member lookup restricted to the named D-Bus interface. Pass the interface name, such as <code>"org.freedesktop.DBus.Properties"</code>, in place of an IID. This is how a member defined on more than one of an object's interfaces is disambiguated.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="ComCall.htm">ComCall</a>, <a href="ComObject.htm">ComObject</a>, <a href="ComObjGet.htm">ComObjGet</a>, <a href="ComObjActive.htm">ComObjActive</a></p>

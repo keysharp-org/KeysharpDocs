@@ -18,7 +18,7 @@
 <pre class="Syntax"><span class="func">BlockInput</span> OnOff
 <span class="func">BlockInput</span> SendMouse
 <span class="func">BlockInput</span> MouseMove</pre>
-<p class="note"><strong>Note:</strong> Blocking all input requires InputControl. <em>MouseMove</em> observes and suppresses motion, so it requires both InputMonitoring and InputControl. Turning either mode off does not request permission. On Linux, blocking requires <code class="no-highlight">keysharp-input</code>; <em>MouseMove</em> preserves button and wheel input. On macOS, the capabilities map to Input Monitoring and Accessibility.</p>
+<p class="note"><strong>Note:</strong> Blocking all input requires InputControl. <em>MouseMove</em> also requires InputMonitoring. Turning a mode off requires neither. On Linux, blocking requires <code class="no-highlight">keysharp-input</code>. On macOS, the capabilities map to Input Monitoring and Accessibility.</p>
 <h2 id="Parameters">Parameters</h2>
 <dl>
 

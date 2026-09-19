@@ -44,14 +44,12 @@
 
 <h2 id="KS">Monitor Object</h2>
 <pre class="NoIndent">class Monitor extends Object</pre>
-<p>One display, with the identity, metadata and device control the functions above do not expose: model and manufacturer, an identifier that survives replugging, refresh rate, physical size, orientation, connection kind, brightness and raw DDC/CI control. It is Keysharp-specific and is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
+<p>Represents one display. This class is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { Monitor }</pre>
-<p class="warning"><strong>Note:</strong> This class replaces the <code>MonitorFromPoint</code> and <code>MonitorGetScale</code> functions of earlier builds, which have been removed. Use <a href="#FromPoint">Monitor.FromPoint</a> and <a href="#Scale">Monitor.Scale</a> instead.</p>
+<p class="note"><strong>Note:</strong> This class is experimental: it and its nested types may change or be removed without deprecation. See <a href="_Warn.htm#Experimental">#Warn Experimental</a>.</p>
 
 <h3 id="Snapshot">Snapshot semantics</h3>
-<p>A Monitor is a <em>snapshot</em> of the display layout plus a live handle to the device. Identity and geometry are read once, when the object is created, so a loop over <a href="#All">Monitor.All</a> sees one consistent picture instead of re-reading &mdash; and possibly re-ordering &mdash; on every property. Call <a href="#Refresh">Refresh</a> to re-read them. <a href="#Brightness">Brightness</a> and the VCP methods always talk to the hardware at the moment they are called.</p>
-<p>Metadata beyond plain geometry (model, serial, refresh rate and so on) costs a native query, so it is resolved on the first property that needs it and then cached on the object. Creating a Monitor, or reading only its geometry, never pays that cost.</p>
-<p>Any property the display does not report is the empty string, never a substituted or plausible-looking value.</p>
+<p>Identity and geometry are read when a Monitor is created; call <a href="#Refresh">Refresh</a> to re-read them. Other metadata, such as <code>Model</code> or <code>RefreshRate</code>, is read when first used and then kept. <a href="#Brightness">Brightness</a> and the VCP methods query the device on every call. A property the display does not report is the empty string.</p>
 
 <h3 id="Obtain">Obtaining a Monitor</h3>
 <pre class="Syntax">M := <span class="func">Monitor</span>(<span class="optional">N</span>)
@@ -66,13 +64,13 @@ Count := Monitor.<span class="func">Count</span></pre>
   <tr><th>Member</th><th>Description</th></tr>
   <tr id="New"><td><code>Monitor(N)</code></td><td>The monitor with 1-based number <em>N</em>, the same numbering <a href="MonitorGet.htm">MonitorGet</a> uses. If <em>N</em> is omitted, the primary monitor. A number outside the current monitor count throws a <a href="Error.htm#ValueError">ValueError</a>.</td></tr>
   <tr id="Primary"><td><code>Monitor.Primary</code></td><td>The primary monitor.</td></tr>
-  <tr id="All"><td><code>Monitor.All</code></td><td>An <a href="Array.htm">Array</a> of every monitor, in number order, built from one enumeration. Prefer this to a loop of <code>Monitor(A_Index)</code>, which re-enumerates per monitor and can have the numbering shift under it if a display is attached midway through.</td></tr>
+  <tr id="All"><td><code>Monitor.All</code></td><td>An <a href="Array.htm">Array</a> of every monitor, in number order, built from one enumeration. Prefer this to a loop over <code>Monitor(A_Index)</code>, whose numbering can change between calls.</td></tr>
   <tr id="Count"><td><code>Monitor.Count</code></td><td>The number of monitors; the same value as <a href="MonitorGetCount.htm">MonitorGetCount</a>.</td></tr>
   <tr id="VirtualScreen"><td><code>Monitor.VirtualScreen</code></td><td>The whole desktop &mdash; the union of every monitor &mdash; as an object with <code>X</code>, <code>Y</code>, <code>Width</code> and <code>Height</code>, in native screen coordinates. <code>X</code> and <code>Y</code> are negative when a display sits left of or above the primary.</td></tr>
   <tr id="FromPoint"><td><code>Monitor.FromPoint(X, Y)</code></td><td>The monitor containing a point in native screen coordinates, or the nearest monitor when the point lies in a gap between displays.</td></tr>
   <tr id="FromMouse"><td><code>Monitor.FromMouse()</code></td><td>The monitor the mouse cursor is on. On Linux, cursor queries require a supported <code class="no-highlight">keysharp-desktop</code> backend and do not request an interactive grant.</td></tr>
   <tr id="FromWindow"><td><code>Monitor.FromWindow(WinTitle, ...)</code></td><td>The monitor a window overlaps most, matching how the platform decides which monitor owns a window. Criteria use ordinary <a href="../misc/WinTitle.htm">WinTitle matching</a>.</td></tr>
-  <tr id="FromId"><td><code>Monitor.FromId(Id)</code></td><td>The monitor whose <a href="#Id">Id</a> matches, or the empty string when that monitor is not currently attached. Matching is case-insensitive. Unlike the other factories this must resolve metadata for every attached display, because an id is not part of the layout snapshot.</td></tr>
+  <tr id="FromId"><td><code>Monitor.FromId(Id)</code></td><td>The monitor whose <a href="#Id">Id</a> matches, or the empty string when that monitor is not currently attached. Matching is case-insensitive. It reads the metadata of every attached display.</td></tr>
 </table>
 
 <h3 id="Identity">Identity</h3>
@@ -89,7 +87,7 @@ Count := Monitor.<span class="func">Count</span></pre>
   <tr id="IsPrimary"><td><code>IsPrimary</code></td><td>Whether this is the primary monitor.</td></tr>
   <tr id="IsInternal"><td><code>IsInternal</code></td><td>Whether this is a built-in panel, such as a laptop or all-in-one screen, rather than an external monitor.</td></tr>
 </table>
-<p class="note"><strong>Note:</strong> A monitor which reports no serial number &mdash; two identical panels from one batch often do not &mdash; is disambiguated by the port it is plugged into, so for those displays <code>Id</code> is stable per <em>port</em> rather than per panel. On macOS, where no port identity is available, such a panel falls back to a per-model id that two identical displays would share. <code>Id</code> is the empty string when the display exposes no usable identity at all.</p>
+<p class="note"><strong>Note:</strong> For a monitor which reports no serial number, <code>Id</code> identifies the port it is plugged into, not the panel; on macOS, it identifies the model, so identical displays share one <code>Id</code>. <code>Id</code> is the empty string when the display exposes no usable identity.</p>
 
 <h3 id="Geometry">Geometry</h3>
 <table class="info">
@@ -102,74 +100,62 @@ Count := Monitor.<span class="func">Count</span></pre>
   <tr id="Physical"><td><code>PhysicalWidth</code>, <code>PhysicalHeight</code></td><td>The panel's physical size in millimetres.</td></tr>
   <tr id="RefreshRate"><td><code>RefreshRate</code></td><td>Vertical refresh in Hz as a floating-point value &mdash; 59.94, not 59.</td></tr>
   <tr id="Orientation"><td><code>Orientation</code></td><td>Clockwise rotation of the desktop content in degrees: 0, 90, 180 or 270.</td></tr>
-  <tr id="Refresh"><td><code>Refresh()</code></td><td>Re-reads this monitor's layout and metadata in place and returns the same object, so it can be chained. The monitor is matched by name first, so it is still tracked after the display order changes, falling back to its number. Returns an empty string &mdash; which is falsy &mdash; when the monitor is no longer attached, leaving the object's last-known values untouched.</td></tr>
+  <tr id="Refresh"><td><code>Refresh()</code></td><td>Re-reads this monitor's layout and metadata in place and returns the same object, so it can be chained. The monitor is matched by name, then by number. Returns an empty string when the monitor is no longer attached, leaving the object's values unchanged.</td></tr>
 </table>
 <p class="warning"><strong>Note:</strong> <code>Scale</code> is not a screen-coordinate conversion factor and must never be applied to absolute positions.</p>
 
 <h3 id="Control">Brightness and DDC/CI</h3>
 <pre class="Syntax">Percent := M.<span class="func">Brightness</span>
 M.<span class="func">Brightness</span> := Percent
-Supported := M.<span class="func">HasBrightness</span>
+Supported := M.<span class="func">IsBrightnessSupported</span>
 Feature := M.<span class="func">GetVCP</span>(Code)
 M.<span class="func">SetVCP</span>(Code, Value)</pre>
 <table class="info">
   <tr><th>Member</th><th>Description</th></tr>
-  <tr id="Brightness"><td><code>Brightness</code></td><td>Gets or sets the monitor's brightness as a percentage from 0 to 100.</td></tr>
-  <tr id="HasBrightness"><td><code>HasBrightness</code></td><td>Whether <code>Brightness</code> works for this monitor.</td></tr>
-  <tr id="GetVCP"><td><code>GetVCP(Code)</code></td><td>Reads one raw DDC/CI VCP feature, returning an object with <code>current</code> and <code>max</code>.</td></tr>
-  <tr id="SetVCP"><td><code>SetVCP(Code, Value)</code></td><td>Writes one raw DDC/CI VCP feature. Throws an <a href="Error.htm#OSError">OSError</a> when the monitor does not implement the code.</td></tr>
+  <tr id="Brightness"><td><code>Brightness</code></td><td>Gets or sets the monitor's brightness as a percentage from 0 to 100. Assigning another value throws a <a href="Error.htm#ValueError">ValueError</a> before the device is contacted.</td></tr>
+  <tr id="IsBrightnessSupported"><td><code>IsBrightnessSupported</code></td><td>Whether <code>Brightness</code> works for this monitor.</td></tr>
+  <tr id="GetVCP"><td><code>GetVCP(Code)</code></td><td>Reads one raw DDC/CI VCP feature, returning an object with <code>Current</code> and <code>Maximum</code>. Throws a <a href="Error.htm#ValueError">ValueError</a> for a <em>Code</em> outside 0 to 255, and an <a href="Error.htm#OSError">OSError</a> when the monitor does not answer.</td></tr>
+  <tr id="SetVCP"><td><code>SetVCP(Code, Value)</code></td><td>Writes one raw DDC/CI VCP feature. Throws a <a href="Error.htm#ValueError">ValueError</a> for a <em>Code</em> outside 0 to 255 or a <em>Value</em> outside 0 to 65535, and an <a href="Error.htm#OSError">OSError</a> when the monitor does not implement the code.</td></tr>
 </table>
-<p><code>Brightness</code> is a percentage from 0 to 100. Reading and writing both perform a real device transaction, which over DDC/CI takes tens of milliseconds, and the value is deliberately not cached because the monitor's own buttons can change it too. Because it is a property rather than a method, <code>M.Brightness += 10</code> works in a hotkey.</p>
-<p>On a monitor or platform that cannot do it, <code>Brightness</code> throws an <a href="Error.htm#OSError">OSError</a> naming the reason. Test <code>HasBrightness</code> to branch without an exception; that is a real probe of the device rather than a platform guess, so it costs one brightness read.</p>
-<p><code>GetVCP</code> reads one raw DDC/CI VCP feature and returns an object with <code>current</code> and <code>max</code>. VCP codes are defined by the MCCS standard: <code>0x10</code> brightness, <code>0x12</code> contrast, <code>0x60</code> input source, <code>0x62</code> speaker volume, <code>0xD6</code> power mode.</p>
-<p><code>SetVCP</code> reads the feature back before writing it, on the connection it already has open, so a code the monitor does not implement throws an <a href="Error.htm#OSError">OSError</a> instead of reporting a success the display silently ignored. A DDC/CI write is unacknowledged, so that read is the only evidence the code exists; it also means a write costs two transactions rather than one.</p>
+<p>Over DDC/CI, each read or assignment of <code>Brightness</code> takes tens of milliseconds. On a monitor or platform which does not support it, <code>Brightness</code> throws an <a href="Error.htm#OSError">OSError</a> naming the reason; reading <code>IsBrightnessSupported</code> performs one brightness read to test this without an exception.</p>
+<p>VCP codes are defined by the MCCS standard, for example <code>0x10</code> brightness, <code>0x12</code> contrast, <code>0x60</code> input source, <code>0x62</code> speaker volume and <code>0xD6</code> power mode.</p>
+<p><code>SetVCP</code> reads the feature before writing it, so each call performs two device transactions.</p>
 <p class="warning"><strong>Warning:</strong> <code>SetVCP</code> drives the monitor's firmware directly. Setting an input-source or power code will switch the monitor away from this computer, and some displays react badly to codes they document but mishandle. Verify a code against the monitor's own MCCS documentation first.</p>
 
 <h3 id="OnChange">Display change notifications</h3>
-<pre class="Syntax">Hook := Monitor.<span class="func">OnChange</span>(Callback <span class="optional">, Count := -1</span>)</pre>
-<p>Calls <em>Callback</em> whenever the display configuration changes, and returns a subscription object whose <code>Stop()</code> cancels it. <em>Count</em> limits how many callbacks are delivered; -1 is unlimited.</p>
-<p><em>Callback</em> receives <code class="no-highlight">(Hook, Kind)</code>:</p>
+<pre class="Syntax">Hook := Monitor.<span class="func">OnChange</span>(Callback)
+Hooks := Monitor.<span class="func">Hooks</span></pre>
+<p>Calls <em>Callback</em> whenever the display configuration changes, and returns a running MonitorHook controlling the subscription.</p>
+<p><em>Callback</em> is a <a href="../misc/Functor.htm">function object</a> which receives <code class="no-highlight">(Hook, Change)</code>:</p>
 <table class="info">
-  <tr><th>Kind</th><th>Meaning</th></tr>
-  <tr><td><code>"topology"</code></td><td>The set of attached monitors changed: one was plugged in or unplugged, or the machine docked or undocked.</td></tr>
-  <tr><td><code>"settings"</code></td><td>The same monitors are attached, but something about them changed: resolution, position, scale, or which one is primary.</td></tr>
+  <tr><th>Change</th><th>Meaning</th></tr>
+  <tr><td><code>"Topology"</code></td><td>The set of attached monitors changed: one was plugged in or unplugged, or the machine docked or undocked.</td></tr>
+  <tr><td><code>"Settings"</code></td><td>The same monitors are attached, but something about them changed: resolution, position, scale, or which one is primary.</td></tr>
 </table>
-<p><a href="../Variables.htm#EventInfo">A_EventInfo</a> holds the monitor count after the change. Anything else the handler needs is a plain read of <a href="#All">Monitor.All</a> or <a href="#Count">Monitor.Count</a>, which is also the only way to get it consistently, because the layout can change again between the event and the callback running. A Monitor object the script is already holding is a snapshot taken before the change; call its <a href="#Refresh">Refresh</a> to bring it up to date.</p>
-<p>A notification which turns out to have changed nothing observable does not call back, so the redundant notifications the underlying platforms emit are not passed on to the script.</p>
-<table class="info">
-  <tr><th>Subscription member</th><th>Description</th></tr>
-  <tr><td><code>Stop()</code></td><td>Cancels the subscription. This is permanent.</td></tr>
-  <tr><td><code>Pause([NewState := 1])</code></td><td>Pauses (1), resumes (0) or toggles (-1) this subscription and returns its new state. A paused subscription stays registered but does not fire.</td></tr>
-  <tr><td><code>Paused</code></td><td>Gets or sets this subscription's own pause switch. A stopped subscription reports false and ignores writes.</td></tr>
-  <tr><td><code>Status</code></td><td>The effective state: <code class="no-highlight">"Active"</code>, <code class="no-highlight">"Paused"</code> or <code class="no-highlight">"Stopped"</code>.</td></tr>
-  <tr><td><code>IsActive</code></td><td>Whether the subscription is firing. A paused subscription is <strong>not</strong> active.</td></tr>
-  <tr><td><code>Count</code></td><td>Remaining callback count, or -1 for unlimited. A stopped subscription reports 0.</td></tr>
-</table>
-<p><code>Status</code> separates the three states a subscription can be in, where <code>IsActive</code> only answers whether it is firing and so is false while the subscription is paused as well as after it is stopped. This is the surface a <a href="WinEvent.htm#Hook">WinEvent hook</a> carries, minus that class&#39;s global pause switch; both derive from <code>Ks.EventHook</code>.</p>
-<p>The subscription stops during <code>__Delete</code>, but garbage collection is non-deterministic. Call <code>Stop()</code> when it is no longer needed.</p>
-
-<h2 id="MonitorPlatforms">Platform Remarks</h2>
-<p>Geometry, <code>Name</code>, <code>Index</code> and the factories work on every platform. What varies is metadata and device control.</p>
-
-<h3 id="MonitorWindows">Windows</h3>
-<p>Identity and physical size come from the EDID Windows caches under the monitor's registry key, the adapter name and connection kind from DisplayConfig and <code>EnumDisplayDevices</code>, and the refresh rate from the DisplayConfig rational rate, so it is exact. Brightness uses WMI for the built-in panel and DDC/CI for external monitors. <code>OnChange</code> listens to display-settings change notifications.</p>
-
-<h3 id="MonitorLinux">Linux</h3>
-<p>Identity, model and physical size come from the DRM connector's EDID under <code>/sys/class/drm</code>, which is readable under X11 and Wayland alike, so one implementation serves both. X11 display geometry, refresh rate and orientation come through <code class="no-highlight">keysharp-desktop</code>; Wayland monitor data uses <code>wl_output</code>. Under Wayland the refresh rate and orientation are the empty string and 0 if the native compositor connection is unavailable. The adapter is reported as the DRM driver name, such as <code>amdgpu</code> or <code>i915</code>.</p>
-<p>Brightness uses the kernel backlight class for the built-in panel (a direct <code>sysfs</code> write where permitted, otherwise logind's <code>SetBrightness</code>) and DDC/CI over <code>/dev/i2c-*</code> for external monitors. DDC/CI therefore needs the <code>i2c-dev</code> module loaded and access to the bus. A root install adds a udev rule granting the local-seat user access to display-controller i2c buses only, and ddcutil's own rule works too; without either, <code>Brightness</code> and the VCP methods throw an OSError naming the requirement. <code>OnChange</code> uses GDK's monitor signals, which cover X11 and every Wayland compositor.</p>
-
-<h3 id="MonitorMacOS">macOS</h3>
-<p>Identity, physical size, rotation and refresh rate come from CoreGraphics. There is no product-name API, so <code>Model</code> is always the empty string, and <code>Adapter</code> is unavailable. <code>Connection</code> distinguishes only built-in from external. The refresh rate is 0, and therefore reported as the empty string, on some built-in panels.</p>
-<p>Brightness works on the built-in panel and Apple's own displays through DisplayServices, and on every other external monitor over DDC/CI. The VCP methods use that same DDC/CI connection, so they reach external monitors only; the built-in panel has none.</p>
-<p class="note"><strong>Note:</strong> The Intel DDC/CI path is implemented but untested. Some USB-C hubs and docks do not carry the DDC channel through to the monitor, in which case <code>Brightness</code> and the VCP methods throw an OSError for a display that would otherwise support them.</p>
+<p>To inspect the new layout, read <a href="#Count">Monitor.Count</a> or <a href="#All">Monitor.All</a> in the callback, or call <a href="#Refresh">Refresh</a> on a Monitor obtained earlier.</p>
+<p>The callback is not called for a notification which changed nothing observable.</p>
+<p>The returned hook is an <a href="EventHook.htm">EventHook</a>. <code>Monitor.Hooks</code> is an Array of the running hooks. A MonitorHook does not keep the script running, so a script which only waits for display changes calls <a href="Persistent.htm">Persistent</a>.</p>
 
 <h2 id="Remarks">Remarks</h2>
 <p>The built-in variables <a href="../Variables.htm#Screen">A_ScreenWidth</a> and <a href="../Variables.htm#Screen">A_ScreenHeight</a> contain the dimensions of the primary monitor, in pixels.</p>
 <p><a href="SysGet.htm">SysGet</a> can be used to retrieve the bounding rectangle of all display monitors. For example, this retrieves the width and height of the virtual screen:</p>
 <pre>MsgBox SysGet(78) " x " SysGet(79)</pre>
+<p>Geometry, <code>Name</code>, <code>Index</code> and the factories work on every platform. What varies is metadata and device control.</p>
+
+<h3 id="MonitorWindows">Windows</h3>
+<p><code>Brightness</code> works on the built-in panel and on external monitors which support DDC/CI.</p>
+
+<h3 id="MonitorLinux">Linux</h3>
+<p>On X11, geometry, refresh rate and orientation are read through <code class="no-highlight">keysharp-desktop</code>. On Wayland, <code>RefreshRate</code> and <code>Orientation</code> are the empty string and 0 if the native compositor connection is unavailable. <code>Adapter</code> is the DRM driver name, such as <code>amdgpu</code> or <code>i915</code>.</p>
+<p>For external monitors, <code>Brightness</code> and the VCP methods need the <code>i2c-dev</code> kernel module and access to the i2c bus. A root install adds a udev rule granting the local-seat user access to display-controller i2c buses, and ddcutil's own rule also works; without either, they throw an OSError naming the requirement. <code>OnChange</code> works on X11 and every Wayland compositor.</p>
+
+<h3 id="MonitorMacOS">macOS</h3>
+<p><code>Model</code> and <code>Adapter</code> are always the empty string, and <code>Connection</code> distinguishes only built-in from external. <code>RefreshRate</code> is the empty string on some built-in panels.</p>
+<p><code>Brightness</code> works on the built-in panel, Apple displays and other external monitors which support DDC/CI. The VCP methods work only on external DDC/CI monitors.</p>
+<p class="note"><strong>Note:</strong> DDC/CI on Intel Macs is unverified. Some USB-C hubs and docks do not carry the DDC channel through to the monitor, in which case <code>Brightness</code> and the VCP methods throw an OSError for a display that would otherwise support them.</p>
 
 <h2 id="Related">Related</h2>
-<p><a href="DllCall.htm">DllCall</a>, <a href="Win.htm">Win functions</a>, <a href="SysGet.htm">SysGet</a></p>
+<p><a href="DllCall.htm">DllCall</a>, <a href="Win.htm">Win functions</a>, <a href="SysGet.htm">SysGet</a>, <a href="EventHook.htm">EventHook</a></p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExLoopAll">
@@ -210,25 +196,25 @@ for M in Monitor.All
 </div>
 
 <div class="ex" id="ExMonitorBrightness">
-<p><a class="ex_number" href="#ExMonitorBrightness"></a> Dims every monitor that supports it. <a href="#HasBrightness">HasBrightness</a> is tested first so an unsupported display is skipped instead of throwing.</p>
+<p><a class="ex_number" href="#ExMonitorBrightness"></a> Dims every monitor that supports it. <a href="#IsBrightnessSupported">IsBrightnessSupported</a> is tested first so an unsupported display is skipped instead of throwing.</p>
 <pre>#Import "Ks" { Monitor }
 
 for M in Monitor.All
-    if (M.HasBrightness)
+    if (M.IsBrightnessSupported)
         M.Brightness := Max(0, M.Brightness - 20)</pre>
 </div>
 
 <div class="ex" id="ExMonitorOnChange">
-<p><a class="ex_number" href="#ExMonitorOnChange"></a> Reacts to the display configuration changing &mdash; for example to re-place windows after docking.</p>
+<p><a class="ex_number" href="#ExMonitorOnChange"></a> Reacts to the display configuration changing &mdash; for example to re-place windows after docking. The hook does not keep the script running, so <a href="Persistent.htm">Persistent</a> does.</p>
 <pre>#Import "Ks" { Monitor }
 
 Hook := Monitor.OnChange(DisplaysChanged)
 Persistent
 
-DisplaysChanged(Hook, Kind)
+DisplaysChanged(Hook, Change)
 {
-    if (Kind = "topology")
-        ToolTip "Monitors attached or removed: now " A_EventInfo
+    if (Change = "Topology")
+        ToolTip "Monitors attached or removed: now " Monitor.Count
     else
         ToolTip "Display settings changed"
 

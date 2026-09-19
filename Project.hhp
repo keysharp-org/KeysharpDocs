@@ -44,7 +44,9 @@ docs\lib\_TrayIcon.htm
 docs\lib\_CSharp.htm
 docs\lib\_Package.htm
 docs\lib\Collect.htm
-docs\lib\ComponentAvailable.htm
+docs\lib\IsComponentAvailable.htm
+docs\lib\Hex.htm
+docs\lib\Base32.htm
 docs\lib\Crypto.htm
 docs\lib\EnvUpdate.htm
 docs\lib\FilePath.htm
@@ -58,8 +60,7 @@ docs\lib\Lock.htm
 docs\lib\Mail.htm
 docs\lib\ObjFree.htm
 docs\lib\Overlay.htm
-docs\lib\ParseScript.htm
-docs\lib\Preprocessor.htm
+docs\lib\ValidateScript.htm
 docs\lib\RealThread.htm
 docs\lib\RegExCs.htm
 docs\lib\RequestCapabilities.htm
@@ -68,9 +69,9 @@ docs\lib\StringBuffer.htm
 docs\lib\StringFunctions.htm
 docs\lib\Task.htm
 docs\lib\Taskbar.htm
+docs\lib\EventHook.htm
 docs\lib\WinEvent.htm
 docs\lib\WinFromPoint.htm
-docs\lib\WinMaximizeAll.htm
 NUL
 
 [INFOTYPES]

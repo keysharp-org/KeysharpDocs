@@ -14,18 +14,18 @@
 <h1>Clr Object</h1>
 <p>Provides experimental access to .NET assemblies through ordinary script property, method, call and index syntax.</p>
 <p>This class is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
-<p class="note"><strong>Experimental:</strong> Basic values and function objects are marshalled, but complex .NET types might not convert correctly.</p>
+<p class="note"><strong>Note:</strong> This class is experimental: it and its nested types may change or be removed without deprecation. See <a href="_Warn.htm#Experimental">#Warn Experimental</a>. Basic values and function objects are marshalled, but complex .NET types might not convert correctly.</p>
 
 <h2 id="Load">Load</h2>
 <pre class="Syntax">Root := Clr.<span class="func">Load</span>(AssemblyOrPath)</pre>
-<p>Loads a DLL/executable path or assembly name and returns a ManagedAssembly or ManagedNamespace wrapper. This is a local operation: it never retrieves anything. To use a library from a package feed, see <a href="_Package.htm">#Package</a>.</p>
+<p>Loads a DLL/executable path or assembly name and returns a ManagedAssembly or ManagedNamespace wrapper. To use a library from a package feed, see <a href="_Package.htm">#Package</a>.</p>
 
 <h2 id="LoadPackage">LoadPackage</h2>
 <pre class="Syntax">Package := Clr.<span class="func">LoadPackage</span>(<span class="optional">Provider:</span>Name <span class="optional">, Version, Optional</span>)</pre>
-<p>Makes a package's assemblies available at run time, and returns a ManagedAssembly over that package's own assemblies. Its types are then reachable both from the return value and through <a href="#Navigation">Clr</a> by namespace. The default provider is <code class="no-highlight">nuget</code>; a prefix such as <code class="no-highlight">aris:dev/name</code> selects another locally installed provider and passes the remainder of the name to it.</p>
-<p><em>Version</em> takes the same forms as the <a href="_Package.htm#Version">#Package</a> directive: omitted for the newest stable release, or partial, exact or bounded. If <em>Optional</em> is true, a package or separately installed provider that cannot be made available returns an empty string instead of raising an error. Malformed package or version syntax remains an error when the provider is installed.</p>
-<p class="note"><strong>Prefer <a href="_Package.htm">#Package</a> where it fits.</strong> Package resolution considers all requested packages together, and resolving in one step is what stops two packages settling on different versions of a shared dependency. This function accumulates — each call re-resolves everything requested so far, including packages named by the directive — but assemblies already loaded by an earlier call cannot be unloaded, so a genuine version conflict is reported rather than repaired. Use this function for what a directive cannot express: a package chosen by a computed name, or one needed only on some code paths.</p>
-<p class="note"><strong>Compiled scripts:</strong> This function needs its selected provider at run time. A normal compiled executable carries a statically visible provider under <code class="no-highlight">components/packages/&lt;name&gt;</code>; <code class="no-highlight">exe-min</code> embeds the provider payload, verifies it and extracts it under the current user's local application-data directory when first used. A raw <code class="no-highlight">.cks</code> is run by Keysharp and uses the provider shipped with that launcher, so it does not copy the provider beside every assembly. A non-default provider hidden entirely inside a computed name must be installed beside the target artifact because the compiler cannot infer it.</p>
+<p>Makes a package's assemblies available at run time, and returns a ManagedAssembly over that package's own assemblies. Its types are then reachable both from the return value and through <a href="#Navigation">Clr</a> by namespace. <em>Name</em> takes the same <code class="no-highlight">Provider:PackageId</code> form as <a href="_Package.htm">#Package</a>.</p>
+<p><em>Version</em> takes the same forms as the <a href="_Package.htm#Version">#Package</a> directive. If <em>Optional</em> is true, a package or separately installed provider that cannot be made available returns an empty string instead of raising an error. Malformed package or version syntax remains an error when the provider is installed.</p>
+<p class="note"><strong>Note:</strong> Prefer <a href="_Package.htm">#Package</a> where it fits. Each call re-resolves every package requested so far, including those named by #Package, but an assembly which is already loaded cannot be unloaded, so a version conflict is reported rather than repaired. Use this function for a package chosen by a computed name, or one needed only on some code paths.</p>
+<p class="note"><strong>Note:</strong> This function needs its provider at run time. An executable built with <a href="../Program.htm#cmd">--compile</a> includes the provider when the compiler can tell from the call which one is used; a non-default provider named only inside a computed name must be installed beside the executable.</p>
 
 <h2 id="Navigation">Namespaces, Types and Instances</h2>
 <ul>
@@ -33,28 +33,73 @@
   <li>Access static methods and properties through a ManagedType, or call it to construct a ManagedInstance.</li>
   <li>Use ordinary property, method and index syntax with a ManagedInstance.</li>
 </ul>
+<p>Invalid generic signatures raise a <a href="Error.htm#ValueError">ValueError</a>.</p>
 
 <h2 id="Enums">Enum Values</h2>
-<p>A script has no enum type, so a member of a .NET enum is named by its Integer:</p>
+<p>A .NET enum value is passed as an Integer:</p>
 <pre>#Import "Ks" { Clr }
 System := Clr.Load("System")
 System.IO.File.SetUnixFileMode(Path, 0o600)</pre>
 <p>The value does not have to be a declared member, so a flag combination can be built in script with <code class="no-highlight">|</code>. The member itself works equally well when read through a ManagedType, as in <code class="no-highlight">System.StringComparison.OrdinalIgnoreCase</code>.</p>
-<p>An enum returned from .NET arrives as a wrapper rather than as an Integer, because a script has nothing to widen it to; use <code class="no-highlight">ToString</code> for the member name. A value with no numeric reading raises a <a href="Error.htm#TypeError">TypeError</a>, as it does for any other whole-number parameter.</p>
+<p>An enum returned from .NET arrives as a wrapper; use <code class="no-highlight">ToString</code> for the member name. A non-numeric value passed as an enum raises a <a href="Error.htm#TypeError">TypeError</a>.</p>
+
+<h2 id="Bytes">Byte Arrays and Spans</h2>
+<p>A <a href="Buffer.htm">Buffer</a> or any object exposing numeric <code>Ptr</code> and <code>Size</code> properties passed where .NET expects a <code class="no-highlight">byte[]</code> parameter, property or field arrives as a copy of its bytes:</p>
+<pre>#Import "Ks" { Clr }
+System := Clr.Load("System")
+Buf := Buffer(3)
+NumPut("UChar", 72, "UChar", 105, "UChar", 33, Buf)
+MsgBox System.Convert.ToBase64String(Buf)   <em>; SGkh</em></pre>
+<p><code class="no-highlight">Span&lt;byte&gt;</code> and <code class="no-highlight">ReadOnlySpan&lt;byte&gt;</code> parameters view the original storage for the duration of the call, so a mutable span can write into it directly. A <code class="no-highlight">byte[]</code> overload is preferred when both forms fit.</p>
+
+<h2 id="Events">Events</h2>
+<pre class="Syntax">Subscription := Instance.<span class="func">OnEvent</span>(EventName, Callback)
+Subscription := Type.<span class="func">OnEvent</span>(EventName, Callback)
+Hooks := Clr.<span class="func">Hooks</span></pre>
+<p>Subscribes <em>Callback</em> to a .NET event of a ManagedInstance, or to a static event of a ManagedType such as <code class="no-highlight">Microsoft.Win32.SystemEvents</code>, and returns a running <code>Clr.EventSubscription</code>. <em>Callback</em> is a <a href="../misc/Functor.htm">function object</a> which receives the event's own arguments, typically <code class="no-highlight">(Sender, EventArgs)</code>. <code>OnEvent</code> takes precedence over a member of that name which the .NET type declares itself.</p>
+<p><code>OnEvent</code> takes exactly two arguments; any other number raises a <a href="Error.htm#ValueError">ValueError</a>. Calling an event's compiler-generated <code class="no-highlight">add_</code><em>EventName</em> or <code class="no-highlight">remove_</code><em>EventName</em> accessor raises a <a href="Error.htm#MethodError">MethodError</a> naming <code>OnEvent</code>. An <em>EventName</em> the target does not declare raises a ValueError.</p>
+<p>An event raised on the thread which subscribed runs the callback at once, and only then can the callback's return value or error reach the .NET code which raised it. An event raised on any other thread is queued and runs in its own <a href="../misc/Threads.htm">thread</a> on the one which subscribed.</p>
+<p>The subscription is an <a href="EventHook.htm">EventHook</a>, with these members of its own:</p>
+<table class="info">
+  <tr><th>Member</th><th>Description</th></tr>
+  <tr><td><code>EventName</code></td><td>The name of the event it is attached to.</td></tr>
+  <tr><td><code>Target</code></td><td>The ManagedInstance or ManagedType it is attached to.</td></tr>
+</table>
+<p><code>Start()</code> after <code>Stop()</code> attaches a new handler, which may run in a different position among the event's other handlers. Stopping, lifetime and <code>Clr.Hooks</code> work as described under <a href="EventHook.htm">EventHook</a>.</p>
+<p>A subscription does not keep the script running, so a script which only waits for .NET events calls <a href="Persistent.htm">Persistent</a>.</p>
+<pre>#CSharp
+public class Raiser
+{
+    public event System.EventHandler Fired;
+    public void Raise() =&gt; Fired?.Invoke(this, System.EventArgs.Empty);
+}
+
+public static Raiser MakeRaiser() =&gt; new Raiser();
+#EndCSharp
+
+R := MakeRaiser()
+Sub := R.OnEvent("Fired", (Sender, Args) =&gt; MsgBox("Fired"))
+R.Raise()   <em>; raised on the script's own thread, so the callback runs at once</em>
+Sub.Stop()
+R.Raise()   <em>; the subscription has ended, so nothing is shown</em></pre>
 
 <h2 id="Names">Name Helpers</h2>
 <pre class="Syntax">Name := Clr.<span class="func">GetNamespaceName</span>(ManagedNamespace)
 Name := Clr.<span class="func">GetTypeName</span>(ManagedType)</pre>
 <p>Returns the underlying full namespace or type name.</p>
 
-<h2 id="ToClr">ToClr on built-in objects</h2>
-<p>Built-in objects which stand in front of a CLR object expose it with a uniform <code class="no-highlight">ToClr()</code> method, returning it as an ordinary Clr object with the member-access semantics described above: <a href="Task.htm#ToClr">Task</a> (the underlying CLR task, so a worker's body is reached as <code class="no-highlight"><a href="RealThread.htm#Task">worker.Task</a>.ToClr()</code>), <a href="Gui.htm#ToClr">Gui</a>, <a href="GuiControl.htm#ToClr">Gui.Control</a> and <a href="Menu.htm#ToClr">Menu</a> (the backing toolkit object, whose concrete type is platform-dependent and unspecified), and <a href="Image.htm">Image</a> (the live underlying bitmap, with pending drawing applied first).</p>
-<p><a href="Map.htm#ToClr">Map</a> and <a href="Array.htm#ToClr">Array</a> are themselves CLR objects &mdash; a Map is a CLR <code class="no-highlight">IDictionary&lt;object, object&gt;</code> and an Array an <code class="no-highlight">IList</code>, so a CLR API declaring one accepts them directly &mdash; and their <code class="no-highlight">ToClr()</code> exposes their full CLR surface late-bound.</p>
-<p>Changes made through the wrapper bypass the owning class's own state and event wiring.</p>
-<pre>#Import "Ks" { RealThread, Await }
-worker := RealThread(() =&gt; 42)
-Await(worker.Task)
-MsgBox worker.Task.ToClr().IsCompleted</pre>
+<h2 id="Wrap">Wrap</h2>
+<pre class="Syntax">Wrapped := Clr.<span class="func">Wrap</span>(Value)</pre>
+<p>Returns any value as an ordinary Clr object, with the member-access semantics described above, so the value's own full CLR surface is reachable late-bound. <a href="Map.htm">Map</a> and <a href="Array.htm">Array</a> are themselves CLR objects &mdash; a Map is a CLR <code class="no-highlight">IDictionary&lt;object, object&gt;</code> and an Array an <code class="no-highlight">IList</code>, so a CLR API declaring one accepts them directly &mdash; and wrapping one reaches those members from script.</p>
+<p id="ToClr">The result is always a view over <em>Value</em> itself. To reach the .NET object a built-in is a facade over &mdash; the toolkit window behind a <a href="Gui.htm#ToClr">Gui</a>, the <code class="no-highlight">HttpClient</code> behind an <a href="Http.htm">Http</a> session &mdash; call that type's own <code class="no-highlight">ToClr()</code>.</p>
+<p>Wrapping something which is already a Clr object is the identity. Wrapping a <a href="ComObject.htm">ComObject</a> yields a view over its wrapper object, not the COM interface.</p>
+
+<p>The last line of this example works only on Windows.</p>
+<pre>#Import "Ks" { Clr }
+arr := [1, 2, 3]
+MsgBox Clr.Wrap(arr).Count            <em>; the CLR IList surface of the Array itself</em>
+MyGui := Gui(, "Demo")
+MsgBox MyGui.ToClr().Text             <em>; Windows: the title of the toolkit window the Gui is a facade over</em></pre>
 <p>Inline C# (<a href="_CSharp.htm">#CSharp</a>) holding a ManagedInstance reads the raw wrapped object from its <code class="no-highlight">Native</code> property. Script member access on a wrapper always dispatches to the wrapped object, so <code class="no-highlight">Native</code> is unreachable from script.</p>
 
 <h2 id="Examples">Examples</h2>

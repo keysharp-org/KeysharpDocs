@@ -30,6 +30,7 @@ InspectFn(fn)
 </pre>
 <p>"FuncObj" is used below as a placeholder for any Func object, as "Func" is the class itself.</p>
 <p>In addition to the methods and properties inherited from <a href="Object.htm">Object</a>, Func objects have the following predefined methods and properties.</p>
+<p><a href="#IsClosure">IsClosure</a>, <a href="#IsMethod">IsMethod</a> and <a href="#Params">Params</a> are Keysharp extensions.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
@@ -70,7 +71,6 @@ FuncObj.<span class="func">Call</span>(Param1, Param2, ...)</pre>
 </dl>
 <h4 id="Call_Remarks">Remarks</h4>
 <p>The "Call" method is implied when calling a value, so need not be explicitly specified.</p>
-<p>Calling a function object invokes the function directly while it has no own properties. Once it has any own property, even one unrelated to calling, invocation resolves <code>Call</code> through the prototype chain. An own <code>Call</code> property or one defined on <code>Func.Prototype</code> can then override the function, while the explicit <code>FuncObj.Call(...)</code> form always resolves through the chain.</p>
 </div>
 
 <div class="methodShort" id="Bind"><h3>Bind</h3>
@@ -124,8 +124,7 @@ FuncObj.<span class="func">Call</span>(Param1, Param2, ...)</pre>
 <h2 id="Properties">Properties</h2>
 
 <div class="methodShort" id="Name"><h3>Name</h3>
-<p>Gets the function's exact AHK-visible name. A top-level function reports a name such as <code>MyFunction</code>; static and instance methods report names such as <code>MyClass.MyMethod</code> and <code>MyClass.Prototype.MyMethod</code>; user-defined property accessors append <code>.get</code>/<code>.set</code>, or <code>.Get</code>/<code>.Set</code> when the accessor keyword begins with an uppercase letter.</p>
-<p>Anonymous functions and <a href="../misc/Functor.htm#BoundFunc">BoundFunc objects</a> have an empty name.</p>
+<p>Gets the function's name.</p>
 <pre class="Syntax">FunctionName := FuncObj.<span class="func">Name</span></pre>
 </div>
 
@@ -142,29 +141,28 @@ FuncObj.<span class="func">Call</span>(Param1, Param2, ...)</pre>
 <div class="methodShort" id="IsClosure"><h3>IsClosure</h3>
 <p>Gets 1 (true) if the function is a <a href="../Functions.htm#closures">closure</a>, otherwise 0 (false).</p>
 <pre class="Syntax">Boolean := FuncObj.<span class="func">IsClosure</span></pre>
-<p>A closure is a nested function which captured a variable from the scope that created it, so each evaluation of the enclosing function produces a distinct function object.</p>
 </div>
 
 <div class="methodShort" id="IsMethod"><h3>IsMethod</h3>
 <p>Gets 1 (true) if the function is a method, otherwise 0 (false).</p>
 <pre class="Syntax">Boolean := FuncObj.<span class="func">IsMethod</span></pre>
-<p>A method receives the target object as a hidden first parameter, <a href="../Objects.htm#Custom_Classes_method">this</a>, so calling it requires a target. This is the distinction between <code>obj.Method()</code> and a plain function retrieved from the same property.</p>
+<p>A method receives the target object as a hidden first parameter, <a href="../Objects.htm#Custom_Classes_method">this</a>, so calling it requires a target.</p>
 </div>
 
 <div class="methodShort" id="Params"><h3>Params</h3>
-<p>Gets an <a href="Array.htm">Array</a> describing the function's parameters. Keysharp extension.</p>
+<p>Gets an <a href="Array.htm">Array</a> describing the function's parameters.</p>
 <pre class="Syntax">Params := FuncObj.<span class="func">Params</span></pre>
 <p>Each element is an object with these properties:</p>
 <ul>
   <li><strong>Name:</strong> the name a <a href="../Language.htm#named-parameters">named argument</a> binds by.</li>
   <li><strong>Index:</strong> the 1-based position.</li>
-  <li><strong>Optional:</strong> 1 if the parameter may be omitted, otherwise 0.</li>
-  <li><strong>ByRef:</strong> 1 if the parameter is <a href="../Functions.htm#ByRef">ByRef</a>, otherwise 0.</li>
-  <li><strong>Variadic:</strong> 1 for the trailing <a href="../Functions.htm#Variadic">variadic</a> parameter, otherwise 0.</li>
-  <li><strong>Default:</strong> the default value. Defined <em>only</em> when the parameter has a real one, so a parameter that merely defaults to unset is distinguishable from one defaulting to a value; test with <a href="Object.htm#HasOwnProp">HasOwnProp</a>.</li>
+  <li><strong>IsOptional:</strong> 1 if the parameter may be omitted, otherwise 0.</li>
+  <li><strong>IsByRef:</strong> 1 if the parameter is <a href="../Functions.htm#ByRef">ByRef</a>, otherwise 0.</li>
+  <li><strong>IsVariadic:</strong> 1 for the trailing <a href="../Functions.htm#Variadic">variadic</a> parameter, otherwise 0.</li>
+  <li><strong>Default:</strong> the default value. It is present only when the parameter has one, not when it defaults to unset; test with <a href="Object.htm#HasOwnProp">HasOwnProp</a>.</li>
 </ul>
-<p>The list excludes anything that cannot be supplied as an argument: the receiver of a method, and parameters internal to the implementation. On a <a href="#Bind">bound</a> function the already-bound parameters are excluded too, so <strong>Index</strong> numbers only the parameters that remain. The names are the same ones named-argument binding uses, so what this reports is exactly what binds.</p>
-<p>The value is <a href="../Concepts.htm#unset">unset</a> when the parameters cannot be known, which is the case for a reference produced by <a href="ObjBindMethod.htm">ObjBindMethod</a>: it does not resolve its target until it is called. An empty Array is a real answer, meaning the function takes no arguments, so it cannot also stand for "no answer".</p>
+<p>The list holds what a caller supplies. A method with no target attached, such as one read from a prototype, lists its receiver first as <strong>this</strong>; parameters internal to the implementation are left out. On a <a href="#Bind">bound</a> function the already-bound parameters are excluded too, so <strong>Index</strong> numbers only the parameters that remain.</p>
+<p>The value is <a href="../Concepts.htm#unset">unset</a> when the parameters cannot be known, such as for a function produced by <a href="ObjBindMethod.htm">ObjBindMethod</a>, which does not resolve its target until it is called.</p>
 <pre class="NoIndent">MyFunc(Alpha, Beta := 5, &amp;Out?, Rest*) =&gt; Alpha
 for p in MyFunc.Params
     MsgBox p.Index ": " p.Name (p.HasOwnProp("Default") ? " = " p.Default : "")</pre>
@@ -180,9 +178,7 @@ for p in MyFunc.Params
 <p>If the function is <a href="../Functions.htm#Variadic">variadic</a>, <em>ParamCount</em> indicates the maximum number of parameters which can be accepted by the function without overflowing into the "variadic*" parameter.</p></div>
 
 <h2 id="Implementation">Implementation Remarks</h2>
-<p id="FuncObj">The underlying managed class is named <code class="no-highlight">FuncObj</code> because .NET already defines a type named Func. Compatibility type checks recognize both <code class="no-highlight">Value is Func</code> and <code class="no-highlight">Value is FuncObj</code>.</p>
-<p>A function object is obtained from a direct function reference, as in <code>MyFunc</code>. A function's name in string form raises a <a href="Error.htm#TypeError">TypeError</a>; a name known only at run time is resolved with a <a href="../Variables.htm#deref">double-deref</a> first, as in <code>%"MyFunc"%</code>. A method is bound by name with <a href="ObjBindMethod.htm">ObjBindMethod</a>, and a <a href="Gui.htm#Call">Gui</a> built with an event sink takes one of that sink's method names in <a href="GuiOnEvent.htm">OnEvent</a>. Most built-in functions can also be used as function objects.</p>
-<p id="Performance">Calling a function object uses reflection and is slower than a direct function call. Prefer direct calls in performance-sensitive loops.</p>
+<p id="Performance">Calling a function object is slower than a direct function call.</p>
 
 </body>
 </html>

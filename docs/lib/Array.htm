@@ -29,6 +29,7 @@ MsgBox users[1]</pre>
 <p>An array can also be extended by assigning a larger value to <a href="#Length">Length</a>. This changes which indices are valid, but <a href="#Has">Has</a> will show that the new elements have no value. Elements without a value are typically used for <a href="../Functions.htm#VariadicCall">variadic calls</a> or by <a href="../Functions.htm#Variadic">variadic functions</a>, but can be used for any purpose.</p>
 <p>"ArrayObj" is used below as a placeholder for any Array object, as "Array" is the class itself.</p>
 <p>In addition to the methods and properties inherited from <a href="Object.htm">Object</a>, Array objects have the following predefined methods and properties.</p>
+<p><a href="#Contains">Contains</a>, <a href="#Filter">Filter</a>, <a href="#FindIndex">FindIndex</a>, <a href="#IndexOf">IndexOf</a>, <a href="#Join">Join</a>, <a href="#Map">Map</a>, <a href="#Remove">Remove</a>, <a href="#Sort">Sort</a> and <a href="#ToString">ToString</a> are Keysharp extensions.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
@@ -39,7 +40,6 @@ MsgBox users[1]</pre>
   </li>
   <li><a href="#Methods">Methods</a>:
     <ul>
-      <li><a href="#Add">Add</a>: Appends one value and returns the new length.</li>
       <li><a href="#Clone">Clone</a>: Returns a shallow copy of an array.</li>
       <li><a href="#Contains">Contains</a>: Returns whether the array contains a value.</li>
       <li><a href="#Delete">Delete</a>: Removes the value of an array element, leaving the index without a value.</li>
@@ -50,14 +50,12 @@ MsgBox users[1]</pre>
       <li><a href="#IndexOf">IndexOf</a>: Finds a value.</li>
       <li><a href="#InsertAt">InsertAt</a>: Inserts one or more values at a given position.</li>
       <li><a href="#Join">Join</a>: Joins element text.</li>
-      <li><a href="#MapTo">MapTo</a>: Transforms elements into a new Array.</li>
-      <li><a href="#MaxIndex">MaxIndex/MinIndex</a>: Returns the highest or lowest index.</li>
+      <li><a href="#Map">Map</a>: Transforms elements into a new Array.</li>
       <li><a href="#Pop">Pop</a>: Removes and returns the last array element.</li>
       <li><a href="#Push">Push</a>: Appends values to the end of an array.</li>
       <li><a href="#Remove">Remove</a>: Removes the first occurrence of a value.</li>
       <li><a href="#RemoveAt">RemoveAt</a>: Removes items from an array.</li>
       <li><a href="#Sort">Sort</a>: Sorts the Array in place.</li>
-      <li><a href="#ToClr">ToClr</a>: Returns the array as a Clr object.</li>
       <li><a href="#ToString">ToString</a>: Returns a string representation of the array.</li>
       <li><a href="#__New">__New</a>: Appends items. Equivalent to Push.</li>
       <li><a href="#__Enum">__Enum</a>: Enumerates array elements.</li>
@@ -84,12 +82,6 @@ ArrayObj := Array.<span class="func">Call</span>(<span class="optional">Value, V
 
 <h2 id="Methods">Methods</h2>
 
-<div class="methodShort" id="Add"><h3>Add</h3>
-<p>Appends one value and returns the new length.</p>
-<pre class="Syntax">Length := ArrayObj.<span class="func">Add</span>(Value)</pre>
-<p>This avoids the variadic-call overhead of Push when only one value is added.</p>
-</div>
-
 <div class="methodShort" id="Clone"><h3>Clone</h3>
 <p>Returns a shallow copy of an array.</p>
 <pre class="Syntax">Clone := ArrayObj.<span class="func">Clone</span>()</pre>
@@ -100,8 +92,7 @@ ArrayObj := Array.<span class="func">Call</span>(<span class="optional">Value, V
 <div class="methodShort" id="Contains"><h3>Contains</h3>
 <p>Returns whether the array contains a value.</p>
 <pre class="Syntax">Boolean := ArrayObj.<span class="func">Contains</span>(<span class="optional">Value</span>)</pre>
-<p>The return value is 1 (true) if an element equal to <em>Value</em> is present, otherwise 0 (false).</p>
-<p>If <em>Value</em> is omitted, the search is for an element which has no value, as left behind by <a href="#Delete">Delete</a>.</p>
+<p>The return value is 1 (true) if an element matches <em>Value</em> as in <a href="#IndexOf">IndexOf</a>, otherwise 0 (false).</p>
 </div>
 
 <div class="methodShort" id="Delete"><h3>Delete</h3>
@@ -238,7 +229,7 @@ MsgBox x[1]              <em>; C</em></pre>
 <pre class="Syntax">Boolean := ArrayObj.<span class="func">Remove</span>(<span class="optional">Value</span>)</pre>
 <p>Elements after the removed value are shifted to the left. If the value is not present, the array is unchanged.</p>
 <p>If <em>Value</em> is omitted, the first element which has no value is removed, as left behind by <a href="#Delete">Delete</a>.</p>
-<p>The return value is 1 (true) if an element equal to <em>Value</em> was found and removed, otherwise 0 (false).</p>
+<p>The return value is 1 (true) if an element matching <em>Value</em> as in <a href="#IndexOf">IndexOf</a> was found and removed, otherwise 0 (false).</p>
 </div>
 
 <div class="methodShort" id="Filter"><h3>Filter</h3>
@@ -246,12 +237,14 @@ MsgBox x[1]              <em>; C</em></pre>
 <pre class="Syntax">Filtered := ArrayObj.<span class="func">Filter</span>(Callback <span class="optional">, StartIndex := 1</span>)</pre>
 <p>The callback receives <code class="no-highlight">(Value, Index)</code>; it may declare only the parameters it needs.</p>
 <p>A negative <em>StartIndex</em> begins at the corresponding position from the end and filters toward the beginning, so the result is in reverse order.</p>
+<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if the array is not empty and <em>StartIndex</em> is 0 or its absolute value exceeds <a href="#Length">Length</a>.</p>
 </div>
 
 <div class="methodShort" id="FindIndex"><h3>FindIndex</h3>
 <p>Returns the index of the first element for which a callback returns true, or 0 if none does.</p>
 <pre class="Syntax">Index := ArrayObj.<span class="func">FindIndex</span>(Callback <span class="optional">, StartIndex := 1</span>)</pre>
 <p>A negative <em>StartIndex</em> begins at the corresponding position from the end and searches toward the beginning.</p>
+<p>An <a href="Error.htm#IndexError">IndexError</a> is thrown if the array is not empty and <em>StartIndex</em> is 0 or its absolute value exceeds <a href="#Length">Length</a>.</p>
 </div>
 
 <div class="methodShort" id="IndexOf"><h3>IndexOf</h3>
@@ -259,7 +252,8 @@ MsgBox x[1]              <em>; C</em></pre>
 <pre class="Syntax">Index := ArrayObj.<span class="func">IndexOf</span>(<span class="optional">Value, StartIndex := 1</span>)</pre>
 <p>A negative <em>StartIndex</em> searches toward the beginning.</p>
 <p>If <em>Value</em> is omitted, the search is for an element which has no value, as left behind by <a href="#Delete">Delete</a>.</p>
-<p>An <a href="Error.htm#IndexError">IndexError</a> is thrown if <em>StartIndex</em> is 0 or its absolute value exceeds <a href="#Length">Length</a>. Searching an empty array is not an error; the return value is 0.</p>
+<p>An element matches only a value of the same type which is equal to it: strings are compared case-sensitively, and a number does not match a number of another type or a numeric string, so <code>1</code> matches neither <code>1.0</code> nor <code>"1"</code>.</p>
+<p>An <a href="Error.htm#IndexError">IndexError</a> is thrown if the array is not empty and <em>StartIndex</em> is 0 or its absolute value exceeds <a href="#Length">Length</a>.</p>
 </div>
 
 <div class="methodShort" id="Join"><h3>Join</h3>
@@ -267,30 +261,19 @@ MsgBox x[1]              <em>; C</em></pre>
 <pre class="Syntax">Text := ArrayObj.<span class="func">Join</span>(<span class="optional">Separator := ","</span>)</pre>
 </div>
 
-<div class="methodShort" id="MapTo"><h3>MapTo</h3>
+<div class="methodShort" id="Map"><h3>Map</h3>
 <p>Returns a new Array containing the value returned by a callback for each source element from <em>StartIndex</em>.</p>
-<pre class="Syntax">Mapped := ArrayObj.<span class="func">MapTo</span>(Callback <span class="optional">, StartIndex := 1</span>)</pre>
-<p>The callback receives <code class="no-highlight">(Value, Index)</code>.</p>
+<pre class="Syntax">Mapped := ArrayObj.<span class="func">Map</span>(Callback <span class="optional">, StartIndex := 1</span>)</pre>
+<p>The callback receives <code class="no-highlight">(Value, Index)</code>; it may declare only the parameters it needs. If it returns no value, the corresponding element of the new Array has no value.</p>
+<p>A negative <em>StartIndex</em> begins at the corresponding position from the end and continues toward the end. An <a href="Error.htm#IndexError">IndexError</a> is thrown if the array is not empty and <em>StartIndex</em> is 0 or its absolute value exceeds <a href="#Length">Length</a>.</p>
 <pre>arr := [10, 20, 30]
-arr2 := arr.MapTo((x, i) =&gt; x * i)</pre>
-</div>
-
-<div class="methodShort" id="MaxIndex"><h3>MaxIndex / MinIndex</h3>
-<p>Returns the highest or lowest index. These compatibility methods are also available on Map.</p>
-<pre class="Syntax">Highest := ArrayObj.<span class="func">MaxIndex</span>()
-Lowest := ArrayObj.<span class="func">MinIndex</span>()</pre>
+arr2 := arr.Map((x, i) =&gt; x * i)   <em>; [10, 40, 90]</em></pre>
 </div>
 
 <div class="methodShort" id="Sort"><h3>Sort</h3>
 <p>Sorts the Array in place and returns the Array.</p>
 <pre class="Syntax">ArrayObj.<span class="func">Sort</span>(Callback)</pre>
 <p>The callback receives two values and should return a negative number when the first belongs before the second, zero when equal, or a positive number otherwise.</p>
-</div>
-
-<div class="methodShort" id="ToClr"><h3>ToClr</h3>
-<p>Returns the array as an ordinary <a href="Clr.htm">Clr</a> object, exposing its full CLR surface late-bound.</p>
-<pre class="Syntax">ClrArray := ArrayObj.<span class="func">ToClr</span>()</pre>
-<p>An array is itself a CLR <code class="no-highlight">IList</code>, so a CLR API declaring one accepts it directly; the wrapper is only needed to reach CLR members from script. See <a href="Clr.htm#ToClr">ToClr on built-in objects</a>.</p>
 </div>
 
 <div class="methodShort" id="ToString"><h3>ToString</h3>

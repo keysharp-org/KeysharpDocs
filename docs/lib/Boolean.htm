@@ -16,14 +16,10 @@
 
 <p>The type of a truth value. Every operator that yields one yields a Boolean: a comparison, a negation, and <a href="Map.htm#Has">Map.Has</a>. The <code class="no-highlight">true</code> and <code class="no-highlight">false</code> keywords are Boolean values too.</p>
 
-<p>A Boolean behaves as the <a href="../Concepts.htm#numbers">Integer</a> 1 or 0 in every other respect, so no existing code has to change to account for it.</p>
+<p>A Boolean behaves as the <a href="../Concepts.htm#numbers">Integer</a> 1 or 0 in every other respect.</p>
 
 <p>The class is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { Boolean }</pre>
-
-<p class="note"><strong>Note:</strong> Only the <em>name</em> comes from the KS module. Boolean <em>values</em> need no import — they are produced by ordinary operators in any script.</p>
-
-<p>AutoHotkey v2 has no boolean type, and the global namespace is AutoHotkey's, which is why the name lives in KS rather than alongside <a href="Integer.htm">Integer</a> and <a href="Float.htm">Float</a>.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
@@ -34,7 +30,7 @@
 </ul>
 
 <h2 id="Behavior">Behaves as an Integer</h2>
-<p>Boolean extends <a href="Integer.htm">Integer</a> because that is how a truth value behaves throughout the language:</p>
+<p>In particular:</p>
 <ul>
   <li><a href="Type.htm">Type</a> reports <code class="no-highlight">"Integer"</code>, not <code class="no-highlight">"Boolean"</code>.</li>
   <li><code class="no-highlight">Value is Integer</code> and <code class="no-highlight">Value is Number</code> are true.</li>
@@ -42,32 +38,16 @@
   <li>It converts to the strings <code class="no-highlight">"1"</code> and <code class="no-highlight">"0"</code>.</li>
   <li><a href="If.htm">If</a> and the ternary operator test it correctly.</li>
 </ul>
-<pre>#Import "Ks" { Boolean }
-
-MsgBox Type(true)        <em>; Integer</em>
-MsgBox Type(1 &gt; 0)       <em>; Integer</em>
-MsgBox true == 1         <em>; 1</em>
-MsgBox true + 1          <em>; 2</em>
-MsgBox "" true           <em>; 1</em></pre>
 
 <h2 id="Testing">Testing for a Boolean</h2>
-<p><code class="no-highlight">Value is Boolean</code> is what distinguishes a truth value from an ordinary Integer. Since a Boolean compares equal to 1 or 0 and <a href="Type.htm">Type</a> names it <code class="no-highlight">"Integer"</code>, no comparison can do it.</p>
+<p><code class="no-highlight">Value is Boolean</code> is what distinguishes a truth value from an ordinary Integer.</p>
 <pre>#Import "Ks" { Boolean }
 
 MsgBox (1 &gt; 0) is Boolean    <em>; 1</em>
 MsgBox (1 &gt; 0) is Integer    <em>; 1</em>
 MsgBox 1 is Boolean          <em>; 0</em>
 MsgBox 1 is Integer          <em>; 1</em></pre>
-<p>This matters when the <em>shape</em> of data is being validated rather than merely read: a plain <code class="no-highlight">if (Value)</code> accepts <code class="no-highlight">1</code>, <code class="no-highlight">"yes"</code> and <code class="no-highlight">true</code> equally.</p>
-
-<h2 id="Encoding">Where the distinction shows in output</h2>
-<p><a href="Json.htm#Encode">Json.Encode</a> writes a Boolean as JSON <code class="no-highlight">true</code> or <code class="no-highlight">false</code>, and an Integer as a number. This is the one place the difference is visible outside a type test.</p>
-<pre>#Import "Ks" { Json }
-
-MsgBox Json.Encode(Map("ok", 1 &gt; 0))   <em>; {"ok":true}</em>
-MsgBox Json.Encode(Map("ok", 1))       <em>; {"ok":1}</em>
-MsgBox Json.Encode(Map("ok", true))    <em>; {"ok":true}</em></pre>
-<p>It is also what lets JSON booleans survive a decode followed by an encode: <a href="Json.htm#Decode">Json.Decode</a> produces Booleans for <code class="no-highlight">true</code> and <code class="no-highlight">false</code>.</p>
+<p><a href="Json.htm#Encode">Json.Encode</a> writes a Boolean as JSON <code class="no-highlight">true</code> or <code class="no-highlight">false</code>; see <a href="Json.htm">Json</a> for how types map.</p>
 
 <h2 id="Call">Boolean()</h2>
 <p>Converts a value to a Boolean, deciding it exactly as <a href="If.htm">If</a> would.</p>
@@ -84,10 +64,7 @@ MsgBox Json.Encode(Map("ok", true))    <em>; {"ok":true}</em></pre>
 
 <h3 id="Call_Return_Value">Return Value</h3>
 <p>Type: <a href="Boolean.htm">Boolean</a></p>
-<p>Returns true if <em>Expression</em> is truthy, else false. An empty string, <code class="no-highlight">0</code> and <code class="no-highlight">"0"</code> are false; any object, any non-empty non-numeric string, and any non-zero number are true.</p>
-
-<h3 id="Call_Errors">Errors</h3>
-<p>An <a href="Error.htm#UnsetError">UnsetError</a> is thrown if <em>Expression</em> is unset, exactly as testing an unset variable with <a href="If.htm">If</a> throws.</p>
+<p>Returns true if <em>Expression</em> is truthy, else false.</p>
 
 <h2 id="Examples">Examples</h2>
 

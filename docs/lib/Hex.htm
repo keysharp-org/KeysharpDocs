@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Hex - Methods | Keysharp</title>
+<meta name="description" content="Encodes binary data as hexadecimal text and decodes hexadecimal text to a Buffer." />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="../static/theme.css" rel="stylesheet" type="text/css" />
+<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" type="text/javascript"></script>
+</head>
+<body>
+<h1>Hex</h1>
+<pre class="NoIndent">class Hex extends Object</pre>
+<p>Converts binary data to and from hexadecimal text. Call both methods on the class itself.</p>
+<pre>#Import Ks { Hex }</pre>
+<h2 id="Encode">Encode</h2>
+<pre class="Syntax">Text := Hex.<span class="func">Encode</span>(Value <span class="optional">, Encoding := "UTF-8"</span>)</pre>
+<p><em>Value</em> is a String, <a href="StringBuffer.htm">StringBuffer</a> or <a href="Buffer.htm">Buffer</a>. Text uses <em>Encoding</em>, whose names match <a href="FileEncoding.htm">FileEncoding</a>. A Buffer retains its bytes. Returns uppercase hexadecimal, two digits per byte, without separators or a <code>0x</code> prefix. Empty input returns an empty String.</p>
+<p>An unrecognized encoding raises <a href="Error.htm#ValueError">ValueError</a>; an input which holds no bytes raises <a href="Error.htm#TypeError">TypeError</a>.</p>
+<h2 id="Decode">Decode</h2>
+<pre class="Syntax">Bytes := Hex.<span class="func">Decode</span>(Text)</pre>
+<p>Returns a <a href="Buffer.htm">Buffer</a> containing the decoded bytes. <em>Text</em> must contain an even number of hexadecimal digits, using 0-9 and A-F in either letter case. Empty text returns an empty Buffer.</p>
+<p>Odd lengths, whitespace, prefixes such as <code>0x</code> and other invalid characters raise <a href="Error.htm#ValueError">ValueError</a>.</p>
+<p>To interpret the resulting bytes as text, call <a href="StrGet.htm">StrGet</a> with the encoding of the original data.</p>
+<h2 id="Examples">Examples</h2>
+<div class="ex" id="ExText">
+<p><a class="ex_number" href="#ExText"></a> Converts text to hexadecimal and reads it back.</p>
+<pre>#Import Ks { Hex }
+Encoded := Hex.Encode("Hello") <em>; 48656C6C6F</em>
+Bytes := Hex.Decode("48656c6c6f")
+FileAppend StrGet(Bytes, Bytes.Size, "UTF-8"), "*"</pre>
+</div>
+<div class="ex" id="ExDigest">
+<p><a class="ex_number" href="#ExDigest"></a> Obtains raw HMAC digest bytes. The complete <a href="Crypto.htm#ExTotp">TOTP example</a> uses this conversion for dynamic truncation.</p>
+<pre>#Import Ks { Crypt, Hex }
+Digest := Hex.Decode(Crypt.Hmac("message", "key"))
+FirstByte := NumGet(Digest, 0, "UChar")</pre>
+</div>
+<h2 id="Related">Related</h2>
+<p><a href="Base32.htm">Base32</a>, <a href="Base64.htm">Base64</a>, <a href="Crypto.htm">Crypt</a>, <a href="Buffer.htm">Buffer</a>, <a href="StrGet.htm">StrGet</a></p>
+</body>
+</html>

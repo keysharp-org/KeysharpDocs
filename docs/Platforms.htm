@@ -14,16 +14,11 @@
 <h1>Platform Support</h1>
 
 <p>The parser, compiler and general runtime operate on Windows, Linux and macOS. Features which integrate with windows, input devices, the screen, desktop services or native APIs can require platform-specific backends or permissions.</p>
-<p class="note"><strong>Note:</strong> This page describes shared platform requirements. Each function page describes the observable contract and limitations specific to that function.</p>
 
 <h2 id="Windows">Windows</h2>
 
-<p>Windows currently has the broadest AutoHotkey v2 compatibility. Windows integrations use native Windows APIs and WinForms.</p>
-<p>The main general differences are:</p>
-<ul>
-  <li>Object destruction is non-deterministic because objects follow the .NET garbage-collection model. See <a href="Objects.htm#Lifetime">Object Lifetime</a>.</li>
-  <li>GUI rendering uses WinForms. Controls can differ in default size, Z-order and label rendering, and a GUI can appear blank before it has first been shown because WinForms initializes controls lazily.</li>
-</ul>
+<p>Windows has the broadest AutoHotkey v2 compatibility.</p>
+<p>GUI controls can differ in default size, Z-order and label rendering, and a GUI can appear blank before it has first been shown.</p>
 <p>Registry functions are available only on Windows. The COM functions are available on all three platforms, but only Windows drives real COM: see <a href="#Linux_DBus">Interprocess automation with ComObject</a> on Linux and <a href="#macOS_AppleEvents">its macOS counterpart</a>.</p>
 
 <h2 id="Linux">Linux</h2>
@@ -35,8 +30,8 @@
   <tr><th>Desktop backend</th><th>Window and capture support</th><th>Requirements and limits</th></tr>
   <tr>
     <td><strong>X11</strong></td>
-    <td>Window queries and control, push window events, area and window capture, cursor and keyboard-map queries.</td>
-    <td>Uses the X server through <code class="no-highlight">keysharp-desktop</code>. Window operations and capture require the same broker consent as on Wayland. Window events fall back to polling when the window manager provides no EWMH client list.</td>
+    <td>Window queries and control, polled window events, area and window capture, cursor and keyboard-map queries.</td>
+    <td>Uses the X server through <code class="no-highlight">keysharp-desktop</code>. Window operations and capture require the same broker consent as on Wayland.</td>
   </tr>
   <tr>
     <td><strong>Wayland &mdash; GNOME</strong></td>
@@ -46,7 +41,7 @@
   <tr>
     <td><strong>Wayland &mdash; Cinnamon</strong></td>
     <td>Window queries and control, push window events, window capture, cursor queries and movement.</td>
-    <td>Requires the keysharp-desktop Cinnamon extension. Area capture is unavailable. There is no shell Eval fallback.</td>
+    <td>Requires the keysharp-desktop Cinnamon extension. Area capture is unavailable.</td>
   </tr>
   <tr>
     <td><strong>Wayland &mdash; KWin/KDE Plasma</strong></td>
@@ -69,41 +64,30 @@
 <h3 id="Linux_Controls">Controls and accessibility automation</h3>
 <p>Controls created by the script support toolkit-based control functions. X11 also exposes native child windows, title, focus and targeted input operations through the desktop component, but it does not expose the full Windows control model. Wayland foreign controls require application accessibility support.</p>
 <p>For cross-process inspection and automation, use <a href="https://github.com/keysharp-org/Keysharp/blob/master/Keysharp/Scripts/AtSpi.ks"><code>AtSpi.ks</code></a>. Running it directly opens AtSpiViewer; the library also provides APIs similar to Windows accessibility and UI Automation libraries.</p>
-<p>Registry functions are unavailable on Linux. GUI support is broadly implemented, although individual control pages identify missing or differing behavior.</p>
 
 <h3 id="Linux_DBus">Interprocess automation with ComObject</h3>
-<p><a href="lib/ComObject.htm">ComObject</a> addresses a D-Bus service, which fills the role COM automation fills on Windows: a named service exposes objects whose methods, properties and signals a script calls by name. The COM function names are kept so that the automation surface reads the same on every platform, as <a href="lib/DllCall.htm">DllCall</a> does; the target strings themselves are not portable between platforms.</p>
+<p><a href="lib/ComObject.htm">ComObject</a> addresses a D-Bus service, which fills the role COM automation fills on Windows: a named service exposes objects whose methods, properties and signals a script calls by name.</p>
 <p>A target is written <code>[session:|system:]service.name[:/object/path]</code>. The session bus is used unless <code>system:</code> is given. When the object path is omitted it is derived from the service name by replacing each dot with a slash; if no such object exists, the error names the objects the service does expose.</p>
-<p>Members are resolved through D-Bus introspection, so a service must be introspectable. When a member name appears on more than one of an object's interfaces, pass the interface name as the second parameter of <code>ComObject</code>, or select it with <a href="lib/ComObjQuery.htm">ComObjQuery</a>.</p>
-<p>D-Bus is strictly typed on the wire and performs no implicit conversion. Argument types come from the service's own introspection data, so ordinary calls need no annotation; use <a href="lib/ComValue.htm">ComValue</a> where a type cannot be derived from it, most often for the values of an <code class="no-highlight">a{sv}</code> dictionary.</p>
-<p class="note"><strong>Note:</strong> Functions which depend on COM machinery that D-Bus does not have throw an error stating the reason rather than failing silently: <a href="lib/ComCall.htm">ComCall</a> (no virtual function tables), <a href="lib/ObjAddRef.htm">ObjAddRef</a> and <code>ObjRelease</code> (no reference counting), and <a href="lib/ComObjValue.htm">ComObjValue</a>, <a href="lib/ComObjFlags.htm">ComObjFlags</a> and <a href="lib/ComObjFromPtr.htm">ComObjFromPtr</a> (no interface pointers or VARIANT flags). <a href="lib/ComObjArray.htm">ComObjArray</a> does not exist on Linux, so referring to it is a compile-time error.</p>
+<p>Members are resolved through D-Bus introspection, so a service must be introspectable. See <a href="lib/ComObject.htm">ComObject</a> and <a href="lib/ComObjQuery.htm">ComObjQuery</a> for selecting an interface, and <a href="lib/ComValue.htm#Linux">ComValue</a> for values whose D-Bus type cannot be derived.</p>
+<p class="note"><strong>Note:</strong> <a href="lib/ComCall.htm">ComCall</a>, <a href="lib/ObjAddRef.htm">ObjAddRef</a>, <code>ObjRelease</code>, <a href="lib/ComObjValue.htm">ComObjValue</a>, <a href="lib/ComObjFlags.htm">ComObjFlags</a> and <a href="lib/ComObjFromPtr.htm">ComObjFromPtr</a> throw an error. <a href="lib/ComObjArray.htm">ComObjArray</a> does not exist on Linux, so referring to it is a compile-time error.</p>
 
 <h2 id="macOS">macOS</h2>
 
 <p>macOS support requires macOS 15 or later. Native input, screen and foreign-window features can prompt for privacy permissions.</p>
 
 <table class="info">
-  <tr><th>Feature</th><th>Availability</th><th>Requirement or limitation</th></tr>
-  <tr><td>Script execution</td><td>Available</td><td>The parser, compiler and runtime are functional.</td></tr>
-  <tr><td>Hotkeys and hotstrings</td><td>Available</td><td>The suppression-capable hook requires Input Monitoring and Accessibility. <code>#</code>/Win maps to Command and <code>!</code>/Alt maps to Option.</td></tr>
-  <tr><td>Keyboard and mouse sending</td><td>Available</td><td>Requires Accessibility.</td></tr>
-  <tr><td>Global keyboard and mouse hooks</td><td>Available</td><td>The suppression-capable hook requires Input Monitoring and Accessibility.</td></tr>
-  <tr><td>Cursor confinement</td><td>Partial</td><td><code>ClipCursor</code> suppresses out-of-bounds movement and requires Input Monitoring and Accessibility.</td></tr>
-  <tr><td>GUI windows</td><td>Available</td><td>Uses Eto.Forms; some controls differ from Windows.</td></tr>
-  <tr><td>Screen capture and pixel functions</td><td>Available</td><td>Requires Screen Recording.</td></tr>
-  <tr><td>Window management</td><td>Partial</td><td>Uses Accessibility APIs. Monitoring also requires Screen Recording because macOS otherwise omits foreign window titles from its window inventory.</td></tr>
-  <tr><td>Registry APIs</td><td>Unavailable</td><td>Windows-only.</td></tr>
-  <tr><td>COM APIs</td><td>Available</td><td><a href="lib/ComObject.htm">ComObject</a> addresses Apple Events rather than COM, and requires Automation permission for each application it controls. See <a href="#macOS_AppleEvents">Interprocess automation with ComObject</a>.</td></tr>
+  <tr><th>Feature</th><th>Availability</th><th>Limitation</th></tr>
+  <tr><td>Hotkeys and hotstrings</td><td>Available</td><td><code>#</code>/Win maps to Command and <code>!</code>/Alt maps to Option.</td></tr>
+  <tr><td>Cursor confinement</td><td>Partial</td><td><code>ClipCursor</code> suppresses out-of-bounds movement.</td></tr>
+  <tr><td>GUI windows</td><td>Available</td><td>Some controls differ from Windows.</td></tr>
+  <tr><td>Window management</td><td>Partial</td><td>Monitoring also requires Screen Recording.</td></tr>
+  <tr><td>COM APIs</td><td>Available</td><td><a href="lib/ComObject.htm">ComObject</a> addresses Apple Events. See <a href="#macOS_AppleEvents">Interprocess automation with ComObject</a>.</td></tr>
 </table>
 
 <h3 id="macOS_AppleEvents">Interprocess automation with ComObject</h3>
-<p><a href="lib/ComObject.htm">ComObject</a> addresses a scriptable application through Apple Events, which fills the role COM automation fills on Windows: an application publishes a scripting dictionary whose commands, properties and elements a script uses by name. The COM function names are kept so that the automation surface reads the same on every platform, as <a href="lib/DllCall.htm">DllCall</a> does; the target strings themselves are not portable between platforms.</p>
-<p>A target is an application, written as a bundle identifier (<code>"com.apple.Finder"</code>), a name (<code>"Finder"</code>), a bundle path, or <code>"pid:1234"</code>, which addresses that process rather than whichever instance the bundle identifier currently resolves to. <code>ComObject</code> launches the application if it is not running, without bringing it to the front; <a href="lib/ComObjActive.htm">ComObjActive</a> and <a href="lib/ComObjGet.htm">ComObjGet</a> attach to a running one and throw otherwise.</p>
-<p>An Apple Events object is a query rather than a handle. <code>window 1 of application "Finder"</code> is resolved by the application each time it is used, so narrowing a collection costs nothing until a value is actually read, and an object which has become stale fails when it is used rather than when it was created.</p>
-<p>Members are resolved through the application's scripting definition, whose terms contain spaces. Spaces and underscores are folded away and case is ignored, so a term such as <code>file name</code> is reachable as <code>FileName</code>, <code>filename</code> or <code>file_name</code>. Where two suites define the same name with different events, the error lists them; pass the suite name as the second parameter of <code>ComObject</code>, or select it with <a href="lib/ComObjQuery.htm">ComObjQuery</a>.</p>
-<p>Apple event parameters are addressed by keyword, so the first unnamed argument is the command's direct parameter and every other value is passed by name: <code>win.Close(Saving: "no")</code>. When the receiver is an object rather than the application itself, the receiver is already the direct parameter, so supplying another unnamed argument is an error.</p>
-<p>Controlling another application requires <strong>Automation</strong> permission, granted per target application in <em>System Settings &rarr; Privacy &amp; Security &rarr; Automation</em>. Permission is requested before the first event so that the prompt is attributed correctly. This is separate from the Accessibility permission the window functions use.</p>
-<p class="note"><strong>Note:</strong> Functions which depend on COM machinery that Apple Events does not have throw an error stating the reason rather than failing silently: <a href="lib/ComCall.htm">ComCall</a> (no virtual function tables), <a href="lib/ObjAddRef.htm">ObjAddRef</a> and <code>ObjRelease</code> (no reference counting), and <a href="lib/ComObjValue.htm">ComObjValue</a>, <a href="lib/ComObjFlags.htm">ComObjFlags</a> and <a href="lib/ComObjFromPtr.htm">ComObjFromPtr</a> (no interface pointers or VARIANT flags). <a href="lib/ComObjArray.htm">ComObjArray</a> does not exist on macOS, so referring to it is a compile-time error.</p>
+<p><a href="lib/ComObject.htm">ComObject</a> addresses a scriptable application through Apple Events, which fills the role COM automation fills on Windows: an application publishes a scripting dictionary whose commands, properties and elements a script uses by name.</p>
+<p>Members are resolved through the application's scripting definition, whose terms contain spaces. Spaces and underscores are folded away and case is ignored, so a term such as <code>file name</code> is reachable as <code>FileName</code>, <code>filename</code> or <code>file_name</code>. See <a href="lib/ComObject.htm#macOS">ComObject</a> for targets, suite selection, commands and values, and <a href="#macOS_Permissions">Permissions</a> for the Automation permission.</p>
+<p class="note"><strong>Note:</strong> <a href="lib/ComCall.htm">ComCall</a>, <a href="lib/ObjAddRef.htm">ObjAddRef</a>, <code>ObjRelease</code>, <a href="lib/ComObjValue.htm">ComObjValue</a>, <a href="lib/ComObjFlags.htm">ComObjFlags</a> and <a href="lib/ComObjFromPtr.htm">ComObjFromPtr</a> throw an error. <a href="lib/ComObjArray.htm">ComObjArray</a> does not exist on macOS, so referring to it is a compile-time error.</p>
 
 <h3 id="macOS_Permissions">Permissions</h3>
 

@@ -14,7 +14,6 @@
 <h1>ComObjType</h1>
 
 <p>Retrieves type information from a COM object.</p>
-<p class="note"><strong>Notice:</strong> On macOS this answers the object's class name, or the application name, bundle identifier or object specifier.</p>
 
 <pre class="Syntax">Info := <span class="func">ComObjType</span>(ComObj <span class="optional">, InfoType</span>)</pre>
 
@@ -36,6 +35,7 @@
     <p><strong>Class:</strong> The object's class name. Note that this is not the same as a Prog ID (a Prog ID is a name used to identify the class in the system registry, or for <a href="ComObject.htm">ComObject</a>).</p>
     <p><strong>CLSID:</strong> The globally unique identifier (GUID) of the object's class. Classes are often registered by CLSID under the <code class="no-highlight">HKCR\CLSID</code> registry key.</p>
     <p>On Linux, the accepted values are <strong>Name</strong>, which returns the D-Bus service name; <strong>IID</strong>, which returns the interface the object is bound to; and <strong>Path</strong>, which returns the object path. Omitting <em>InfoType</em> is equivalent to <strong>IID</strong>. Any other value throws.</p>
+    <p>On macOS, omitting <em>InfoType</em> returns the object's class name; <strong>Name</strong> returns the application name, <strong>CLSID</strong> or <strong>IID</strong> its bundle identifier, and <strong>Path</strong> the object specifier. Any other value throws.</p>
   </dd>
 
 </dl>
@@ -44,6 +44,7 @@
 <p>Type: <a href="../Concepts.htm#numbers">Integer</a> or <a href="../Concepts.htm#strings">String</a></p>
 <p>The return value depends on the value of <em>InfoType</em>. An empty string is returned if either parameter is invalid or if the requested type information could not be retrieved.</p>
 <p>On Linux, the interface name is returned only when the object is bound to one interface, either because it was requested or because the object implements exactly one. An object with several unbound interfaces returns an empty string; use <a href="ComObjQuery.htm">ComObjQuery</a> to bind one.</p>
+<p>On Linux and macOS, a <a href="Error.htm#TypeError">TypeError</a> is thrown if <em>ComObj</em> is not a ComObject.</p>
 
 <h2 id="vt">Variant Type Constants</h2>
 <p>COM uses the following values to identify basic data types:</p>

@@ -14,7 +14,7 @@
 
 <h1>#CSharp <span class="ver">[Keysharp]</span></h1>
 
-<p>Embeds C# in a script. The C# is compiled into the script's own assembly, alongside the code generated from the script itself, so calling it needs no interop layer and no separate build step.</p>
+<p>Embeds C# in a script. The C# is compiled with the script, so it needs no separate build step.</p>
 
 <pre class="Syntax"><span class="func">#CSharp</span>
 <em>C# members</em>
@@ -24,7 +24,7 @@
 
 <span class="func">#CSharp</span> &lt;Library&gt;</pre>
 
-<p class="note"><strong>Note:</strong> This is for the handful of paths where AutoHotkey-level semantics cost too much &mdash; tight numeric loops, buffer and pixel work, repeated <a href="DllCall.htm">DllCall</a>. It is not a general substitute for script code, and it does not make <em>calls</em> cheaper. See <a href="#Performance">Performance</a>.</p>
+<p class="note"><strong>Note:</strong> This is for the handful of paths where AutoHotkey-level semantics cost too much &mdash; tight numeric loops, buffer and pixel work, repeated <a href="DllCall.htm">DllCall</a>. See <a href="#Performance">Performance</a>.</p>
 
 <h2 id="Parameters">Parameters</h2>
 <dl>
@@ -33,23 +33,21 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>Reads the C# from a file instead of from a block.</p>
-    <p>A relative path uses the <a href="../Modules.htm#Search_Path">module search path</a>, not <a href="_Include.htm">#Include</a>'s resolution: the directory of the file containing the directive first, then each configured search directory in order. The first existing file wins, and a miss names every directory that was tried. <code class="no-highlight">%A_ScriptDir%</code>-style path variables expand here as they do in an #Include path.</p>
-    <p>The working directory is never consulted, deliberately: when a script is built by the compile daemon the working directory is the Keysharp <em>install</em> directory, so a path resolved against it would read from somewhere the script author cannot predict.</p>
-    <p>Unlike a module name, the path is taken as written &mdash; no extension is appended and no <code class="no-highlight">__Init</code> lookup happens, because this names a file rather than a module.</p>
-    <p>Prefer this once the C# outgrows a few lines: a real <code class="no-highlight">.cs</code> file gets syntax highlighting and can use editor completion when the editor is configured for a class-member fragment. The file contains members for the directive's scope, not a standalone namespace or containing class. This parameter is not an expression and does not accept <a href="../Variables.htm">variable references</a>.</p>
+    <p>A relative path is searched for along the <a href="../Modules.htm#Search_Path">module search path</a>, beginning with the directory of the file containing the directive. <code class="no-highlight">%A_ScriptDir%</code>-style path variables expand here as they do in an #Include path.</p>
+    <p>The path is used as written; no extension is appended. The file contains members for the directive's scope, not a standalone namespace or containing class. This parameter is not an expression.</p>
   </dd>
 
   <dt id="Library">Library</dt>
   <dd>
     <p>Type: Name</p>
-    <p>Reads <code class="no-highlight">Library.cs</code> using the same Lib-folder search order and underscore fallback as <a href="_Include.htm">#Include &lt;Library&gt;</a>. The local <code class="no-highlight">Lib</code> folder is searched first, followed by the user and standard library folders.</p>
-    <p>For example, <code class="no-highlight">#CSharp &lt;Math_Add&gt;</code> searches for <code class="no-highlight">Math_Add.cs</code> in every Lib folder, then for <code class="no-highlight">Math.cs</code>. The angle-bracket form is a library name rather than a path: it does not expand variables.</p>
+    <p>Reads <code class="no-highlight">Library.cs</code> using the same Lib-folder search order and underscore fallback as <a href="_Include.htm">#Include &lt;Library&gt;</a>.</p>
+    <p>For example, <code class="no-highlight">#CSharp &lt;Math_Add&gt;</code> searches for <code class="no-highlight">Math_Add.cs</code> in every Lib folder, then for <code class="no-highlight">Math.cs</code>. Variable references are not allowed.</p>
   </dd>
 </dl>
 
 <h2 id="Visibility">What the script can see</h2>
 <p>At module scope, a <code class="no-highlight">public static</code> method becomes a script function within its declaring module, while public static fields and properties enter the module's variable store. Anything that is not <code class="no-highlight">public</code> is a C# helper which the script cannot call. A module-scope <code class="no-highlight">public</code> method which is not <code class="no-highlight">static</code> is rejected because a module has no instance.</p>
-<p>An explicit <code class="no-highlight">{ Name }</code> import can request any public static module method. Add <code class="no-highlight">[Export]</code> to include one in wildcard imports. The attribute is valid only on public static methods at module scope; default exports are not supported, and a bare import binds the module object.</p>
+<p>An explicit <code class="no-highlight">{ Name }</code> import can request any public static module method. Add <code class="no-highlight">[Export]</code> to include one in wildcard imports. The attribute is valid only on public static methods at module scope.</p>
 <p>In a class-body block, public methods and public property accessors are script-visible. A private or protected accessor remains a C# helper, and an <code class="no-highlight">init</code> accessor is read-only after construction. A field is never script-visible, but it may hold C#-side state shared by that class's blocks.</p>
 
 <pre>#CSharp
@@ -61,18 +59,16 @@ public static long Doubled(long n) => Helper(n);
 
 MsgBox Doubled(21)   <em>; 42</em></pre>
 
-<p>At the top level of a script or module, the block's members become members of that module. A name that collides with a script variable or function, or with a name Keysharp generates, is reported against the block. A block may also appear in a <a href="#ClassScope">class body</a>.</p>
+<p>A name that collides with a script variable or function, or with a name Keysharp generates, is reported against the block.</p>
 
 <h2 id="ClassScope">Blocks in a class</h2>
-<p>A block written in a class body declares members of that class, so a fast path can live with the code it belongs to instead of taking a name in the script's global scope.</p>
+<p>A block written in a class body declares members of that class.</p>
 
-<p>A <code class="no-highlight">static</code> member receives its receiver as an ordinary leading parameter, before the arguments the script passes &mdash; the object for an instance member, the class itself for a class-static one. This is the same implicit <code class="no-highlight">this</code> slot AutoHotkey uses: a script-declared <code class="no-highlight">static Stat(a,b,c)</code> likewise reports four required parameters.</p>
+<p>A <code class="no-highlight">static</code> member receives its receiver as an ordinary leading parameter, before the arguments the script passes &mdash; the object for an instance member, the class itself for a class-static one. By convention it is written <code class="no-highlight">object @this</code>; the name is not checked.</p>
 
-<p>By convention it is written <code class="no-highlight">object @this</code>, matching what Keysharp generates for a script-declared method, but the name is yours to choose and is not checked. (<code class="no-highlight">@this</code> is C#'s escape for using the reserved word <code class="no-highlight">this</code> as an identifier.)</p>
+<p>A <code class="no-highlight">public static</code> method whose first parameter cannot hold a receiver &mdash; because there is none, or because it is a value type, a string, an array, a pointer, or a <code class="no-highlight">params</code>/by-ref parameter &mdash; is reported at compile time, including one marked <code class="no-highlight">[Static]</code>.</p>
 
-<p>Omitting it altogether is a different matter, and is reported at compile time: a <code class="no-highlight">public static</code> method whose first parameter could not hold a receiver &mdash; because there is none, or because it is a value type, a string, an array, a pointer, or a <code class="no-highlight">params</code>/by-ref slot &mdash; would otherwise have its first real argument handed the object. Left alone that surfaces at the call as "Too many arguments provided", or, for a variadic member, as a silently extra leading element in the <code class="no-highlight">params</code> array. <code class="no-highlight">[Static]</code> is not exempt: it selects <em>which</em> receiver arrives, never <em>whether</em> one does.</p>
-
-<p>Since every such method is <code class="no-highlight">static</code> in C#, C#'s own <code class="no-highlight">static</code> is not what decides whether the script sees an instance member or a class-static one. The <code class="no-highlight">[Static]</code> attribute does, and so does prefixing the name with <code class="no-highlight">static</code>:</p>
+<p>The <code class="no-highlight">[Static]</code> attribute, or a <code class="no-highlight">static</code> prefix on the name, makes the member class-static; otherwise it is an instance member:</p>
 
 <pre>class Vec {
     __New(x, y) => (this.x := x, this.y := y)
@@ -99,7 +95,7 @@ v := Vec(3.0, 4.0)
 MsgBox v.Len2(2)      <em>; 50.0</em>
 MsgBox Vec.Origin()   <em>; 0,0</em></pre>
 
-<p>Members declared this way are registered exactly like the ones Keysharp generates for the class's AutoHotkey-declared methods, so they behave identically in every respect the script can observe: an instance member is not reachable through the class, a static one is not reachable through an instance, and the two sides may share a name without either shadowing the other. Ordinary parameters follow the receiver as usual &mdash; typed, optional or <code class="no-highlight">params</code>:</p>
+<p>These members behave like script-declared methods. Ordinary parameters follow the receiver &mdash; typed, optional or <code class="no-highlight">params</code>:</p>
 
 <pre>#CSharp
 [Static]
@@ -113,9 +109,9 @@ public static long staticScaled(object @this, long n) => n * 10;
 public static long Count(object @this, params object[] args) => args.Length;
 #EndCSharp</pre>
 
-<p>A class-static <em>property</em> is written as its accessor method &mdash; <code class="no-highlight">staticget_Name</code> or <code class="no-highlight">staticset_Name</code> &mdash; because a property has no parameter list to receive the class in. So <code class="no-highlight">public static long staticget_Answer(object @this) =&gt; 42;</code> is read by the script as <code class="no-highlight">Vec.Answer</code>.</p>
+<p>A class-static <em>property</em> is written as its accessor method, <code class="no-highlight">staticget_Name</code> or <code class="no-highlight">staticset_Name</code>. For example, <code class="no-highlight">public static long staticget_Answer(object @this) =&gt; 42;</code> is read by the script as <code class="no-highlight">Vec.Answer</code>.</p>
 
-<p>A C# <em>instance</em> member is also accepted, and declares no receiver, because C# binds one for it. This is also the only way a <em>property</em> can get one, a property having no parameter list to declare it in &mdash; so a <code class="no-highlight">public static</code> property in a class body is rejected. Both methods and properties work:</p>
+<p>A <code class="no-highlight">public static</code> property in a class body is rejected, but a C# <em>instance</em> method or property is accepted, and declares no receiver:</p>
 
 <pre>#CSharp
 public object Thrice(long n) =&gt; n * 3;   <em>; called as v.Thrice(4)</em>
@@ -140,16 +136,16 @@ MsgBox SumSquares(4)      <em>; 30</em>
 MsgBox SumSquares("4")    <em>; 30 &mdash; a numeric string converts, as "4" == 4 does</em>
 MsgBox SumSquares(4.0)    <em>; 30 &mdash; a Float truncates toward zero</em></pre>
 
-<p>Only a genuinely non-numeric value raises, and it raises a catchable <a href="Error.htm#TypeError">TypeError</a>, exactly as <code class="no-highlight">1 + "abc"</code> does. Integer-family and floating-point return types are normalised to Integer and Float, so results behave like any other script value.</p>
+<p>A non-numeric value raises a <a href="Error.htm#TypeError">TypeError</a>, as <code class="no-highlight">1 + "abc"</code> does. Integer-family and floating-point return values become Integer and Float.</p>
 
-<p>A returned CLR value which has no native script representation is wrapped with the same objects used by <a href="Clr.htm">Clr</a>: <code class="no-highlight">System.Type</code> becomes a <code class="no-highlight">ManagedType</code>, and other CLR objects and value types become a <code class="no-highlight">ManagedInstance</code>. This also applies when the declared return, property or field type is <code class="no-highlight">object</code>. Passing a <code class="no-highlight">ManagedInstance</code> back to C# unwraps its payload for a matching reference or value type and for an <code class="no-highlight">object</code> target; <code class="no-highlight">ManagedType</code> similarly unwraps for a <code class="no-highlight">System.Type</code>-compatible target.</p>
+<p>A returned CLR value which has no native script representation is wrapped with the same objects used by <a href="Clr.htm">Clr</a>: <code class="no-highlight">System.Type</code> becomes a <code class="no-highlight">ManagedType</code>, and other CLR objects and value types become a <code class="no-highlight">ManagedInstance</code>. This also applies when the declared return, property or field type is <code class="no-highlight">object</code>. Passing a <code class="no-highlight">ManagedInstance</code> back to C# unwraps its payload for a matching reference or value type and for an <code class="no-highlight">object</code> target; <code class="no-highlight">ManagedType</code> similarly unwraps for a <code class="no-highlight">System.Type</code>-compatible target. The <a href="Clr.htm#Bytes">Clr byte-array and byte-span conversion rules</a> also apply at this boundary.</p>
 
-<p>The exported boundary supports objects and reference types, strings, Booleans, integer-family types, <code class="no-highlight">float</code>/<code class="no-highlight">double</code>, and <code class="no-highlight">params object[]</code>. Signatures which the script dispatcher cannot represent are rejected: <code class="no-highlight">ref</code>/<code class="no-highlight">out</code>/<code class="no-highlight">in</code>, pointers and by-ref returns, <code class="no-highlight">char</code>, <code class="no-highlight">decimal</code>, nullable and tuple types, <code class="no-highlight">Span&lt;T&gt;</code>/<code class="no-highlight">ReadOnlySpan&lt;T&gt;</code>, typed <code class="no-highlight">params</code> arrays, and generic exported methods. Make such a method non-public when it is only a C# helper.</p>
+<p>The exported boundary supports objects and reference types, strings, Booleans, integer-family types, <code class="no-highlight">float</code>/<code class="no-highlight">double</code>, <code class="no-highlight">Span&lt;byte&gt;</code>/<code class="no-highlight">ReadOnlySpan&lt;byte&gt;</code> and <code class="no-highlight">params object[]</code>. Signatures which the script dispatcher cannot represent are rejected: <code class="no-highlight">ref</code>/<code class="no-highlight">out</code>/<code class="no-highlight">in</code>, pointers and by-ref returns, <code class="no-highlight">char</code>, <code class="no-highlight">decimal</code>, nullable and tuple types, other <code class="no-highlight">Span&lt;T&gt;</code>/<code class="no-highlight">ReadOnlySpan&lt;T&gt;</code> types, other typed <code class="no-highlight">params</code> arrays, and generic exported methods. Make such a method non-public when it is only a C# helper.</p>
 
-<p class="note"><strong>Note:</strong> This is a check of the <em>written</em> type name &mdash; no C# name binding happens during lowering &mdash; so <code class="no-highlight">System.Char</code> is recognized like <code class="no-highlight">char</code>, but a <code class="no-highlight">using</code> alias for a rejected type, or a user-defined <code class="no-highlight">ref struct</code>, is not caught at compile time. Such a member fails when it is first called instead.</p>
+<p class="note"><strong>Note:</strong> A <code class="no-highlight">using</code> alias for a rejected type, or a user-defined <code class="no-highlight">ref struct</code>, is not detected at compile time; such a member fails when it is first called.</p>
 
 <h2 id="Globals">Sharing state with the script</h2>
-<p>Module globals are static fields of the same class, so C# reads and writes them directly &mdash; in lowercase, since that is the name actually generated and C# is case-sensitive:</p>
+<p>C# reads and writes a module global directly, by its name in lowercase:</p>
 
 <pre>global Hits := 0
 
@@ -161,20 +157,20 @@ public static long Tally(long n)
 }
 #EndCSharp</pre>
 
-<p>A global arrives as an unconverted value, and the script decides its type &mdash; <code class="no-highlight">Threshold := 1</code> stores an Integer and <code class="no-highlight">Threshold := 0.75</code> a Float, so a C# cast is not safe on one. Passing a global as a <em>parameter</em> instead is both safer and faster: the value is converted once at the boundary, and the body works with a real <code class="no-highlight">double</code>.</p>
+<p>A global holds an unconverted script value whose type the script decides, so a C# cast on it can fail. Pass the value as a typed parameter instead; it is converted at the boundary.</p>
 
 <h2 id="Usings">Namespaces and preprocessor symbols</h2>
-<p>Every script module has its own inline C# syntax tree. A <code class="no-highlight">using</code> at the top of any block is pooled across that module's tree, so it is available to later module and class blocks in the same module. It cannot leak into another module, and two modules may give the same alias different meanings. Already in scope in each module: <code class="no-highlight">System</code>, <code class="no-highlight">System.Collections.Generic</code>, <code class="no-highlight">System.Runtime.CompilerServices</code>, <code class="no-highlight">System.Runtime.InteropServices</code> and <code class="no-highlight">Keysharp.Runtime</code>.</p>
-<p><code class="no-highlight">Keysharp.Builtins</code> is deliberately <em>not</em> imported: its <code class="no-highlight">Array</code>, <code class="no-highlight">String</code> and <code class="no-highlight">Buffer</code> would be ambiguous with the <code class="no-highlight">System</code> types of the same name. Name those types in full, or import the namespace and resolve the ambiguity for that module.</p>
-<p>Aliases and <code class="no-highlight">using static</code> use ordinary C# syntax. A using may also be guarded by <code class="no-highlight">#if</code>; only the active branch is imported. Keysharp normalizes <code class="no-highlight">global using</code> to an ordinary module-local using. Otherwise C# would apply it to every syntax tree in the compilation and break module isolation.</p>
+<p>A <code class="no-highlight">using</code> at the top of any block applies to every module and class block in the same script module, and to no other module. Already in scope in each module: <code class="no-highlight">System</code>, <code class="no-highlight">System.Collections.Generic</code>, <code class="no-highlight">System.Runtime.CompilerServices</code>, <code class="no-highlight">System.Runtime.InteropServices</code> and <code class="no-highlight">Keysharp.Runtime</code>.</p>
+<p><code class="no-highlight">Keysharp.Builtins</code> is not imported: its <code class="no-highlight">Array</code>, <code class="no-highlight">String</code> and <code class="no-highlight">Buffer</code> would be ambiguous with the <code class="no-highlight">System</code> types of the same name. Name those types in full, or import the namespace and resolve the ambiguity for that module.</p>
+<p>A using may be guarded by <code class="no-highlight">#if</code>; only the active branch is imported. A <code class="no-highlight">global using</code> applies only to its own module.</p>
 <p>The symbols active at the directive's source position apply inside its block, including around using directives, so <code class="no-highlight">#if WINDOWS</code> selects the same branch on both sides and a later <code class="no-highlight">#Define</code> or <code class="no-highlight">#Undef</code> does not change an earlier block. Imported modules retain their own symbols. Note that Keysharp matches <a href="KeysharpDirectives.htm#Conditional">#Define</a> names case-insensitively while C# does not.</p>
 
 <h2 id="Unsafe">Pointers and unsafe code</h2>
-<p>Pointer code is allowed, with C#'s own <code class="no-highlight">unsafe</code> keyword as the only opt-in, exactly as in any other C# project. The directive takes no options.</p>
-<p class="warning"><strong>Know what that costs:</strong> an out-of-bounds pointer write raises an <code class="no-highlight">AccessViolationException</code>, which .NET does not deliver to a managed <code class="no-highlight">catch</code>. The process disappears with no <a href="OnError.htm">OnError</a>, no error dialog and no <a href="OnExit.htm">OnExit</a> &mdash; a silent death for a background hotkey script. This is the same exposure <a href="DllCall.htm">DllCall</a> and <a href="NumPut.htm">NumPut</a> already carry, which is why it is not gated separately here.</p>
+<p>Pointer code is allowed in code marked with C#'s <code class="no-highlight">unsafe</code> keyword.</p>
+<p class="warning"><strong>Warning:</strong> A pointer write which causes an access violation ends the process at once, with no <a href="OnError.htm">OnError</a>, error dialog or <a href="OnExit.htm">OnExit</a>, as it can with <a href="DllCall.htm">DllCall</a> and <a href="NumPut.htm">NumPut</a>.</p>
 
 <h2 id="Errors">Errors</h2>
-<p>Syntax, boundary and name checks which Keysharp performs while lowering point to the authored script or C# file. Later Roslyn binding errors point to the generated module-specific inline C# unit. Keysharp does not add <code class="no-highlight">#line</code> mappings, consistently with script runtime locations not generally tracking original source lines.</p>
+<p>Syntax errors and the boundary and name checks described above point to the script or C# file. Other C# compile errors point to the generated inline C# unit.</p>
 <p>An exception thrown inside inline C# is mapped to the matching Keysharp error before it reaches the script, so an ordinary <code class="no-highlight">try</code> intercepts it:</p>
 
 <pre>#CSharp
@@ -191,17 +187,14 @@ catch IndexError
     MsgBox "caught"</pre>
 
 <h2 id="Performance">Performance</h2>
-<p>A call into inline C# is dispatched like any other script function call, so the directive does not make <em>calls</em> cheaper &mdash; it makes <em>bodies</em> cheaper. Put the whole loop inside the C#: one call that runs a million iterations is the win; a million calls into a one-line helper is slower than staying in script code, because it pays the dispatch a million times and gains nothing.</p>
-<p>For bulk numeric data, hand C# a <a href="Buffer.htm">Buffer</a> rather than an <a href="Array.htm">Array</a>. Array element access goes through the same conversion machinery a script uses, so it stays script-speed even when called from C#, while a Buffer's memory can be walked directly as a <code class="no-highlight">Span</code>.</p>
-<p>Scripts that do not use this directive are unaffected: the wider framework reference set it needs is only added when a <code class="no-highlight">#CSharp</code> block is present.</p>
+<p>A call into inline C# costs as much as any other function call; only the body runs faster. Put the whole loop inside the C#: a million calls into a one-line helper is slower than staying in script code.</p>
+<p>For bulk numeric data, hand C# a <a href="Buffer.htm">Buffer</a> rather than an <a href="Array.htm">Array</a>. Array element access stays at script speed even from C#, while a Buffer's memory can be walked directly as a <code class="no-highlight">Span</code>.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p>All blocks in one script module form one C# syntax tree, so a later block in that module can use a type declared in an earlier one. Another module has a separate tree and using pool. Members still land in the type the block's scope names &mdash; the module, or the class it was written in &mdash; which is what keeps a class block's private helpers from colliding with another class's.</p>
-<p>A block cannot appear inside a function, or inside a block such as an <a href="If.htm">If</a> body: there is no type there for its members to become members of. Like other directives, #CSharp cannot be executed conditionally.</p>
+<p>All blocks in one script module form one C# syntax tree, so a later block in that module can use a type declared in an earlier one.</p>
+<p>A block cannot appear inside a function, or inside a block such as an <a href="If.htm">If</a> body. Like other directives, #CSharp cannot be executed conditionally.</p>
 <p><a href="../Scripts.htm#ahk2exe">Compiled scripts</a> carry their inline C# as ordinary compiled code, so nothing extra is needed on the machine that runs one.</p>
-<p><code class="no-highlight">--transpile</code> writes a tooling view of the inline C# to a separate <code class="no-highlight">Scriptname.inline.cs</code> beside the generated <code class="no-highlight">Scriptname.cs</code>. In a multi-module script this view concatenates the module-specific units which Roslyn compiles as separate trees.</p>
-
-<p class="warning"><strong>Security:</strong> Inline C# runs with the script's full privileges, and can do anything the process can. It is the same trust decision as <a href="DllCall.htm">DllCall</a> or <a href="Clr.htm">Clr</a>, and it is the script author's.</p>
+<p><code class="no-highlight">--transpile</code> writes a tooling view of the inline C# to a separate <code class="no-highlight">Scriptname.inline.cs</code> beside the generated <code class="no-highlight">Scriptname.cs</code>. In a multi-module script this view concatenates the module-specific units.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="Clr.htm">Clr</a>, <a href="DllCall.htm">DllCall</a>, <a href="_Package.htm">#Package</a>, <a href="Buffer.htm">Buffer</a>, <a href="_Include.htm">#Include</a></p>
@@ -230,9 +223,7 @@ MsgBox "longest chain under 1e6 starts at " Collatz(1, 1000000)</pre>
 <div class="ex" id="ExBuffer">
 <p><a class="ex_number" href="#ExBuffer"></a> Walks a screen capture's pixels directly, using C#'s own <code class="no-highlight">unsafe</code> for the pointer.</p>
 <pre>#CSharp
-using Keysharp.Builtins;
-
-public static unsafe long CountNear(Buffer buf, int argb, int tol = 16)
+public static unsafe long CountNear(Keysharp.Builtins.Buffer buf, int argb, int tol = 16)
 {
     int wr = (argb &gt;&gt; 16) &amp; 0xFF, wg = (argb &gt;&gt; 8) &amp; 0xFF, wb = argb &amp; 0xFF;
     var px = new System.ReadOnlySpan&lt;byte&gt;((void*)buf.Ptr, (int)(long)buf.Size);
@@ -245,6 +236,7 @@ public static unsafe long CountNear(Buffer buf, int argb, int tol = 16)
 }
 #EndCSharp
 
+#Import "Ks" { Image }
 Img := Image.FromRect(0, 0, A_ScreenWidth, A_ScreenHeight)
 MsgBox CountNear(Img.GetPixelData(4), 0xFF3B30, 20) " reddish pixels"</pre>
 </div>

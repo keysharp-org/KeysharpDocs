@@ -33,9 +33,15 @@
 <p>A <a href="Error.htm#TargetError">TargetError</a> is thrown if the window could not be found, except if the <a href="#group">group</a> mode is used.</p>
 
 <h2 id="Remarks">Remarks</h2>
+<p>A minimized window returns to its previous normal or maximized state. A currently maximized window returns to normal. To unminimize all windows while leaving currently maximized windows unchanged, use <a href="WinMinimizeAll.htm">WinMinimizeAllUndo</a>.</p>
+<p id="group">This function operates only upon the topmost matching window except when <em>WinTitle</em> is <a href="GroupAdd.htm">ahk_group GroupName</a>, in which case all windows in the group are affected.</p>
+<h3 id="Windows">Windows</h3>
 <p>If a particular type of window does not respond correctly to WinRestore, try using the following instead:</p>
 <pre><a href="PostMessage.htm">PostMessage</a> 0x0112, 0xF120,,, WinTitle, WinText  <em>; 0x0112 = WM_SYSCOMMAND, 0xF120 = SC_RESTORE</em></pre>
-<p id="group">This function operates only upon the topmost matching window except when <em>WinTitle</em> is <a href="GroupAdd.htm">ahk_group GroupName</a>, in which case all windows in the group are affected.</p>
+<h3 id="Linux">Linux</h3>
+<p>Restoring minimized windows belonging to other applications requires a <code>keysharp-desktop</code> client library and service supporting explicit unminimization. Availability depends on the desktop backend. Behavior in live Linux desktop sessions is unverified.</p>
+<h3 id="macOS">macOS</h3>
+<p>Restoring other applications' windows requires Accessibility permission. A minimized window is unminimized without leaving native full screen; restoring a non-minimized full-screen window exits full screen. Native state transitions have not been verified on macOS.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="WinMinimize.htm">WinMinimize</a>, <a href="WinMaximize.htm">WinMaximize</a></p>

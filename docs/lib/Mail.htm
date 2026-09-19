@@ -16,24 +16,44 @@
 <pre class="Syntax"><span class="func">Mail</span>(Recipients, Subject, Message <span class="optional">, Options</span>)</pre>
 <h2 id="Parameters">Parameters</h2>
 <dl>
-  <dt>Recipients</dt><dd><p>A recipient or list of recipients.</p></dd>
-  <dt>Subject</dt><dd><p>Type: String</p><p>The message subject.</p></dd>
-  <dt>Message</dt><dd><p>Type: String</p><p>The message body.</p></dd>
+  <dt>Recipients</dt>
+  <dd><p>Type: <a href="../Concepts.htm#strings">String</a> or <a href="Array.htm">Array</a></p>
+    <p>One address, or an Array of them. An empty Array, an empty address, or an entry which is not a String is an error.</p></dd>
+  <dt>Subject</dt><dd><p>Type: <a href="../Concepts.htm#strings">String</a></p><p>The message subject.</p></dd>
+  <dt>Message</dt><dd><p>Type: <a href="../Concepts.htm#strings">String</a></p><p>The message body.</p></dd>
   <dt>Options</dt>
   <dd>
-    <p>A Map containing zero or more of the following keys:</p>
+    <p>Type: <a href="Map.htm">Map</a></p>
     <table class="info">
       <tr><th>Key</th><th>Value</th></tr>
-      <tr><td><code>attachments</code></td><td>A path or Array of attachment paths.</td></tr>
-      <tr><td><code>bcc</code></td><td>A recipient or Array of blind-copy recipients.</td></tr>
-      <tr><td><code>cc</code></td><td>A recipient or Array of copy recipients.</td></tr>
-      <tr><td><code>from</code></td><td>Comma-separated From address.</td></tr>
-      <tr><td><code>replyto</code></td><td>Comma-separated Reply-To address.</td></tr>
-      <tr><td><code>host</code></td><td>SMTP hostname and port in <code class="no-highlight">hostname:port</code> form.</td></tr>
-      <tr><td><code>header</code></td><td>Additional header text.</td></tr>
+      <tr><td><code>host</code></td><td>Required. The server as <code class="no-highlight">hostname</code> or <code class="no-highlight">hostname:port</code>. Port 25 if none is given. A bracketed IPv6 literal keeps its own colons.</td></tr>
+      <tr><td><code>from</code></td><td>Required. The sender's address.</td></tr>
+      <tr><td><code>cc</code></td><td>A further recipient, or an Array of them.</td></tr>
+      <tr><td><code>bcc</code></td><td>A blind-copy recipient, or an Array of them. These reach the server but do not appear in the message headers.</td></tr>
+      <tr><td><code>replyto</code></td><td>The address replies should go to, when it differs from <code>from</code>.</td></tr>
+      <tr><td><code>attachments</code></td><td>A file path, or an Array of them. A path which cannot be read is an error.</td></tr>
+      <tr><td><code>headers</code></td><td>A <a href="Map.htm">Map</a> of additional SMTP header names and values.</td></tr>
     </table>
+    <p>An option which takes exactly one value &mdash; <code>host</code>, <code>from</code>, <code>replyto</code> &mdash; also accepts a one-element Array.</p>
   </dd>
 </dl>
-<p class="warning"><strong>Security warning:</strong> Avoid embedding mail credentials in a script. Use an operating-system credential store or another protected configuration mechanism.</p>
+<h2 id="Return_Value">Return Value</h2>
+<p>This function returns an empty string, and returns only once the server has accepted the message.</p>
+<h2 id="Errors">Errors</h2>
+<table class="info">
+  <tr><th>Thrown</th><th>When</th></tr>
+  <tr><td><a href="Error.htm#TypeError">TypeError</a></td><td><em>Recipients</em> is neither a String nor an Array of them, or <em>Options</em> is not a Map.</td></tr>
+  <tr><td><a href="Error.htm#ValueError">ValueError</a></td><td>A required option is missing, an option's value has the wrong shape, an address or port cannot be parsed, or a key is not recognized.</td></tr>
+  <tr><td><a href="Error.htm#OSError">OSError</a></td><td>An attachment cannot be read, or the server rejects the message or cannot be reached. The server's own reason is included where it gave one.</td></tr>
+</table>
+<h2 id="Examples">Examples</h2>
+<pre>#Import "Ks" { Mail }
+
+Mail("someone@example.com", "Build finished", "The nightly build is done.",
+    Map("host", "smtp.example.com:25",
+        "from", "builds@example.com",
+        "cc", ["lead@example.com", "qa@example.com"],
+        "attachments", A_ScriptDir "\build.log"))</pre>
+<p class="note"><strong>Note:</strong> The connection is unauthenticated and unencrypted, so the server must accept mail from the script's machine without a login.</p>
 </body>
 </html>

@@ -13,8 +13,7 @@
 
 
 <h1>ObjAddRef / ObjRelease</h1>
-<p class="note"><strong>Notice:</strong> These functions affect native COM interface pointers. They do not control the lifetime of ordinary managed objects; retain or release a normal object simply by assigning or clearing references to it.</p>
-<p class="note"><strong>Notice:</strong> These functions are supported only on Windows. On Linux they throw an error, because D-Bus objects are not reference counted; they are not available on macOS.</p>
+<p class="note"><strong>Note:</strong> These functions operate on native COM interface pointers and do not affect the lifetime of script objects. They are available only on Windows; on Linux and macOS, they throw an error.</p>
 
 <p>Increments or decrements an object's <a href="../Objects.htm#Reference_Counting">reference count</a>.</p>
 

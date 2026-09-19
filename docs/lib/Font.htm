@@ -22,18 +22,20 @@
   <li><a href="#Call">Call</a></li>
   <li><a href="#Properties">Properties</a></li>
   <li><a href="#Families">Standard Families</a></li>
+  <li><a href="#Exists">Exists</a></li>
+  <li><a href="#Errors">Errors</a></li>
   <li><a href="#Remarks">Remarks</a></li>
   <li><a href="#Examples">Examples</a></li>
 </ul>
 
 <h2 id="Call">Call</h2>
-<pre class="Syntax">FontObj := <span class="func">Font</span>(<span class="optional">Options, FontName</span>)</pre>
+<pre class="Syntax">FontObj := <span class="func">Font</span>(<span class="optional">Options, Name</span>)</pre>
 <p>Creates a Font from the two arguments <a href="Gui.htm#SetFont">Gui.SetFont</a> takes.</p>
 <dl>
   <dt>Options</dt>
   <dd><p>Type: <a href="../Concepts.htm#strings">String</a></p>
   <p>Zero or more space-delimited tokens: <code class="no-highlight">s</code><em>Size</em>, <code class="no-highlight">w</code><em>Weight</em>, <code class="no-highlight">q</code><em>Quality</em>, <code class="no-highlight">c</code><em>Color</em>, and the keywords <code class="no-highlight">bold</code>, <code class="no-highlight">italic</code>, <code class="no-highlight">underline</code>, <code class="no-highlight">strike</code> and <code class="no-highlight">norm</code>.</p></dd>
-  <dt>FontName</dt>
+  <dt>Name</dt>
   <dd><p>Type: <a href="../Concepts.htm#strings">String</a></p>
   <p>The font family name, such as <code class="no-highlight">"Segoe UI"</code>.</p></dd>
 </dl>
@@ -42,31 +44,41 @@
 <table class="info">
   <tr><th>Property</th><th>Description</th></tr>
   <tr id="Name"><td><code>Name</code></td><td>The font family name.</td></tr>
-  <tr id="Size"><td><code>Size</code></td><td>Point size.</td></tr>
-  <tr id="Color"><td><code>Color</code></td><td>Text color as a 6-digit <code class="no-highlight">RRGGBB</code> string, like <a href="Gui.htm#BackColor">Gui.BackColor</a>. A color name, hex string or integer may be assigned.</td></tr>
-  <tr id="Weight"><td><code>Weight</code></td><td>Weight as the <code class="no-highlight">w</code><em>N</em> option takes it: 400 is normal, 700 is bold.</td></tr>
+  <tr id="Size"><td><code>Size</code></td><td>A finite point size greater than zero that fits native single-precision storage. Decimal options use a period regardless of locale.</td></tr>
+  <tr id="Color"><td><code>Color</code></td><td>Text color as a 6-digit <code class="no-highlight">RRGGBB</code> string, like <a href="Gui.htm#BackColor">Gui.BackColor</a>. A color name, hex string or integer may be assigned. The color is opaque: any alpha channel in the input is discarded.</td></tr>
+  <tr id="Weight"><td><code>Weight</code></td><td>An integer from 1 to 1000: 400 is normal, 700 is bold. GUI and image fonts approximate weights below 700 as normal and weights of 700 or more as bold; GUI snapshots report 400 or 700. Windows RichEdit character formatting preserves numeric weights.</td></tr>
   <tr id="Bold"><td><code>Bold</code></td><td><a href="#Weight">Weight</a> as a truth value. Reading it is <code>Weight &gt;= 700</code>; assigning sets 700 or 400.</td></tr>
   <tr id="Italic"><td><code>Italic</code></td><td>Whether the font is italic.</td></tr>
   <tr id="Underline"><td><code>Underline</code></td><td>Whether the font is underlined.</td></tr>
   <tr id="Strike"><td><code>Strike</code></td><td>Whether the font is struck through.</td></tr>
-  <tr id="Quality"><td><code>Quality</code></td><td>Rendering quality as the <code class="no-highlight">q</code><em>N</em> option takes it. Carried so an option string round-trips; nothing acts on it yet.</td></tr>
+  <tr id="Quality"><td><code>Quality</code></td><td>An integer from 0 to 5. On Windows GUI fonts and image canvases, 0 selects the system default, 1 draft, 2 proof, 3 no antialiasing, 4 antialiasing and 5 ClearType. GUI fonts and image canvases on other platforms reject non-default quality; per-range RichEdit quality is also unsupported.</td></tr>
   <tr id="Options"><td><code>Options</code></td><td>The set properties as an option string <a href="Gui.htm#SetFont">SetFont</a> accepts, such as <code class="no-highlight">"s10 w700 cFF0000 italic"</code>. The family is not included, so the round trip is <code>SetFont(FontObj.Options, FontObj.Name)</code>.</td></tr>
 </table>
 
+<p>Assigning an empty string to a property clears its contribution. An explicit <code>false</code> disables that style when the Font object is applied, while unspecified styles remain unchanged.</p>
+<p><code>Options</code> retains the SetFont string vocabulary. Disabling Italic, Underline or Strike emits <code>norm</code>, which resets all styles. To preserve unspecified styles in a partial update, pass the Font object directly instead of its Options string. A later color token takes precedence over an earlier one.</p>
+
 <h2 id="Families">Standard Families</h2>
-<p>Each of these class properties returns a new Font describing a family the platform itself uses, so a script can match the desktop instead of naming a font which may not be installed.</p>
+<p>Each of these class properties returns a new Font describing a family the platform itself uses.</p>
 <table class="info">
   <tr><th>Property</th><th>Description</th></tr>
-  <tr id="Ui"><td><code>Font.Ui</code></td><td>The platform's standard interface font, queried from the system so it follows the desktop theme.</td></tr>
-  <tr id="Emoji"><td><code>Font.Emoji</code></td><td>The family the platform draws color emoji with, at the UI font's size.</td></tr>
-  <tr id="Monospace"><td><code>Font.Monospace</code></td><td>The first fixed-pitch family which is installed, at the UI font's size.</td></tr>
-  <tr id="GuiDefault"><td><code>Font.GuiDefault</code></td><td>The font a new <a href="Gui.htm">Gui</a> starts with: AutoHotkey's default rather than the platform interface font, so a ported script lays out identically.</td></tr>
+  <tr id="UiDefault"><td><code>Font.UiDefault</code></td><td>The platform's standard interface font, queried from the system so it follows the desktop theme.</td></tr>
+  <tr id="Emoji"><td><code>Font.Emoji</code></td><td>The preferred emoji family when installed, otherwise the interface font, at the interface font's size. Color emoji rendering depends on the drawing backend.</td></tr>
+  <tr id="Monospace"><td><code>Font.Monospace</code></td><td>The first installed family from the platform's preferred monospace candidates, at the interface font's size, with a generic monospace fallback.</td></tr>
+  <tr id="GuiDefault"><td><code>Font.GuiDefault</code></td><td>The font a new <a href="Gui.htm">Gui</a> starts with. This can differ from UiDefault.</td></tr>
   <tr id="FamilyList"><td><code>Font.Families</code></td><td>An <a href="Array.htm">Array</a> of the family names installed on the system, sorted alphabetically.</td></tr>
 </table>
-<p class="note"><strong>Note:</strong> On Linux and macOS the system cannot be asked for its interface font until the first window exists, so <code>Font.Ui</code> falls back to the platform's usual family before then.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS the system cannot be asked for its interface font until the first window exists, so <code>Font.UiDefault</code> falls back to the platform's usual family before then.</p>
 
+<p>These Font objects set size and styles only when the toolkit can resolve them, and never set text color.</p>
+<h2 id="Exists">Exists</h2>
+<pre class="Syntax">Installed := Font.<span class="func">Exists</span>(Name)</pre>
+<p>Returns whether a font family is installed. Name comparison is case-insensitive; an empty name returns false. The family list is cached after successful enumeration, so fonts installed later in the process are not included.</p>
+<h2 id="Errors">Errors</h2>
+<p>Unknown or malformed constructor options raise ValueError. Non-numeric numeric-property values raise TypeError. Invalid sizes, fractional or out-of-range weights, and fractional or out-of-range qualities raise ValueError. An unsupported rendering quality raises Error when applied.</p>
 <h2 id="Remarks">Remarks</h2>
-<p>A <a href="Gui.htm#Font">Gui</a> and each of its <a href="GuiControl.htm#Font">controls</a> expose a Font property returning a detached snapshot: changing the returned object does not change the control. Assign it back to apply it.</p>
+<p>A Font can be passed as the Options argument to Gui.SetFont, Gui.Control.SetFont, RichEdit.SetFormat, Image.DrawText and Image.MeasureText. An explicit font-name argument overrides its Name. The name argument accepts a name, not a Font object. A missing family in GUI assignment preserves the previous family while applying the other attributes.</p>
+<p>Clone returns an independent copy. Equality compares the stored font attributes, including whether an attribute is unspecified; family names compare case-insensitively.</p>
 
 <h2 id="Examples">Examples</h2>
 
@@ -76,7 +88,7 @@
 
 MyFont := Font("s12 bold cNavy", "Segoe UI")
 MyGui := Gui()
-MyGui.SetFont(MyFont.Options, MyFont.Name)
+MyGui.SetFont(MyFont)
 MyGui.Add("Text", , "Heading")
 MyGui.Show()</pre>
 </div>
@@ -93,13 +105,13 @@ MyFont.Size += 4
 MyFont.Bold := true
 Ctl.Font := MyFont   <em>; assign it back to apply it</em>
 
-MyGui.SetFont(Font.Monospace.Options, Font.Monospace.Name)
+MyGui.SetFont(Font.Monospace)
 MyGui.Add("Edit", "w300 r5", "Fixed-pitch text")
 MyGui.Show()</pre>
 </div>
 
 <h2 id="Related">Related</h2>
-<p><a href="Gui.htm#SetFont">Gui.SetFont</a>, <a href="Gui.htm#Font">Gui.Font</a>, <a href="Gui.htm">Gui</a>, <a href="../Modules.htm#KS">KS module</a></p>
+<p><a href="Gui.htm#SetFont">Gui.SetFont</a>, <a href="Gui.htm#Font">Gui.Font</a>, <a href="GuiControl.htm#Font">GuiCtrl.Font</a>, <a href="Gui.htm">Gui</a>, <a href="../Modules.htm#KS">KS module</a></p>
 
 </body>
 </html>

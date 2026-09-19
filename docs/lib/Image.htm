@@ -1,4 +1,4 @@
-﻿<!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
 <title>Image Object | Keysharp</title>
@@ -15,13 +15,16 @@
 <pre class="NoIndent">class Image extends Object</pre>
 <p>Captures, loads, creates, draws, transforms, searches and saves images across platforms.</p>
 <p>This class is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
+<p class="note"><strong>Note:</strong> This class is experimental: it and its nested types may change or be removed without deprecation. See <a href="_Warn.htm#Experimental">#Warn Experimental</a>.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul>
   <li><a href="#Create">Creating and Capturing Images</a></li>
   <li><a href="#Colors">Colors and Fonts</a></li>
+  <li><a href="#Paths">Paths</a></li>
   <li><a href="#Drawing">Drawing</a></li>
-  <li><a href="#Transforms">Transforms</a></li>
+  <li><a href="#DrawingState">Drawing State</a></li>
+  <li><a href="#Transforms">Raster and Color Transforms</a></li>
   <li><a href="#Output">Output and Pixels</a></li>
   <li><a href="#Search">Searching</a></li>
   <li><a href="#Properties">Properties and Lifetime</a></li>
@@ -56,7 +59,7 @@
 <h3 id="FromDesktop">FromDesktop</h3>
 <pre class="Syntax">Picture := Image.<span class="func">FromDesktop</span>()</pre>
 <p>Captures the whole virtual desktop.</p>
-<p class="note"><strong>Note:</strong> On Linux, screen and window capture factories require <code class="no-highlight">keysharp-desktop</code>, the <code>ScreenCapture</code> grant and a backend which supports the requested capture. This applies on X11 and Wayland. A whole-desktop portal screenshot can supply a screen rectangle only when its pixels map consistently to desktop coordinates; it does not provide occluded-window capture. See <a href="../Platforms.htm#Linux">Linux Platform Support</a>.</p>
+<p class="note"><strong>Note:</strong> On Linux, screen and window capture factories require <code class="no-highlight">keysharp-desktop</code>, the <code>ScreenCapture</code> grant and a backend which supports the requested capture. See <a href="../Platforms.htm#Linux">Linux Platform Support</a>.</p>
 
 <h3 id="FromMonitor">FromMonitor</h3>
 <pre class="Syntax">Picture := Image.<span class="func">FromMonitor</span>(<span class="optional">MonitorNumber</span>)</pre>
@@ -68,13 +71,51 @@
 
 <h3 id="FromWindow">FromWindow</h3>
 <pre class="Syntax">Picture := Image.<span class="func">FromWindow</span>(WinTitle <span class="optional">, Options, WinText, ExcludeTitle, ExcludeText</span>)</pre>
-<p>Captures the matching window. The included decorations and ability to capture an occluded window depend on the backend. On X11, the desktop component uses an XComposite window pixmap when available; the direct X-image fallback can be affected by occlusion. GNOME, Cinnamon and KWin provide dedicated window-capture paths. Generic Wayland foreign-toplevel information alone does not provide window capture.</p>
-<p><em>Options</em> can be a capture-mode number or an object. On Windows, modes 0 and 1 use GetDC with BitBlt, modes 2 and 3 use PrintWindow, and mode 4 (the default) uses PrintWindow with PW_RENDERFULLCONTENT for hardware-accelerated windows. Mode 5 (UWP capture) is not implemented.</p>
-<p><code>{decorations: false}</code> requests client-area-only capture on a platform which can honor it, such as KWin. Other platforms ignore this property.</p>
+<p>Captures the matching window. The included decorations and ability to capture an occluded window depend on the backend. On X11 without the Composite extension, an occluded window may not be captured correctly. For window capture on each Wayland desktop, see <a href="../Platforms.htm#Linux">Linux Platform Support</a>.</p>
+<p><em>Options</em> can be a mode string or an object with a <code>Mode</code> property, such as <code>{Mode: "FullContent", Decorations: true}</code>. Omitting Options or Mode selects <code>"FullContent"</code>. Mode names are case-insensitive; any other value, including an empty string, throws <a href="Error.htm#ValueError">ValueError</a>.</p>
+<table class="info">
+  <tr><th>Mode</th><th>Windows capture technique</th></tr>
+  <tr><td><code>"BitBlt"</code></td><td>Copies the window pixels using BitBlt.</td></tr>
+  <tr><td><code>"BitBltOpaque"</code></td><td>Temporarily turns off window transparency, then uses BitBlt.</td></tr>
+  <tr><td><code>"PrintWindow"</code></td><td>Asks the window to draw itself using PrintWindow.</td></tr>
+  <tr><td><code>"PrintWindowOpaque"</code></td><td>Temporarily turns off window transparency, then uses PrintWindow.</td></tr>
+  <tr><td><code>"FullContent"</code></td><td>Uses PrintWindow with PW_RENDERFULLCONTENT for hardware-accelerated windows. This is the default.</td></tr>
+</table>
+<p>On Linux and macOS, the mode is validated but ignored. <code>{Decorations: false}</code>, the default, requests client-area-only capture on a platform which can honor it, such as KWin. Other platforms ignore this property.</p>
 
 <h2 id="Colors">Colors and Fonts</h2>
 <p>A color can be a name such as <code class="no-highlight">"Red"</code>, an opaque <code class="no-highlight">0xRRGGBB</code> value, or a <code class="no-highlight">0xAARRGGBB</code> value with alpha. To preserve a fully transparent <code class="no-highlight">00</code> alpha, pass an eight-digit string or the color name <code class="no-highlight">"Transparent"</code>; a numeric <code class="no-highlight">0x00RRGGBB</code> is indistinguishable from an opaque RGB value.</p>
 <p>Fonts use the same two arguments as <a href="Gui.htm#SetFont">Gui.SetFont</a>: an <em>Options</em> string of <code class="no-highlight">s</code><em>Size</em> plus optional <code class="no-highlight">bold</code>, <code class="no-highlight">italic</code>, <code class="no-highlight">underline</code>, <code class="no-highlight">strike</code>, <code class="no-highlight">norm</code>, <code class="no-highlight">w</code><em>Weight</em> or <code class="no-highlight">q</code><em>Quality</em> tokens (such as <code class="no-highlight">"s16 bold italic"</code>), and a separate <em>FontName</em>. An unrecognized option throws ValueError; pass the text color as DrawText's <em>Color</em> parameter, not a <code class="no-highlight">c</code> option.</p>
+
+<p>Options can also be a <a href="Font.htm">Font</a> object. An explicit FontName overrides the object&#39;s Name; FontName itself does not accept a Font object. DrawText uses the object&#39;s opaque Color when its separate Color argument is omitted. Sizes must be finite and greater than zero. Weights are approximated to normal below 700 and bold from 700 upward. Rendering quality is supported on Windows as described by <a href="Font.htm#Quality">Font.Quality</a>; non-default quality on other platforms raises Error.</p>
+<h3 id="LinearGradient">LinearGradient</h3>
+<pre class="Syntax">Brush := Image.Brush.<span class="func">LinearGradient</span>(X1, Y1, X2, Y2, StartColor, EndColor)</pre>
+<p>Creates an immutable linear-gradient brush. Color changes along the vector from the first point to the second and is padded with the nearest endpoint color beyond it. The two points must differ.</p>
+
+<h3 id="RadialGradient">RadialGradient</h3>
+<pre class="Syntax">Brush := Image.Brush.<span class="func">RadialGradient</span>(CenterX, CenterY, RadiusX, RadiusY, CenterColor, EdgeColor)</pre>
+<p>Creates an immutable radial-gradient brush centered on an ellipse. Both radii must be positive. The edge color is padded beyond the ellipse. Gradient coordinates are logical drawing coordinates and follow the complete drawing transform with the geometry.</p>
+
+<h2 id="Paths">Paths</h2>
+<pre class="Syntax">Path := Image.<span class="func">Path</span>(<span class="optional">FillRule := "EvenOdd"</span>)</pre>
+<p>Creates reusable vector geometry. <em>FillRule</em> is <code class="no-highlight">"EvenOdd"</code> or <code class="no-highlight">"NonZero"</code>, case-insensitively, and controls filling and clipping. Path methods are chainable.</p>
+<table class="info">
+  <tr><th>Method</th><th>Effect</th></tr>
+  <tr><td><code>MoveTo(X, Y)</code></td><td>Starts a figure.</td></tr>
+  <tr><td><code>LineTo(X, Y)</code></td><td>Adds a line to the active figure.</td></tr>
+  <tr><td><code>CubicTo(ControlX1, ControlY1, ControlX2, ControlY2, X, Y)</code></td><td>Adds a cubic B&eacute;zier curve.</td></tr>
+  <tr><td><code>ArcTo(X, Y, Width, Height, StartAngle, SweepAngle)</code></td><td>Adds an elliptical arc, connecting it to the active figure when necessary. Angles are degrees from the ellipse's rightmost point and positive angles run clockwise.</td></tr>
+  <tr><td><code>Close()</code></td><td>Closes and ends the active figure.</td></tr>
+  <tr><td><code>AddRect(X, Y, Width, Height)</code></td><td>Adds a closed rectangle.</td></tr>
+  <tr><td><code>AddRoundRect(X, Y, Width, Height, Radius)</code></td><td>Adds a closed rounded rectangle; Radius is clamped to the available range.</td></tr>
+  <tr><td><code>AddEllipse(X, Y, Width, Height)</code></td><td>Adds a closed ellipse.</td></tr>
+  <tr><td><code>AddPolygon(Points)</code></td><td>Adds a closed polygon from an Array of <code>{X, Y}</code> objects. Coordinates are copied when called.</td></tr>
+  <tr><td><code>AddPath(OtherPath [, Transform])</code></td><td>Copies another path, optionally through a <em>Transform</em> object.</td></tr>
+  <tr><td><code>Clear()</code></td><td>Removes all geometry while retaining the fill rule.</td></tr>
+  <tr><td><code>Clone()</code></td><td>Returns independently mutable geometry with the same fill rule and active figure.</td></tr>
+</table>
+<p><code>LineTo</code> and <code>CubicTo</code> require an active figure. Filling and clipping implicitly close open figures, while stroking closes only a figure ended with <code>Close()</code>. Non-positive helper dimensions and a zero-sweep arc add nothing. A non-empty polygon needs at least three points.</p>
+<p><em>Transform</em> for AddPath has the form <code>{ScaleX, ScaleY, OffsetX, OffsetY, SkewX, SkewY}</code>. Omitted properties use the identity values 1, 1, 0, 0, 0, 0. The source path and descriptor are captured when AddPath is called.</p>
 
 <h2 id="Drawing">Drawing</h2>
 <p>Drawing methods are chainable and are applied lazily.</p>
@@ -88,12 +129,36 @@
   <tr><td><code>FillRoundRect(X, Y, Width, Height, Radius [, Color])</code></td><td>Fills a rounded rectangle.</td></tr>
   <tr><td><code>DrawEllipse(X, Y, Width, Height [, Color, Thickness])</code></td><td>Draws an ellipse outline.</td></tr>
   <tr><td><code>FillEllipse(X, Y, Width, Height [, Color])</code></td><td>Fills an ellipse.</td></tr>
-  <tr><td><code>DrawText(Text, X, Y [, Color, Options, FontName])</code></td><td>Draws text using the <a href="#Colors">font convention</a> above.</td></tr>
+  <tr><td><code>DrawPath(Path [, Color, Thickness])</code></td><td>Strokes a path with a solid color or gradient Brush. Strokes are centered with flat caps and miter joins.</td></tr>
+  <tr><td><code>FillPath(Path [, Color])</code></td><td>Fills a path with a solid color or gradient Brush.</td></tr>
+  <tr><td><code>DrawText(Text, X, Y [, Color, Options, FontName])</code></td><td>Draws text using the <a href="#Colors">font convention</a> above. <em>Color</em> can also be a gradient Brush.</td></tr>
   <tr><td><code>DrawImage(Picture [, X, Y, Width, Height])</code></td><td>Draws another image, optionally at the supplied position and size.</td></tr>
   <tr id="MeasureText"><td><code>MeasureText(Text [, Options, FontName])</code></td><td>Returns a <code>{Width, Height}</code> object with the size the text would occupy when drawn.</td></tr>
 </table>
 
-<h2 id="Transforms">Transforms</h2>
+<h2 id="DrawingState">Drawing State</h2>
+
+<h3 id="Transform">Transform</h3>
+<pre class="Syntax">Matrix := Picture.Transform
+Picture.Transform := {ScaleX: 1, ScaleY: 1, OffsetX: 0, OffsetY: 0, SkewX: 0, SkewY: 0}</pre>
+<p>Controls the affine coordinate system used by drawing. The getter returns a detached object containing all six coefficients. Assignment changes only supplied own data properties, so <code class="no-highlight">Picture.Transform := {OffsetX: 20}</code> preserves the other five.</p>
+<pre>TransformedX = ScaleX * X + SkewX * Y + OffsetX
+TransformedY = SkewY * X + ScaleY * Y + OffsetY</pre>
+<p>The complete matrix must remain finite and nonsingular. Assign all six identity values shown above to reset it.</p>
+
+<h3 id="Clip">Clip</h3>
+<pre class="Syntax">Picture.<span class="func">Clip</span>(Path)
+Picture.<span class="func">Clip</span>()</pre>
+<p>Intersects the current clip with <em>Path</em>, captured through the current Transform. Later transform changes do not move an existing clip. Calling Clip with no argument resets clipping; clipping with an empty Path instead produces an empty clip.</p>
+
+<h3 id="State">SaveState and RestoreState</h3>
+<pre class="Syntax">State := Picture.<span class="func">SaveState</span>()
+Picture.<span class="func">RestoreState</span>(State)</pre>
+<p>SaveState captures Transform and Clip. RestoreState restores that snapshot, which can be reused but belongs only to the Image which created it.</p>
+<p>Path, shape, text and DrawImage methods capture drawing state when called. Clear ignores drawing state and clears the whole bitmap without resetting it. MeasureText, pixel access, search and the raster operations below use untransformed coordinates.</p>
+<p class="note"><strong>Note:</strong> Vector rendering is unverified on Linux and macOS.</p>
+
+<h2 id="Transforms">Raster and Color Transforms</h2>
 <p>Transform methods queue a lazy operation and return the Image so calls can be chained.</p>
 <table class="info">
   <tr><th>Method</th><th>Effect</th></tr>
@@ -103,9 +168,9 @@
   <tr><td><code>Flip([Horizontal])</code></td><td>Flips the image.</td></tr>
   <tr><td><code>Crop(X, Y, Width, Height)</code></td><td>Crops to a rectangle.</td></tr>
   <tr><td><code>Grayscale()</code></td><td>Converts color to grayscale.</td></tr>
-  <tr><td><code>Alpha(Factor)</code></td><td>Multiplies each pixel's alpha by a value from 0 to 1.</td></tr>
-  <tr><td><code>Brightness(Amount)</code></td><td>Adjusts brightness by a value from -1 to 1.</td></tr>
-  <tr><td><code>Contrast(Amount)</code></td><td>Adjusts contrast by a value from -1 to 1.</td></tr>
+  <tr><td><code>Alpha(Factor)</code></td><td>Multiplies each pixel's alpha by a value clamped to 0 through 1.</td></tr>
+  <tr><td><code>Brightness(Amount)</code></td><td>Adjusts brightness by a value clamped to -1 through 1.</td></tr>
+  <tr><td><code>Contrast(Amount)</code></td><td>Adjusts contrast by a value clamped to -1 through 1.</td></tr>
 </table>
 
 <h2 id="Output">Output and Pixels</h2>
@@ -119,12 +184,13 @@
   <tr><td><code>GetPixel(X, Y)</code></td><td>Returns the full <code class="no-highlight">0xAARRGGBB</code> pixel value.</td></tr>
   <tr><td><code>SetPixel(X, Y, Color)</code></td><td>Sets a pixel from an RGB or ARGB color.</td></tr>
 </table>
-<p><code>ToClr()</code> hands out the live underlying bitmap, not a copy: it goes stale once the image is next transformed or disposed. See <a href="Clr.htm#ToClr">ToClr on built-in objects</a>.</p>
+<p><code>Copy()</code> copies the pixels and image metadata, with identity drawing state and no clip. Calling <code>Clone()</code> on an Image throws an <a href="Error.htm">Error</a>.</p>
+<p><code>ToClr()</code> hands out the live underlying bitmap, not a copy: it goes stale once the image is next transformed or disposed.</p>
 
 <h3 id="GetPixelData">GetPixelData</h3>
 <pre class="Syntax">Data := Picture.<span class="func">GetPixelData</span>(<span class="optional">BytesPerPixel := 4, Buffer</span>)</pre>
-<p>Returns a tightly packed <a href="Buffer.htm">Buffer</a>. Use 4 for RGBA or 1 for grayscale. The data is suitable for native calls and OCR libraries.</p>
-<p>Pass <em>Buffer</em> to write into storage you already own instead of allocating a new one, and that same object is returned &mdash; for the capture-in-a-loop case, where a fresh multi-megabyte Buffer per frame dominates the cost. It may be a <a href="Buffer.htm">Buffer</a> or any object exposing <code>Ptr</code> and <code>Size</code>, and must hold at <em>least</em> <code class="no-highlight">Width * Height * BytesPerPixel</code> bytes. Exactly that many are written from the start and anything beyond is left alone, so one buffer sized for the largest capture serves smaller ones too.</p>
+<p>Returns a tightly packed <a href="Buffer.htm">Buffer</a>. Use 4 for RGBA or 1 for grayscale.</p>
+<p>If <em>Buffer</em> is specified, the data is written into it and it is returned. It can be a <a href="Buffer.htm">Buffer</a> or any object with <code>Ptr</code> and <code>Size</code> properties, and must hold at least <code class="no-highlight">Width * Height * BytesPerPixel</code> bytes; bytes beyond that are left unchanged.</p>
 
 <h3 id="SetPixelData">SetPixelData</h3>
 <pre class="Syntax">Picture.<span class="func">SetPixelData</span>(Data <span class="optional">, BytesPerPixel := 4</span>)</pre>
@@ -135,15 +201,27 @@
 
 <h3 id="SearchImage">Search</h3>
 <pre class="Syntax">Match := Picture.<span class="func">Search</span>(Needle <span class="optional">, X, Y, Width, Height, Variation, Trans, Direction</span>)</pre>
-<p>Finds one sub-image. On success, returns <code>{X, Y}</code> for its top-left; on failure, returns an empty string, so <code class="no-highlight">if Match := Picture.Search(Needle)</code> is the idiomatic use. <em>Variation</em> is the per-channel tolerance from 0 to 255. <em>Trans</em> specifies a needle color which matches any color. <em>Direction</em> uses the <a href="ImageSearch.htm">ImageSearch</a> scan directions 1 through 9 to choose which match wins.</p>
+<p>Finds one sub-image. On success, returns <code>{X, Y}</code> for its top-left; on failure, returns an empty string. <em>Variation</em> is the per-channel tolerance and is clamped to 0 through 255. <em>Trans</em> specifies a needle color which matches any color. <em>Direction</em> chooses which match wins and defaults to <code>"TopLeft"</code>. Names are case-insensitive; any other value, including an empty string, throws <a href="Error.htm#ValueError">ValueError</a>.</p>
+<table class="info">
+  <tr><th>Direction</th><th>Match order</th></tr>
+  <tr><td><code>"TopLeft"</code></td><td>Rows from top to bottom, each from left to right.</td></tr>
+  <tr><td><code>"TopRight"</code></td><td>Rows from top to bottom, each from right to left.</td></tr>
+  <tr><td><code>"BottomLeft"</code></td><td>Rows from bottom to top, each from left to right.</td></tr>
+  <tr><td><code>"BottomRight"</code></td><td>Rows from bottom to top, each from right to left.</td></tr>
+  <tr><td><code>"LeftTop"</code></td><td>Columns from left to right, each from top to bottom.</td></tr>
+  <tr><td><code>"LeftBottom"</code></td><td>Columns from left to right, each from bottom to top.</td></tr>
+  <tr><td><code>"RightTop"</code></td><td>Columns from right to left, each from top to bottom.</td></tr>
+  <tr><td><code>"RightBottom"</code></td><td>Columns from right to left, each from bottom to top.</td></tr>
+  <tr><td><code>"Center"</code></td><td>Nearest the center of the search region first.</td></tr>
+</table>
 
 <h3 id="SearchAll">SearchAll</h3>
 <pre class="Syntax">Matches := Picture.<span class="func">SearchAll</span>(Needle <span class="optional">, X, Y, Width, Height, Variation, Trans, Direction</span>)</pre>
-<p>Returns every match as an <a href="Array.htm">Array</a> of <code>{X, Y}</code> objects, ordered by <em>Direction</em>. If none are found, the array is empty, so check <code class="no-highlight">Matches.Length</code>.</p>
+<p>Returns every match as an <a href="Array.htm">Array</a> of <code>{X, Y}</code> objects, ordered by <em>Direction</em>, with the same names and default as <a href="#SearchImage">Search</a>. If none are found, the array is empty.</p>
 
 <h3 id="SearchPixel">SearchPixel</h3>
 <pre class="Syntax">Match := Picture.<span class="func">SearchPixel</span>(Color <span class="optional">, X, Y, Width, Height, Variation, Direction</span>)</pre>
-<p>Finds the first matching pixel. On success, returns <code>{X, Y, Color}</code>, where <code>Color</code> is the actual full ARGB pixel value; on failure, returns an empty string. <em>Direction</em> selects the scan's starting corner: 1 is the top-left (the default), 2 the top-right, 3 the bottom-left and 4 the bottom-right. The image-search directions 5 through 9 do not apply to a pixel scan and throw ValueError.</p>
+<p>Finds the first matching pixel. On success, returns <code>{X, Y, Color}</code>, where <code>Color</code> is the actual full ARGB pixel value; on failure, returns an empty string. <em>Direction</em> selects the scan's starting corner: <code>"TopLeft"</code> (the default), <code>"TopRight"</code>, <code>"BottomLeft"</code> or <code>"BottomRight"</code>. Names are case-insensitive; any other value, including an empty string, throws <a href="Error.htm#ValueError">ValueError</a>.</p>
 
 <h2 id="Properties">Properties and Lifetime</h2>
 <table class="info">
@@ -151,13 +229,13 @@
   <tr><td><code>OriginX</code>, <code>OriginY</code></td><td>Read-only screen origin recorded by a capture factory.</td></tr>
   <tr><td><code>ScaleX</code>, <code>ScaleY</code></td><td>Read-only HiDPI pixel scale used to map image positions back to screen coordinates.</td></tr>
 </table>
-<p><code>Rotate</code> and <code>Flip</code> invalidate the screen-origin mapping, and Rotate also invalidates the scale mapping: the affected properties then read an empty string instead of a stale value.</p>
+<p><code>Rotate</code> and <code>Flip</code> invalidate the screen-origin mapping, and Rotate also invalidates the scale mapping: the affected properties then return an empty string.</p>
 
 <h3 id="SetOrigin">SetOrigin</h3>
 <pre class="Syntax">Picture.<span class="func">SetOrigin</span>(X, Y <span class="optional">, ScaleX, ScaleY</span>)</pre>
 <p>Re-anchors the screen mapping: sets the origin and, optionally, the pixel scale (<em>ScaleY</em> defaults to <em>ScaleX</em>). Use it to give a <a href="#FromBuffer">FromBuffer</a> or file image a screen position, or to restore the mapping after Rotate or Flip invalidated it.</p>
 <p>Using an Image after it has been disposed throws an exception.</p>
-<p>One image belongs to one thread, in the same way a <a href="Gui.htm">Gui</a> does. Nothing in an image is synchronized: its pending operations, its pixels and the drawing resources it reuses between calls are all plain state. Ordinary threads share an OS thread and so are safe by construction, but a <a href="RealThread.htm">RealThread</a> is a real one &mdash; two of those drawing on the same image can corrupt its internal state, which presents as a hang rather than as an error. Hand an image to another real thread only after finishing with it, or give each thread its own.</p>
+<p>An Image is not synchronized. Two <a href="RealThread.htm">RealThreads</a> using the same image at the same time can corrupt it and hang the script; finish with an image before passing it to another real thread, or give each thread its own.</p>
 
 <h2 id="Examples">Examples</h2>
 <pre>#Import "Ks" { Image }
@@ -166,6 +244,16 @@ Image.FromRect(100, 100, 640, 480)
     .Grayscale()
     .Resize(320, -1)
     .Save("capture.png")</pre>
+
+<pre>#Import "Ks" { Image }
+
+Badge := Image.Path().AddRoundRect(4, 4, 152, 52, 14)
+Fill := Image.Brush.LinearGradient(4, 4, 156, 56, "DodgerBlue", "MidnightBlue")
+Picture := Image.Create(160, 60)
+Picture.FillPath(Badge, Fill)
+       .DrawPath(Badge, "White", 2)
+       .DrawText("Ready", 48, 18, "White", "s16 bold")
+       .Save("badge.png")</pre>
 
 <h2 id="Related">Related</h2>
 <p><a href="Overlay.htm">Overlay</a>, <a href="ImageSearch.htm">ImageSearch</a>, <a href="PixelSearch.htm">PixelSearch</a>, <a href="Clipboard.htm">Clipboard</a>, <a href="../Platforms.htm">Platform Support</a></p>

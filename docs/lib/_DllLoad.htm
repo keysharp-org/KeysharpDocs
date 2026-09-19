@@ -16,7 +16,7 @@
 
 <p><a href="DllCall.htm#load">Loads</a> a DLL or EXE file before the script starts executing.</p>
 
-<p class="note"><strong>Native modules only.</strong> This makes a module available to <a href="DllCall.htm">DllCall</a>; it has no effect on what <a href="Clr.htm">Clr</a> can see, so pointing it at a .NET assembly does not make that assembly's types available. For .NET code use <a href="_Package.htm">#Package</a> to name a package, or <a href="Clr.htm#Load">Clr.Load</a> for an assembly already on disk.</p>
+<p class="note"><strong>Note:</strong> #DllLoad loads native libraries only. To use a .NET assembly, see <a href="_Package.htm">#Package</a> or <a href="Clr.htm#Load">Clr.Load</a>.</p>
 
 <pre class="Syntax"><span class="func">#DllLoad</span> <span class="optional">FileOrDirName</span></pre>
 <h2 id="Parameters">Parameters</h2>

@@ -15,7 +15,7 @@
 <pre class="NoIndent">class File extends Object</pre>
 
 <p>Provides an interface for file input/output, such as reading or writing text or retrieving its length. <a href="FileOpen.htm">FileOpen</a> returns an object of this type.</p>
-<p>Calling the class itself opens a File over <a href="#Call">memory the script already holds</a> instead of a path, so that the same read, write and seek methods can be used on a <a href="Buffer.htm">Buffer</a>.</p>
+<p>Calling the class itself <a href="#Call">opens a File over a Buffer</a>.</p>
 
 <p>"FileObj" is used below as a placeholder for any File object, as "File" is the class itself.</p>
 <p>In addition to the methods and properties inherited from <a href="Object.htm">Object</a>, File objects have the following predefined methods and properties.</p>
@@ -49,7 +49,7 @@
 </ul>
 
 <h2 id="Call">Opening a File Over Memory</h2>
-<p>Calling the File class returns a File whose contents are memory the script already holds, rather than a file on disk.</p>
+<p>Calling the File class returns a File whose contents are memory the script already holds.</p>
 <pre class="Syntax">FileObj := <span class="func">File</span>(Source <span class="optional">, Encoding</span>)</pre>
 
 <h3 id="Call_Parameters">Parameters</h3>
@@ -57,7 +57,7 @@
   <dt>Source</dt>
   <dd>
     <p>Type: <a href="Buffer.htm">Buffer</a> or <a href="../Structs.htm">Struct</a></p>
-    <p>Any object exposing both <code>Ptr</code> and <code>Size</code>, whose memory becomes the file's contents. <a href="StringBuffer.htm">StringBuffer</a> qualifies, as does any later type providing the pair.</p>
+    <p>A <a href="Buffer.htm#like">Buffer-like object</a> whose memory becomes the file's contents.</p>
   </dd>
   <dt>Encoding</dt>
   <dd>
@@ -67,9 +67,8 @@
 </dl>
 
 <h3 id="Call_Remarks">Remarks</h3>
-<p>The resulting File supports the same methods as one opened from a path, which makes it a convenient binary reader and writer: <a href="#ReadNum">Read<em>NumType</em></a> and <a href="#WriteNum">Write<em>NumType</em></a> advance sequentially, so a structure can be read field by field without computing offsets for <a href="NumGet.htm">NumGet</a>.</p>
-<p>The memory belongs to <em>Source</em> and cannot grow, so a write which would pass the end throws instead of reallocating. The File keeps <em>Source</em> alive for as long as it exists, so the memory cannot be reclaimed while the File still refers to it.</p>
-<p><a href="#Handle">Handle</a> is 0, because there is no operating-system file behind the object.</p>
+<p>A write past the end of <em>Source</em> throws an <a href="Error.htm">Error</a>. The File keeps <em>Source</em> alive for as long as the File exists.</p>
+<p><a href="#Handle">Handle</a> is 0.</p>
 <p>To open a path, use <a href="FileOpen.htm">FileOpen</a>. Calling <code>File()</code> with no source throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
 
 <div class="ex" id="ExMemory">
@@ -248,7 +247,6 @@ MsgBox NumGet(buf, 0, "UInt")  <em>; 3735928559 - the bytes are in the Buffer it
 <div class="methodShort" id="Flush"><h3>Flush</h3>
 <p>Writes buffered data to the underlying file or stream without closing it.</p>
 <pre class="Syntax">FileObj.<span class="func">Flush</span>()</pre>
-<p>Call this method when data written through the File object must be made available to the underlying stream before <a href="#Close">Close</a> is called.</p>
 </div>
 
 <div class="methodShort" id="Close"><h3>Close</h3>
@@ -276,8 +274,7 @@ MsgBox NumGet(buf, 0, "UInt")  <em>; 3735928559 - the bytes are in the Buffer it
 <div class="methodShort" id="AtEOF"><h3>AtEOF</h3>
   <p>Gets a non-zero number if the file pointer has reached the end of the file, otherwise zero.</p>
 <pre class="Syntax">IsAtEOF := FileObj.<span class="func">AtEOF</span></pre>
-  <p>This property should be used only with an actual file. If the File object was created from a handle to a non-seeking device such as a console buffer or pipe, the returned value may not be meaningful, as such devices do not logically have an "end of file". In that case it is 0.</p>
-  <p>The comparison is between the file pointer and the length, so this is valid for binary content as well as text.</p></div>
+  <p>This property should be used only with an actual file. If the File object was created from a handle to a non-seeking device such as a console buffer or pipe, the returned value may not be meaningful, as such devices do not logically have an "end of file". In that case it is 0.</p></div>
 
 <div class="methodShort" id="Encoding"><h3>Encoding</h3>
 <p>Gets or sets the text encoding used by this file object.</p>

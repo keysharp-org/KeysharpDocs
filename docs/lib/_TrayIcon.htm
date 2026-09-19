@@ -22,7 +22,7 @@
 <dl>
   <dt>FileName</dt>
   <dd>
-    <p>The path to an icon file or an icon-bearing module. It must be relative to the main script's directory (the program include root), even when #TrayIcon appears in an <a href="_Include.htm">#Include</a>d file. A rooted path is a compile-time error.</p>
+    <p>The path to an icon file or an icon-bearing module. It must be relative to the main script's directory, even when #TrayIcon appears in an <a href="_Include.htm">#Include</a>d file. A rooted path is a compile-time error.</p>
     <p>If omitted, the tray is made visible with the script's default icon: the <a href="_App.htm#Icon">#App Icon</a>, if present, or Keysharp's built-in icon.</p>
   </dd>
 
@@ -34,9 +34,8 @@
 </dl>
 
 <h2 id="Remarks">Remarks</h2>
-<p>The compiler resolves <em>FileName</em> against the main script's directory, selects the icon, and embeds that selected icon in the script assembly as the tray default. This also happens for source and in-memory execution, so the original file is not read when the script runs. After <a href="TraySetIcon.htm">TraySetIcon</a> selects a run-time icon, <code>TraySetIcon("*")</code> restores this embedded default. While the default is active, <a href="../Variables.htm#IconFile">A_IconFile</a> is blank and <a href="../Variables.htm#IconNumber">A_IconNumber</a> is 1. Only the canonical relative logical path is retained; the resolved build-machine path is not serialized.</p>
-<p>#TrayIcon and <a href="_NoTrayIcon.htm">#NoTrayIcon</a> are applied in source order. Any #TrayIcon, with or without a file, cancels an earlier #NoTrayIcon and makes the tray visible. A later #NoTrayIcon hides an icon selected earlier. A bare #TrayIcon also discards an earlier custom selection and restores the default.</p>
-<p><a href="TraySetIcon.htm">TraySetIcon</a> can change the icon after the script starts, and <a href="../Variables.htm#IconHidden">A_IconHidden</a> can show or hide it at run time.</p>
+<p>The selected icon is embedded in the script assembly, including for source and in-memory execution, so the original file is not read when the script runs. After <a href="TraySetIcon.htm">TraySetIcon</a> selects another icon, <code>TraySetIcon("*")</code> restores this one.</p>
+<p>#TrayIcon and <a href="_NoTrayIcon.htm">#NoTrayIcon</a> are applied in source order. Any #TrayIcon, with or without a file, cancels an earlier #NoTrayIcon and makes the tray visible. A later #NoTrayIcon hides an icon selected earlier.</p>
 <p>Like other directives, #TrayIcon cannot be executed conditionally.</p>
 
 <h2 id="Related">Related</h2>

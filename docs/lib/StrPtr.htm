@@ -31,11 +31,10 @@
 <p>If <em>Value</em> is a variable, this function returns a StringBuffer entangled with that variable. Otherwise, it returns the address of a pinned UTF-16 copy of the string.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p>Strings are immutable managed objects, so StrPtr does not expose a variable's internal string storage.</p>
 <pre>Ptr := StrPtr(MyVar)</pre>
 <p>The returned StringBuffer can be passed directly as a pointer to <a href="DllCall.htm">DllCall</a>, <a href="NumPut.htm">NumPut</a> and similar functions. After such a call writes to it, the original variable is updated from the buffer. For new code, creating a <a href="StringBuffer.htm">StringBuffer</a> explicitly is clearer and is recommended.</p>
 <pre>Ptr := StrPtr("literal string")</pre>
-<p>For a literal or other non-variable value, the returned integer points to a pinned copy. Do not modify a literal string through this pointer. Release the pin with <a href="ObjFree.htm">ObjFree</a> when it is no longer needed; otherwise it remains allocated until script shutdown.</p>
+<p>Do not modify a literal string through the returned address. Release the pin with <a href="ObjFree.htm">ObjFree</a> when it is no longer needed; otherwise it remains allocated until script shutdown.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="StringBuffer.htm">StringBuffer</a>, <a href="ObjFree.htm">ObjFree</a>, <a href="DllCall.htm">DllCall</a>, <a href="SendMessage.htm">SendMessage</a>, <a href="Buffer.htm">Buffer object</a>, <a href="NumPut.htm">NumPut</a>, <a href="NumGet.htm">NumGet</a></p>

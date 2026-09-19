@@ -36,17 +36,11 @@
 <h2 id="Error_Handling">Error Handling</h2>
 <p>An <a href="Error.htm#OSError">OSError</a> is thrown on failure, including when the operation is refused for lack of privileges, and on Linux when the volume's filesystem is not one of those listed below.</p>
 
-<h2 id="Remarks">Platform Remarks</h2>
+<h2 id="Remarks">Remarks</h2>
 <p>Changing a volume label is a privileged operation on every platform. Expect it to require an elevated process on Windows, and root on Linux and macOS.</p>
 
-<h3 id="Windows">Windows</h3>
-<p>Sets the label directly through the .NET drive API.</p>
-
 <h3 id="Linux">Linux</h3>
-<p>The mount point is resolved to its backing block device with <code>findmnt</code>, then the label is set with the utility for that filesystem: <code>e2label</code> (ext2/ext3/ext4), <code>btrfs filesystem label</code>, <code>xfs_admin</code>, <code>fatlabel</code> (FAT/FAT32/msdos), <code>ntfslabel</code> (NTFS) or <code>exfatlabel</code>. That utility must be installed; any other filesystem throws.</p>
-
-<h3 id="macOS">macOS</h3>
-<p>Renames the volume with <code>diskutil renameVolume</code>.</p>
+<p>Requires <code>findmnt</code> and the labeling utility for the volume's filesystem: <code>e2label</code> (ext2/ext3/ext4), <code>btrfs filesystem label</code>, <code>xfs_admin</code>, <code>fatlabel</code> (FAT/FAT32/msdos), <code>ntfslabel</code> (NTFS) or <code>exfatlabel</code>.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="DriveGetLabel.htm">DriveGetLabel</a>, <a href="Drive.htm">Drive functions</a></p>

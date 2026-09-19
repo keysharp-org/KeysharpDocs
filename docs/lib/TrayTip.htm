@@ -123,7 +123,7 @@ HideTrayTip() {
 </pre>
 
 <h2 id="Remarks">Remarks</h2>
-<p class="note"><strong>Notice:</strong> The <code>Mute</code> option is accepted but cannot suppress the system-configured notification sound. Numeric option 4 is also unnecessary because the program's tray icon is always shown in the title, and option 32 cannot select a large version of that icon.</p>
+<p class="note"><strong>Note:</strong> The <code>Mute</code> option does not suppress the notification sound, and option 32 does not select a large icon. The tray icon is always shown in the title, whether or not option 4 is used.</p>
 <p>On Windows 10, a traytip window usually looks like this:</p>
 <img src="../static/dlg_traytip.png" alt="TrayTip" />
 <p id="Windows10"><strong>Windows 10 and later</strong> replace all balloon windows with toast notifications by default (this can be overridden via group policy). Calling TrayTip multiple times will usually cause multiple notifications to be placed in a "queue" instead of each notification replacing the last.</p>

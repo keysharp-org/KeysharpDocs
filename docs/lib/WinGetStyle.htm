@@ -19,7 +19,7 @@
 <pre class="Syntax">Style := <span class="func">WinGetStyle</span>(<span class="optional">WinTitle, WinText, ExcludeTitle, ExcludeText</span>)
 ExStyle := <span class="func">WinGetExStyle</span>(<span class="optional">WinTitle, WinText, ExcludeTitle, ExcludeText</span>)</pre>
 
-<p class="note"><strong>Note:</strong> No non-Windows platform has a real Win32 style word. For a window created by the script, Keysharp projects the toolkit state onto the WS_* bits: WS_CAPTION or WS_POPUP from the border style, WS_SYSMENU, WS_THICKFRAME, WS_MINIMIZEBOX and WS_MAXIMIZEBOX from the frame buttons, and WS_VISIBLE, WS_DISABLED, WS_MINIMIZE and WS_MAXIMIZE from the window state. For foreign windows, X11 and Wayland report only WS_CAPTION when the desktop backend reports a decorated window; other Win32 style bits are unavailable. macOS returns 0. WinGetExStyle always returns 0 on Linux and macOS.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS, the style of a window created by the script is derived from its state: WS_CAPTION or WS_POPUP from the border style, WS_SYSMENU, WS_THICKFRAME, WS_MINIMIZEBOX and WS_MAXIMIZEBOX from the frame buttons, and WS_VISIBLE, WS_DISABLED, WS_MINIMIZE and WS_MAXIMIZE from the window state. For foreign windows, X11 and Wayland report only WS_CAPTION when the desktop backend reports a decorated window; other Win32 style bits are unavailable. macOS returns 0. WinGetExStyle always returns 0 on Linux and macOS.</p>
 
 <h2 id="Parameters">Parameters</h2>
 <dl>

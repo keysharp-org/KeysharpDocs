@@ -38,10 +38,6 @@
 <p>Type: <a href="../Concepts.htm#strings">String</a></p>
 <p>This function returns the previous setting.</p>
 
-<h2 id="Error_Handling">Error Handling</h2>
-<p>A <a href="Error.htm">ValueError</a> is thrown if the name is not one of those listed, or names a code page this system does not have, and the current setting is left unchanged. An encoding which cannot be resolved is never quietly substituted, because the file would then be read or written as the wrong bytes.</p>
-<p>The same applies everywhere an encoding is named, including <a href="FileRead.htm">FileRead</a>, <a href="FileOpen.htm">FileOpen</a>, <a href="File.htm">File.Encoding</a>, <a href="StrGet.htm">StrGet</a>, <a href="StrPut.htm">StrPut</a>, <a href="StringFunctions.htm#Base64Encode">Base64Encode</a> and <a href="Crypto.htm">Crypt</a>.</p>
-
 <h2 id="Remarks">Remarks</h2>
 <p>The default encoding is CP0. However, the default encoding is not used if a UTF-8 or UTF-16 byte order mark is present in the file, unless the file is being opened with write-only access (i.e. the previous contents of the file are being discarded).</p>
 <p>CP0 does not universally identify a single code page; rather, it corresponds to the system default ANSI code page, which depends on the system locale or "language for non-Unicode programs" system setting. To get the actual code page number, call <code>DllCall("GetACP")</code>.</p>

@@ -12,8 +12,8 @@
 </head>
 <body><script>site.init();</script>
 <h1>Changes from v2.0 to v2.1</h1>
-<p>This page provides a complete overview of changes between AutoHotkey v2.0 and v2.1. For changes made after v2.1, see the <a href="ChangeLog.htm">changelog</a>. For full technical details of changes, refer to <a href="https://github.com/AutoHotkey/AutoHotkey/tree/alpha">GitHub</a>.</p>
-<p class="note"><strong>Note:</strong> This is an overview of the AutoHotkey v2.1 specification and change history, not an independent guarantee that every item is implemented identically by Keysharp on every platform. Follow the links to the current API pages for Keysharp behavior and see <a href="KeysharpDifferences.htm">Keysharp differences and limitations</a>.</p>
+<p>This page provides a complete overview of changes between AutoHotkey v2.0 and v2.1. For changes made after v2.1, see the <a href="AutoHotkeyChangeLog.htm">changelog</a>. For full technical details of changes, refer to <a href="https://github.com/AutoHotkey/AutoHotkey/tree/alpha">GitHub</a>.</p>
+<p class="note"><strong>Note:</strong> This page describes AutoHotkey v2.1. Follow the links to the current API pages for Keysharp behavior and see <a href="KeysharpDifferences.htm">Keysharp differences and limitations</a>.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul>
@@ -26,7 +26,7 @@
 
   <li><a href="#CompatMode">Compatibility Mode</a>
     <ul>
-      <li><a href="#v21mode">v2.1 Mode</a></a></li>
+      <li><a href="#v21mode">v2.1 Mode</a></li>
     </ul>
   </li>
 
@@ -56,7 +56,6 @@
 <p>These changes may prevent v2.0 scripts from working as expected in the current release.</p>
 
 <h3 id="Modeless_Menus">Modeless Menus</h3>
-<p class="note"><strong>Note:</strong> Keysharp does not expose the native MNS_MODELESS style described in this subsection. <a href="lib/Menu.htm#Show">Menu.Show</a> waits by default; pass false for its <em>Wait</em> parameter to return immediately while the menu remains open.</p>
 <p>The Tray menu and <a href="lib/Menu.htm#Show">Menu.Show</a> now use modeless menus to allow new threads to launch without freezing the menu. OS support for modeless menus has some bugs relating to Z-order and ability to click the first item in a submenu. Modeless menus are currently enabled by default, but this may be changed if workarounds are not found for these bugs.</p>
 
 <h3 id="Default_DPI_Awareness">Default DPI Awareness</h3>
@@ -67,7 +66,6 @@
   <li>Coordinates are virtualized; that is, translated between physical pixels and a coordinate space based on system DPI. The virtualized coordinates make sense in relation to the script's own automatically-scaled windows, but tend to be unexpected in scripts which work with external windows.</li>
 </ul>
 <p>Per-monitor DPI awareness disables DPI virtualization and bitmap-scaling, and therefore requires the program to react to DPI changes, such as by resizing the GUI and its controls. This is now done automatically by default unless the script disables <a href="lib/Gui.htm#DPIResize">DPIResize</a> for the GUI or control. The built-in scaling is not expected to be perfect, and will require additional help from the script in some cases.</p>
-<p class="note"><strong>Note:</strong> On Windows, Keysharp implements <a href="lib/Gui.htm#DPIResize">DPIResize</a> per control; the GUI option sets the default only for controls added afterward. Linux and macOS use toolkit-managed scaling, which individual controls cannot opt out of. The cross-platform <a href="lib/GuiOnEvent.htm#DPIChange">DPIChange</a> event can be used for custom reactions to a scale change.</p>
 <p>Scripts which do not work well with the new default can restore the previous mode within a more limited context, as described in <a href="misc/DPIScaling.htm#Mixed_Settings">DPI Scaling - Mixed Settings</a>.</p>
 <p>Scripts which were designed to <a href="misc/DPIScaling.htm#Workarounds">opt in to per-monitor mode</a> should be relatively unaffected by this change. Such scripts might have previously observed the mode unexpectedly reverting under specific conditions, because the script's main window is created before the script sets the mode. See <a href="misc/DPIScaling.htm#New_Threads">DPI Scaling - New Threads</a> for details.</p>
 <p>Hard-coded screen coordinates and offsets for secondary screens may need to be adjusted, but that would already be the case if display settings were changed.</p>
@@ -151,7 +149,6 @@
 <p>Changed <code>Ctrl::Alt</code> to not send an unsuppressed <code class="no-highlight">{Ctrl up}</code>. This was originally intended to work around an issue with system handling of the modifier keys, but was superseded by a better workaround in v2.0.8.</p>
 
 <h3 id="Debugger">Debugger</h3>
-<p class="note"><strong>Note:</strong> Keysharp does not currently implement DBGp or interactive script debugging. The changes in this subsection describe AutoHotkey only. See <a href="Scripts.htm#debug">Debugging a Script</a> for Keysharp's diagnostic facilities.</p>
 <p>Improved DBGp property and context commands:</p>
 <ul>
   <li>Inherited properties are included as direct children of the object's property element.</li>
@@ -178,7 +175,7 @@
 <p>These additions should generally not affect v2.0 scripts at all.</p>
 
 <h3 id="Syntax_and_Core_Objects">Syntax and Core Objects</h3>
-<p>Added <a href="Modules.htm">Modules</a>, <a href="lib/_Module.htm">#Module</a> and <a href="lib/_Import.htm">#Import</a>. Module globals are implicitly exported; imported aliases are re-exported only with <a href="lib/_Import.htm#Export">#Import Export</a>. The experimental standalone Export declaration and default exports were removed in v2.1-alpha.31.</p>
+<p>Added <a href="Modules.htm">Modules</a>, <a href="lib/_Module.htm">#Module</a>, and <a href="lib/_Import.htm">#Import</a>.</p>
 <p>Added <a href="Functions.htm#funcexpr">function definition expressions</a>.</p>
 <p>Added <code>a !~= b</code>, equivalent to <code>!(a ~= b)</code> (<a href="Variables.htm#regex">shorthand</a> for "not <a href="lib/RegExMatch.htm">RegExMatch</a>").</p>
 <p>Added typed properties (<a href="Structs.htm">structures</a>).</p>

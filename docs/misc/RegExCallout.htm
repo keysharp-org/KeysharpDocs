@@ -28,7 +28,7 @@
 
 <h2 id="syntax">Syntax</h2>
 
-<p>The syntax for a RegEx callout is <span class="regex">(?C<em>Number</em>:<em>Function</em>)</span>, where both <em>Number</em> and <em>Function</em> are optional. Colon ':' is allowed only if <em>Function</em> is specified, and is optional if <em>Number</em> is omitted. A named callout in the pattern must enclose its name in double quotes, single quotes or braces.</p>
+<p>The syntax for a RegEx callout is <span class="regex">(?C<em>Number</em>:<em>Function</em>)</span>, where both <em>Number</em> and <em>Function</em> are optional. Colon ':' is allowed only if <em>Function</em> is specified, and is optional if <em>Number</em> is omitted. If <em>Function</em> is specified, <em>Number</em> is ignored and the callout function receives 0 as <em>CalloutNumber</em>.</p>
 <p>A callout function must be a top-level function; closures and nested functions are not supported. If <em>Function</em> is omitted, it defaults to <code>pcre_callout</code>. If no matching function is found, an error is thrown.</p>
 
 <h2 id="callout-functions">RegEx Callout Functions</h2>
@@ -69,15 +69,29 @@ Callout(m, *) {
     
 <h2 id="EventInfo">EventInfo</h2>
 
-<p class="note"><strong>Notice:</strong> RegEx callouts do not set <code>A_EventInfo</code>. Use the five callback parameters described above; the native PCRE callout block is not exposed.</p>
+<p>Additional information is available by accessing the pcre_callout_block structure via <b>A_EventInfo</b>.</p>
+<pre>version           := NumGet(A_EventInfo,  0, "Int")
+callout_number    := NumGet(A_EventInfo,  4, "Int")
+offset_vector     := NumGet(A_EventInfo,  8, "Ptr")
+subject           := NumGet(A_EventInfo,  8 + A_PtrSize, "Ptr")
+subject_length    := NumGet(A_EventInfo,  8 + A_PtrSize*2, "Int")
+start_match       := NumGet(A_EventInfo, 12 + A_PtrSize*2, "Int")
+current_position  := NumGet(A_EventInfo, 16 + A_PtrSize*2, "Int")
+capture_top       := NumGet(A_EventInfo, 20 + A_PtrSize*2, "Int")
+capture_last      := NumGet(A_EventInfo, 24 + A_PtrSize*2, "Int")
+pad := A_PtrSize=8 ? 4 : 0  <em>; Compensate for 64-bit data alignment.</em>
+callout_data      := NumGet(A_EventInfo, 28 + pad + A_PtrSize*2, "Ptr")
+pattern_position  := NumGet(A_EventInfo, 28 + pad + A_PtrSize*3, "Int")
+next_item_length  := NumGet(A_EventInfo, 32 + pad + A_PtrSize*3, "Int")</pre>
+<p>The <em>callout_data</em> field, and the <em>mark</em> field at offset <code>36 + pad + A_PtrSize*3</code>, are always 0. For more information, see <a href="http://www.pcre.org/pcre.txt">pcre.txt</a>, <a href="../lib/NumGet.htm">NumGet</a> and <a href="../Variables.htm#PtrSize">A_PtrSize</a>.</p>
 
 <h2 id="auto">Auto-Callout</h2>
 
-<p>Including <strong>C</strong> in the options of the pattern enables auto-callout mode. Callouts equivalent to <span class="regex">(?C255)</span> are inserted before pattern items. The default top-level <code>pcre_callout</code> function receives the five parameters described above.</p>
+<p>Including <strong>C</strong> in the options of the pattern enables the auto-callout mode. In this mode, RegEx callouts equivalent to <span class="regex">(?C255)</span> are inserted before each item in the pattern.</p>
 
 <h2 id="remarks">Remarks</h2>
 
-<p>RegEx callouts execute on the current pseudo-thread.</p>
+<p>RegEx callouts are executed on the current quasi-thread, but the previous value of A_EventInfo will be restored after the RegEx callout function returns.</p>
 <p>PCRE is optimized to abort early in some cases if it can determine that a match is not possible. For all RegEx callouts to be called in such cases, it may be necessary to disable these optimizations by specifying <span class="regex">(*NO_START_OPT)</span> at the start of the pattern.</p>
 
 </body>

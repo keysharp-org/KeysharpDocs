@@ -19,42 +19,7 @@
 <p>Go to entries starting with: <a href="#E">E</a>,  &nbsp; <a href="#I">I</a>,  &nbsp; <a href="#M">M</a>,  &nbsp; <a href="#S">S</a>,  &nbsp; <a href="#W">W</a>, &nbsp; <a href="#hash">#</a></p>
 
 <h2 id="KeysharpExtensions">Keysharp-Specific API Index</h2>
-<p>These APIs extend the inherited language. Import the <a href="../Modules.htm#KS">KS module</a> unless the individual page says otherwise.</p>
-<table class="info">
-  <tr><th style="width:16em">Name</th><th abbr="Descr">Description</th></tr>
-  <tr><td><a href="App.htm">App</a></td><td>The running application: assembly identity and metadata, the process command line, and the exit in progress.</td></tr>
-  <tr><td><a href="Await.htm">Await</a></td><td>Waits for work which finishes later and returns its value.</td></tr>
-  <tr><td><a href="Base64.htm">Base64</a></td><td>Converts between binary data and Base64 text.</td></tr>
-  <tr><td><a href="Clipboard.htm">Clipboard</a></td><td>Reads and writes clipboard text, images, files, HTML, RTF and native formats.</td></tr>
-  <tr><td><a href="Clr.htm">Clr</a></td><td>Provides experimental direct .NET interop.</td></tr>
-  <tr><td><a href="Collect.htm">Collect</a></td><td>Requests managed garbage collection and finalization.</td></tr>
-  <tr><td><a href="ComponentAvailable.htm">ComponentAvailable</a></td><td>Reports whether the optional parser or compiler is available.</td></tr>
-  <tr><td><a href="Crypto.htm">Crypt</a></td><td>Hashes values and files, encrypts and decrypts with AES, derives keys from passwords, and returns cryptographically secure random values.</td></tr>
-  <tr><td><a href="EnvUpdate.htm">EnvUpdate</a></td><td>Notifies the platform that environment variables changed.</td></tr>
-  <tr><td><a href="FilePath.htm">FileDirName / FileFullPath</a></td><td>Normalizes and extracts file-system paths.</td></tr>
-  <tr><td><a href="FormatCs.htm">FormatCs</a></td><td>Formats values with .NET composite-format strings.</td></tr>
-  <tr><td><a href="Font.htm">Font</a></td><td>A font as a value object, plus the platform's standard interface, emoji and monospace families.</td></tr>
-  <tr><td><a href="HashMap.htm">HashMap</a></td><td>Provides Map behavior without sorted-copy enumeration.</td></tr>
-  <tr><td><a href="Http.htm">Http</a></td><td>Sends HTTP requests, as static shortcuts or as a session carrying headers, credentials and cookies.</td></tr>
-  <tr><td><a href="Image.htm">Image</a></td><td>Loads, captures, transforms and saves images.</td></tr>
-  <tr><td><a href="StringFunctions.htm">Join / NormalizeEol</a></td><td>Joins values and normalizes line endings.</td></tr>
-  <tr><td><a href="Lock.htm">Lock</a></td><td>Guards code shared between real threads.</td></tr>
-  <tr><td><a href="Mail.htm">Mail</a></td><td>Creates and sends email messages.</td></tr>
-  <tr><td><a href="NamedArgs.htm">NamedArgs</a></td><td>Carries the named arguments of one call, for building or inspecting them at run time.</td></tr>
-  <tr><td><a href="ObjFree.htm">ObjFree</a></td><td>Releases managed pins created for string pointers.</td></tr>
-  <tr><td><a href="Overlay.htm">Overlay</a></td><td>Draws cross-platform desktop overlays.</td></tr>
-  <tr><td><a href="RealThread.htm">RealThread</a></td><td>Runs and communicates with an independent operating-system thread.</td></tr>
-  <tr><td><a href="RegExCs.htm">RegExMatchCs / RegExReplaceCs</a></td><td>Uses .NET regular-expression syntax.</td></tr>
-  <tr><td><a href="RequestCapabilities.htm">RequestCapabilities</a></td><td>Requests and queries platform permissions.</td></tr>
-  <tr><td><a href="RunScript.htm">RunScript / ProcessInfo</a></td><td>Starts scripts and exposes process information.</td></tr>
-  <tr><td><a href="StringBuffer.htm">StringBuffer</a></td><td>Provides writable string storage for native calls.</td></tr>
-  <tr><td><a href="Task.htm">Task</a></td><td>Work that finishes later, such as the result of an asynchronous .NET call.</td></tr>
-  <tr><td><a href="Taskbar.htm">Taskbar</a></td><td>Draws a badge and a progress bar on a window's taskbar button.</td></tr>
-  <tr><td><a href="Url.htm">Url</a></td><td>Percent-encodes and decodes text for URLs and form bodies.</td></tr>
-  <tr><td><a href="WinEvent.htm">WinEvent</a></td><td>Monitors window and accessibility events.</td></tr>
-  <tr><td><a href="WinFromPoint.htm">WinFromPoint</a></td><td>Finds the window at a screen coordinate.</td></tr>
-  <tr><td><a href="WinMaximizeAll.htm">WinMaximizeAll</a></td><td>Maximizes all eligible windows.</td></tr>
-</table>
+<p>Keysharp-specific classes, functions and variables are listed under <a href="../Modules.htm#KS">KS Module</a>.</p>
 
 <table class="info">
   <tr>
@@ -466,6 +431,10 @@
     <td>Writes a value to the specified <a href="../Concepts.htm#environment-variables">environment variable</a>.</td>
   </tr>
   <tr>
+    <td><a href="EnvUpdate.htm">EnvUpdate</a></td>
+    <td>Notifies the platform that environment variables changed.</td>
+  </tr>
+  <tr>
     <td><a href="Exit.htm">Exit</a></td>
     <td>Exits the <a href="../misc/Threads.htm">current thread</a>.</td>
   </tr>
@@ -872,6 +841,10 @@
     <td>Creates a <a href="../misc/Functor.htm#BoundFunc">BoundFunc object</a> which calls a method of a given object.</td>
   </tr>
   <tr>
+    <td><a href="ObjFree.htm">ObjFree</a></td>
+    <td>Releases memory associated with a pointer returned by <a href="StrPtr.htm">StrPtr</a>.</td>
+  </tr>
+  <tr>
     <td><a href="../Objects.htm#ObjFromPtr">ObjFromPtr / ObjFromPtrAddRef</a></td>
     <td>Converts an object's address to a proper reference. ObjFromPtrAddRef additionally increments the object's <a href="../Objects.htm#Reference_Counting">reference count</a>.</td>
   </tr>
@@ -894,10 +867,6 @@
   <tr>
     <td><a href="Object.htm#HasOwnProp">ObjHasOwnProp</a></td>
     <td>Returns 1 (true) if an object owns a property by the specified name, otherwise 0 (false).</td>
-  </tr>
-  <tr>
-    <td><a href="Object.htm#ObjHasProp">ObjHasProp</a></td>
-    <td>Returns 1 (true) if an object or one of its base objects has a property by the specified name, otherwise 0 (false).</td>
   </tr>
   <tr>
     <td><a href="Object.htm#OwnPropCount">ObjOwnPropCount</a></td>

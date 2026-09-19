@@ -37,7 +37,7 @@
 <p>This function attempts to update the appearance/contents of a window by informing the OS that the window's rectangle needs to be redrawn. If this approach does not work for a particular window, try <a href="WinMove.htm">WinMove</a>. If that does not work, try <a href="WinHide.htm">WinHide</a> in combination with <a href="WinShow.htm">WinShow</a>.</p>
 
 <h3 id="Linux">Linux</h3>
-<p><strong>X11:</strong> The target window is cleared through X11 rather than by Windows-style invalidation, so results can differ between applications.</p>
+<p><strong>X11:</strong> Results can differ between applications.</p>
 
 <h3 id="macOS">macOS</h3>
 <p>This function does not request a redraw. If the target exists, the call succeeds without changing the window.</p>

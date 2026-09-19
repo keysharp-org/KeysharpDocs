@@ -16,6 +16,7 @@
 <p>Separates a file name or URL into its name, directory, extension, and drive.</p>
 
 <pre class="Syntax"><span class="func">SplitPath</span> Path <span class="optional">, &amp;OutFileName, &amp;OutDir, &amp;OutExtension, &amp;OutNameNoExt, &amp;OutDrive</span></pre>
+<pre class="Syntax">PathInfo := <span class="func">SplitPath</span>(Path)</pre>
 <h2 id="Parameters">Parameters</h2>
 <dl>
 
@@ -29,34 +30,38 @@
   <dt>&amp;OutFileName</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#variable-references">VarRef</a></p>
-    <p>If omitted, the corresponding value will not be stored. Otherwise, specify a reference to the output variable in which to store the file name without its path. The file's extension is included.</p>
+    <p>If omitted, the corresponding value will not be stored in a variable. Otherwise, specify a reference to the output variable in which to store the file name without its path. The file's extension is included.</p>
   </dd>
 
   <dt>&amp;OutDir</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#variable-references">VarRef</a></p>
-    <p>If omitted, the corresponding value will not be stored. Otherwise, specify a reference to the output variable in which to store the directory of the file, including drive letter or share name (if present). The final backslash is not included even if the file is located in a drive's root directory.</p>
+    <p>If omitted, the corresponding value will not be stored in a variable. Otherwise, specify a reference to the output variable in which to store the directory of the file, including drive letter or share name (if present). The final backslash is not included even if the file is located in a drive's root directory.</p>
   </dd>
 
   <dt>&amp;OutExtension</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#variable-references">VarRef</a></p>
-    <p>If omitted, the corresponding value will not be stored. Otherwise, specify a reference to the output variable in which to store the file's extension (e.g. TXT, DOC, or EXE). The dot is not included.</p>
+    <p>If omitted, the corresponding value will not be stored in a variable. Otherwise, specify a reference to the output variable in which to store the file's extension (e.g. TXT, DOC, or EXE). The dot is not included.</p>
   </dd>
 
   <dt>&amp;OutNameNoExt</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#variable-references">VarRef</a></p>
-    <p>If omitted, the corresponding value will not be stored. Otherwise, specify a reference to the output variable in which to store the file name without its path, dot and extension.</p>
+    <p>If omitted, the corresponding value will not be stored in a variable. Otherwise, specify a reference to the output variable in which to store the file name without its path, dot and extension.</p>
   </dd>
 
   <dt>&amp;OutDrive</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#variable-references">VarRef</a></p>
-    <p>If omitted, the corresponding value will not be stored. Otherwise, specify a reference to the output variable in which to store the drive letter or server name of the file. If the file is on a local or mapped drive, the variable will be set to the drive letter followed by a colon (no backslash). If the file is on a network path (UNC), the variable will be set to the share name, e.g. \\Workstation01</p>
+    <p>If omitted, the corresponding value will not be stored in a variable. Otherwise, specify a reference to the output variable in which to store the drive letter or server name of the file. If the file is on a local or mapped drive, the variable will be set to the drive letter followed by a colon (no backslash). If the file is on a network path (UNC), the variable will be set to the share name, e.g. \\Workstation01</p>
   </dd>
 
 </dl>
+
+<h2 id="Return_Value">Return Value</h2>
+<p>Type: <a href="Object.htm">Object</a></p>
+<p>If all output variables are omitted, this function returns an object with the properties <code>FileName</code>, <code>Dir</code>, <code>Extension</code>, <code>NameNoExt</code> and <code>Drive</code>, which hold the values described for the corresponding output variables. Otherwise, the return value is <a href="../v2.1-changes.htm#CompatMode"><em>blank-unset</em></a>.</p>
 
 <h2 id="Remarks">Remarks</h2>
 <p>Any of the output variables may be omitted if the corresponding information is not needed.</p>
@@ -79,13 +84,21 @@ SplitPath FullFileName,, &amp;dir
 
 <em>; To fetch all info:</em>
 SplitPath FullFileName, &amp;name, &amp;dir, &amp;ext, &amp;name_no_ext, &amp;drive
+
+<em>; Alternatively, omit all output variables to return the info as an object:</em>
+info := SplitPath(FullFileName)
    
 <em>; The above will set the variables as follows:
 ; name = Address List.txt
 ; dir = C:\My Documents
 ; ext = txt
 ; name_no_ext = Address List
-; drive = C:</em></pre>
+; drive = C:
+; info.FileName = Address List.txt
+; info.Dir = C:\My Documents
+; info.Extension = txt
+; info.NameNoExt = Address List
+; info.Drive = C:</em></pre>
 </div>
 
 </body>

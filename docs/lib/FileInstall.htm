@@ -23,13 +23,13 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>The embedded file's relative path exactly as listed in <a href="_App.htm#Files">#App { Files: [...] }</a>, with either <code class="no-highlight">/</code> or <code class="no-highlight">\</code> separators, compared case-insensitively. When <em>Source</em> matches no embedded file, the call behaves like <a href="FileCopy.htm">FileCopy</a> instead. In source mode, a relative <em>Source</em> resolves against <a href="../Variables.htm#ScriptDir">A_ScriptDir</a> and names the live file on disk.</p>
-    <p>Unlike AutoHotkey, <em>Source</em> may be any expression: Keysharp does not scan FileInstall calls to decide what to embed, because the <a href="_App.htm#Files">Files</a> list is the single authority.</p>
+    <p>Unlike AutoHotkey, <em>Source</em> may be any expression.</p>
   </dd>
 
   <dt>Dest</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>The name of the file to be created. It is assumed to be in <a href="../Variables.htm#WorkingDir">A_WorkingDir</a> if an absolute path isn&#39;t specified. The destination directory must already exist, whether the file is extracted from the assembly or copied from disk; FileInstall does not create it.</p>
+    <p>The name of the file to be created. It is assumed to be in <a href="../Variables.htm#WorkingDir">A_WorkingDir</a> if an absolute path isn&#39;t specified. The destination directory must already exist.</p>
   </dd>
 
   <dt>Overwrite</dt>
@@ -51,12 +51,11 @@
   <li>The destination file already exists and the <em>Overwrite</em> parameter was 0 or omitted.</li>
   <li>The destination file could not be opened due to a permission error, or because the file is in use.</li>
   <li>The destination directory does not exist.</li>
-  <li>The source file does not exist (only when it is not embedded, so the call fell back to a copy).</li>
+  <li>The source file does not exist (only when <em>Source</em> is not embedded).</li>
 </ul>
 
 <h2 id="Remarks">Remarks</h2>
-<p>The files named by <a href="_App.htm#Files">#App { Files: [...] }</a> are embedded into the compiled script's assembly &mdash; whether compiled to a <code class="no-highlight">.cks</code> or to an executable &mdash; and FileInstall extracts them at run time. Unlike <a href="../Scripts.htm#ahk2exe">Ahk2Exe</a>, which scans FileInstall calls, Keysharp packages only the explicit manifest list; FileInstall performs extraction and does not select payloads.</p>
-<p>When <em>Source</em> matches no embedded file &mdash; including when the script is running from source &mdash; FileInstall copies the live file from disk instead. Source-mode compilation does not snapshot the declared files, so changes made to the file on disk are visible when FileInstall is called. If the source and destination resolve to the same file, the fallback has no effect and does not raise an error.</p>
+<p>When <em>Source</em> is copied rather than extracted, no action is taken if the full source and destination paths are equal.</p>
 <p>Embedded files are neither compressed nor encrypted.</p>
 
 <h2 id="Related">Related</h2>

@@ -14,7 +14,7 @@
 <h1>ComObjArray</h1>
 
 <p>Creates a SafeArray for use with COM.</p>
-<p class="note"><strong>Notice:</strong> This class is supported only on Windows. It does not exist on Linux or macOS, so referring to it is a compile-time error.</p>
+<p class="note"><strong>Note:</strong> This class is available only on Windows. On Linux and macOS, referring to it is a compile-time error.</p>
 
 <pre class="Syntax">ArrayObj := <span class="func">ComObjArray</span>(VarType, Count1 <span class="optional">, Count2, ... Count8</span>)</pre>
 <p><code>ComObjArray</code> itself is a <a href="Class.htm">class</a> derived from <code>ComValue</code>, but is used only to create or identify SafeArray wrapper objects.</p>

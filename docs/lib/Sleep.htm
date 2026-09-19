@@ -28,7 +28,6 @@
 </dl>
 
 <h2 id="Remarks">Remarks</h2>
-<p>Sleep processes pending GUI and script events while waiting. Repeated work is therefore usually clearer and less prone to re-entrancy issues when implemented with <a href="SetTimer.htm">SetTimer</a> instead of a loop containing Sleep.</p>
 <p>If application shutdown has begun, Sleep returns without waiting.</p>
 <p>Due to the granularity of the OS's time-keeping system, <em>Delay</em> is typically rounded up to the nearest multiple of 10 or 15.6 milliseconds (depending on the type of hardware and drivers installed). To achieve a shorter delay, see <a href="#ExShorterSleep">Examples</a>.</p>
 <p>The actual delay time might wind up being longer than what was requested if the CPU is under load. This is because the OS gives each needy process a slice of CPU time (typically 20 milliseconds) before giving another timeslice to the script.</p>

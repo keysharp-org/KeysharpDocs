@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Keysharp String Functions | Keysharp</title>
-<meta name="description" content="Line-ending and joining functions exported by the KS module." />
+<meta name="description" content="The line-ending function exported by the KS module." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" type="text/css" />
@@ -12,20 +12,16 @@
 <body>
 
 <h1>Keysharp String Functions</h1>
-<p>These functions are exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
-<p>Text codecs are classes rather than functions: see <a href="Base64.htm">Base64</a>, <a href="Url.htm">Url</a> and <a href="Json.htm">Json</a>.</p>
+<p>This function is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
 
-<h2 id="NormalizeEol">NormalizeEol</h2>
-<pre class="Syntax">Text := <span class="func">NormalizeEol</span>(Text <span class="optional">, Eol</span>)</pre>
-<p>Converts every line ending in <em>Text</em> to <em>Eol</em>. If <em>Eol</em> is omitted, the current platform's default line ending is used.</p>
-
-<h2 id="Join">Join</h2>
-<pre class="Syntax">Text := <span class="func">Join</span>(Separator, Values*)</pre>
-<p>Converts each value to a string and joins the results with <em>Separator</em>. Expand an existing collection with <code class="no-highlight">Values*</code>.</p>
+<h2 id="ReplaceLineEndings">ReplaceLineEndings</h2>
+<pre class="Syntax">Text := <span class="func">ReplaceLineEndings</span>(Text <span class="optional">, EndOfLine</span>)</pre>
+<p>Converts every line ending in <em>Text</em> to <em>EndOfLine</em>. If <em>EndOfLine</em> is omitted, <code class="no-highlight">`n</code> is used on every platform.</p>
+<p>A line ending is <code class="no-highlight">`r`n</code>, a lone <code class="no-highlight">`r</code> or <code class="no-highlight">`n</code>, a form feed, or one of the Unicode characters NEL (U+0085), LINE SEPARATOR (U+2028) and PARAGRAPH SEPARATOR (U+2029).</p>
 
 <h2 id="Example">Example</h2>
-<pre>#Import "Ks" { NormalizeEol, Join }
-Text := Join(", ", "red", "green", "blue")</pre>
+<pre>#Import "Ks" { ReplaceLineEndings }
+Text := ReplaceLineEndings("one`r`ntwo`rthree", "`n")   <em>; "one`ntwo`nthree"</em></pre>
 
 </body>
 </html>

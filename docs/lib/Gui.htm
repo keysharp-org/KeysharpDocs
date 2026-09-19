@@ -232,10 +232,10 @@ MyGui.Show()</pre>
     <p id="Background"><strong>Background</strong><em>Color</em>: Changes the background color of the control. Replace <em>Color</em> with a color name (see <a href="../misc/Colors.htm">color chart</a>) or RGB value (the 0x prefix is optional). Examples: <code class="no-highlight">BackgroundSilver</code>, <code class="no-highlight">BackgroundFFDD99</code>. If this option is not used, or if <code class="no-highlight">+Background</code> is used with no suffix, a <a href="GuiControls.htm#Text">Text</a>, <a href="GuiControls.htm#Picture">Picture</a>, <a href="GuiControls.htm#GroupBox">GroupBox</a>, <a href="GuiControls.htm#CheckBox">CheckBox</a>, <a href="GuiControls.htm#Radio">Radio</a>, <a href="GuiControls.htm#Slider">Slider</a>, <a href="GuiControls.htm#Tab">Tab</a> or <a href="GuiControls.htm#Link">Link</a> control uses the background color set by <a href="#BackColor">Gui.BackColor</a> (or if none or other control type, the system's default background color). Specifying <code class="no-highlight">BackgroundDefault</code> or <code class="no-highlight">-Background</code> applies the system's default background color. For example, a control can be restored to the system's default color via <code>LV.Opt("+BackgroundDefault")</code>. If a control type does not support this option, an error is thrown.</p>
     <p><strong>Border:</strong> Provides a thin-line border around the control. Most controls do not need this because they already have a type-specific border. When adding a border to an <em>existing</em> control, it might be necessary to increase the control's width and height by 1 pixel.</p>
     <p id="DPIResize"><strong>DPIResize</strong> <span class="ver">[v2.1-alpha.16+]</span>: Enables or disables automatic changes to this control's position and size when the GUI moves to a display with a different DPI. This is enabled by default, unless <a href="#Gui_DPIResize">-DPIResize</a> was used in the GUI's options prior to adding the control.</p>
-    <p><strong>Windows:</strong> The control is re-laid out when the GUI receives a <a href="https://learn.microsoft.com/windows/win32/hidpi/wm-dpichanged">WM_DPICHANGED message</a>. The new X, Y, width and height are calculated with a formula equivalent to <code>Round(n * NewDPI / OldDPI)</code>, where n is the current value in pixels without <a href="#DPIScale">DPI scaling</a>. Point-based fonts are rendered at the new DPI and therefore change physical size without changing their stored point size. Disable automatic resizing if the control should be positioned or sized by different rules, such as if the layout of the GUI changes depending on DPI.</p>
-    <p>Even if enabled, the script may need to handle the <a href="GuiOnEvent.htm#DPIChange">DPIChange</a> event or WM_DPICHANGED message to account for elements which are not scaled automatically, such as <a href="ListView.htm#IL">Image Lists</a>. Alternatively, the system's automatic bitmap-based scaling of the window or control can be re-enabled as described under <a href="../misc/DPIScaling.htm#Mixed_Settings">DPI Scaling - Mixed Settings</a>.</p>
+    <p>On Windows, this occurs when the GUI receives a <a href="https://learn.microsoft.com/windows/win32/hidpi/wm-dpichanged">WM_DPICHANGED message</a>, and the new X, Y, width and height are calculated with a formula equivalent to <code>Round(n * NewDPI / OldDPI)</code>, where n is the current value in pixels without <a href="#DPIScale">DPI scaling</a>. Point-based fonts are rendered at the new DPI and therefore change physical size without changing their stored point size. Disable automatic resizing if the control should be positioned or sized by different rules, such as if the layout of the GUI changes depending on DPI.</p>
+    <p>Even if enabled, the script may need to handle the <a href="GuiOnEvent.htm#DpiChanged">DpiChanged</a> event or WM_DPICHANGED message to account for elements which are not scaled automatically, such as <a href="ListView.htm#IL">Image Lists</a>. Alternatively, the system's automatic bitmap-based scaling of the window or control can be re-enabled as described under <a href="../misc/DPIScaling.htm#Mixed_Settings">DPI Scaling - Mixed Settings</a>.</p>
     <p>On Windows, this option has no effect if <a href="../misc/DPIScaling.htm#Per-Monitor_DPI_Awareness">per-monitor DPI awareness</a> is disabled for the control or window, or if the script suppresses the default handling of the WM_DPICHANGED message (such as by returning a non-empty value from an <a href="GuiOnMessage.htm">OnMessage</a> callback).</p>
-    <p><strong>Linux and macOS:</strong> The native GUI toolkit uses logical coordinates and manages the backing scale. This option is accepted, but an individual control cannot opt out of toolkit-managed scaling. The <a href="GuiOnEvent.htm#DPIChange">DPIChange</a> event is still launched when the backing scale changes.</p>
+    <p>On Linux and macOS, this option has no effect; the GUI toolkit scales every control.</p>
     <p id="Redraw"><strong>Redraw:</strong> When used with <a href="GuiControl.htm#Opt">GuiControl.Opt</a>, this option enables or disables redraw (visual updates) for a control by sending it a <a href="https://learn.microsoft.com/windows/win32/gdi/wm-setredraw">WM_SETREDRAW message</a>. See <a href="GuiControl.htm#Redraw">Redraw</a> for more details.</p>
     <p><strong>Theme:</strong> This option can be used to override the window's current theme setting for the newly created control. It has no effect when used on an existing control; however, this may change in a future version. See GUI's <a href="#Theme">+/-Theme</a> option for details.</p>
     <p><strong>(Unnamed Style):</strong> Specify a plus or minus sign followed immediately by a decimal or hexadecimal <a href="../misc/Styles.htm">style number</a>. If the sign is omitted, a plus sign is assumed.</p>
@@ -302,7 +302,7 @@ MyGui.Show()</pre>
 </dl>
 <h4 id="GetClientPos_Remarks">Remarks</h4>
 <p>The client area is the part of the window which can contain controls. It excludes the window's title bar, menu (if it has a standard one) and borders.  The position and size of the client area are less dependent on OS version and theme than the values returned by <a href="#GetPos">Gui.GetPos</a>.</p>
-<p>On Windows, unlike <a href="WinGetClientPos.htm">WinGetClientPos</a>, this method applies <a href="#DPIScale">DPI scaling</a> to <em>Width</em> and <em>Height</em> unless the <code class="no-highlight">-DPIScale</code> option was used. On Linux and macOS, it returns the GUI toolkit's logical size regardless of the <code class="no-highlight">DPIScale</code> option.</p>
+<p>Unlike <a href="WinGetClientPos.htm">WinGetClientPos</a>, this method applies <a href="#DPIScale">DPI scaling</a> to <em>Width</em> and <em>Height</em> (unless the <code class="no-highlight">-DPIScale</code> option was used).</p>
 </div>
 
 <div class="methodShort" id="GetPos">
@@ -325,7 +325,7 @@ MyGui.Show()</pre>
 </dl>
 <h4 id="GetPos_Remarks">Remarks</h4>
 <p>As the coordinates returned by this method include the window's title bar, menu and borders, they may be dependent on OS version and theme. To get more consistent values across different systems, consider using <a href="#GetClientPos">Gui.GetClientPos</a> instead.</p>
-<p>On Windows, unlike <a href="WinGetPos.htm">WinGetPos</a>, this method applies <a href="#DPIScale">DPI scaling</a> to <em>Width</em> and <em>Height</em> unless the <code class="no-highlight">-DPIScale</code> option was used. On Linux and macOS, it returns the GUI toolkit's logical size regardless of the <code class="no-highlight">DPIScale</code> option.</p>
+<p>Unlike <a href="WinGetPos.htm">WinGetPos</a>, this method applies <a href="#DPIScale">DPI scaling</a> to <em>Width</em> and <em>Height</em> (unless the <code class="no-highlight">-DPIScale</code> option was used).</p>
 </div>
 
 <div class="methodShort" id="Hide">
@@ -364,7 +364,7 @@ MyGui.Show()</pre>
   </dd>
 </dl>
 <h4 id="Move_Remarks">Remarks</h4>
-<p>On Windows, unlike <a href="WinMove.htm">WinMove</a>, this method applies <a href="#DPIScale">DPI scaling</a> to <em>Width</em> and <em>Height</em> unless the <code class="no-highlight">-DPIScale</code> option was used. On Linux and macOS, it accepts the GUI toolkit's logical size regardless of the <code class="no-highlight">DPIScale</code> option.</p>
+<p>Unlike <a href="WinMove.htm">WinMove</a>, this method applies <a href="#DPIScale">DPI scaling</a> to <em>Width</em> and <em>Height</em> (unless the <code class="no-highlight">-DPIScale</code> option was used).</p>
 <h4 id="Move_Examples">Examples</h4>
 <pre>MyGui.Move(10, 20, 200, 100)
 MyGui.Move(VarX+10, VarY+5, VarW*2, VarH*1.5)
@@ -402,10 +402,10 @@ MyGui.Move(x-10,, w+20)</pre>
     <p>The effect of this parameter is cumulative; that is, it alters only those settings that are explicitly specified, leaving all the others unchanged.</p>
     <p>Specify a plus sign to add the option and a minus sign to remove it. For example: <code>MyGui.Opt("+Resize -MaximizeBox")</code>.</p>
     <p><strong>AlwaysOnTop:</strong> Makes the window stay on top of all other windows, which is the same effect as <a href="WinSetAlwaysOnTop.htm">WinSetAlwaysOnTop</a>.</p>
-    <p id="AppMenu"><strong>AppMenu</strong> (present by default): On macOS, supplies the application and standard Edit menus needed for Command-C, Command-X, Command-V, Command-A and undo/redo in text controls. Use <code class="no-highlight">-AppMenu</code> for a window which should contribute no application menu. The option has no effect on Windows or Linux.</p>
+    <p id="AppMenu"><strong>AppMenu</strong> (present by default): On macOS, supplies the application and standard Edit menus needed for Command-C, Command-X, Command-V, Command-A and undo/redo in text controls. Use <code class="no-highlight">-AppMenu</code> for a window which should contribute no application menu. If <a href="#MenuBar">MenuBar</a> is assigned, the Edit menu is merged ahead of the script's menus. The option has no effect on Windows or Linux.</p>
     <p id="AutoScroll"><strong>AutoScroll:</strong> Shows scrollbars when the window's controls extend beyond its client area.</p>
     <p><strong>Border:</strong> Provides a thin-line border around the window. This is not common.</p>
-    <p id="ClickThrough"><strong>ClickThrough:</strong> Passes mouse input through the window to whatever is beneath it, so the window is visible but never receives clicks. Use <code class="no-highlight">-ClickThrough</code> to restore normal input. This is intended for overlay-style windows; see also <a href="Overlay.htm">Overlay</a>, which is click-through by design.</p>
+    <p id="ClickThrough"><strong>ClickThrough:</strong> Passes mouse input through the window to whatever is beneath it. See also <a href="Overlay.htm">Overlay</a>.</p>
     <p><strong>Caption</strong> (present by default): Provides a title bar and a thick window border/edge. When removing the caption from a window that will use <a href="WinSetTransColor.htm">WinSetTransColor</a>, remove it only after setting the TransColor.</p>
     <p><strong>Disabled:</strong> Disables the window, which prevents the user from interacting with its controls. This is often used on a window that owns other windows (see <a href="#Owner">Owner</a>).</p>
     <p id="DPIScale"><strong>DPIScale:</strong> Use <code>MyGui.Opt("-DPIScale")</code> to disable <a href="../misc/DPIScaling.htm">DPI scaling</a>, which is enabled by default on Windows. If DPI scaling is enabled, coordinates and sizes passed to or retrieved from the Gui and <a href="GuiControl.htm">GuiControl</a> methods/properties are automatically scaled based on the GUI window's current DPI. For example, with a DPI of 144 (150&nbsp;%), <code>MyGui.Show("w100")</code> would make the Gui 150 (100 * 1.5) pixels wide, and resizing the window to 200 pixels wide via the mouse or <a href="WinMove.htm">WinMove</a> would cause <code>MyGui.GetClientPos(,,&amp;W)</code> to set <em>W</em> to 133 (200 // 1.5). <a href="../Variables.htm#ScreenDPI">A_ScreenDPI</a> contains the system DPI and can differ from a window's DPI on another monitor.</p>
@@ -413,10 +413,10 @@ MyGui.Move(x-10,, w+20)</pre>
     <ul>
       <li>Avoid using hard-coded coordinates wherever possible. For example, use the <a href="#xp">XP</a>, <a href="#xs">XS</a>, <a href="#xm">XM</a> and <a href="#PosPlusMargin">X+M</a> options for positioning controls and specify height in <a href="#R">rows of text</a> instead of pixels.</li>
       <li>Enable (<code>MyGui.Opt("+DPIScale")</code>) and disable (<code>MyGui.Opt("-DPIScale")</code>) scaling on the fly, as needed. Changing the setting does not affect positions or sizes which have already been set.</li>
-      <li>Manually scale the coordinates. For example, <code>x*(A_ScreenDPI/96)</code> converts x from logical/GUI coordinates to physical/non-GUI coordinates at the system DPI. Within a <a href="GuiOnEvent.htm#DPIChange">DPIChange</a> callback, use <code class="no-highlight">NewDPI</code> instead when converting for the window's current monitor.</li>
+      <li>Manually scale the coordinates. For example, <code>x*(A_ScreenDPI/96)</code> converts x from logical/GUI coordinates to physical/non-GUI coordinates at the system DPI. Within a <a href="GuiOnEvent.htm#DpiChanged">DpiChanged</a> callback, use <code class="no-highlight">NewDPI</code> instead when converting for the window's current monitor.</li>
     </ul>
-    <p>This option only affects the scaling of coordinates passed to or received from the GUI. Some elements may be scaled according to DPI regardless of this option. On Linux and macOS, the native toolkit already exposes logical coordinates and manages backing scaling, so <code class="no-highlight">+DPIScale</code> and <code class="no-highlight">-DPIScale</code> are accepted but do not alter the coordinate scale.</p>
-    <p id="Gui_DPIResize"><strong>DPIResize</strong> <span class="ver">[v2.1-alpha.16+]</span>: Use <code class="no-highlight">-DPIResize</code> or <code class="no-highlight">+DPIResize</code> to set the default for all subsequently added controls, as an alternative to using it in each control's options. Changing this option does not affect controls which already exist. Each GUI starts with a default of <code class="no-highlight">+DPIResize</code>. On Windows, this setting is independent of <a href="#DPIScale">DPIScale</a>; for example, <code class="no-highlight">-DPIScale +DPIResize</code> uses raw pixel coordinates while still resizing controls when the window DPI changes. On Linux and macOS, the option is accepted but does not override toolkit-managed scaling. For details, see the control's <a href="#DPIResize">DPIResize</a> option.</p>
+    <p>This option only affects the scaling of coordinates passed to or received from the GUI. Some elements may be scaled according to DPI regardless of this option. On Linux and macOS, this option has no effect, and coordinates are in the GUI toolkit's logical units.</p>
+    <p id="Gui_DPIResize"><strong>DPIResize</strong> <span class="ver">[v2.1-alpha.16+]</span>: Use <code class="no-highlight">-DPIResize</code> or <code class="no-highlight">+DPIResize</code> to set the default for all subsequently added controls, as an alternative to using it in each control's options. Each GUI starts with a default of <code class="no-highlight">+DPIResize</code>. For details, see the control's <a href="#DPIResize">DPIResize</a> option.</p>
     <p id="LastFound"><strong>LastFound:</strong> Sets the window to be the <a href="../misc/WinTitle.htm#LastFoundWindow">last found window</a> (though this is unnecessary in a <a href="GuiOnEvent.htm#Threads">GUI thread</a> because it is done automatically), which allows functions such as <a href="WinGetStyle.htm">WinGetStyle</a> and <a href="WinSetTransparent.htm">WinSetTransparent</a> to operate on it even if it is hidden (that is, <a href="DetectHiddenWindows.htm">DetectHiddenWindows</a> is not necessary). This is especially useful for changing the properties of the window before showing it. For example:</p>
     <pre>MyGui.Opt("+LastFound")
 WinSetTransColor(CustomColor " 150")
@@ -439,7 +439,7 @@ MyGui.Opt("+Owner")  <em>; Make the GUI owned by the <a href="../Variables.htm#S
       <li>The <code class="no-highlight">+Parent</code> option may fail during GUI creation if the parent window is external, but may work after the GUI is created. This is due to differences in how styles are applied.</li>
       <li>Navigating into and out of the child GUI with the Tab key requires the <code class="no-highlight">+E0x00010000</code> option (WS_EX_CONTROLPARENT).</li>
     </ul>
-    <p id="Round"><strong>Round:</strong> Rounds the window's outer corners, for a borderless window which draws its own chrome. Use <code class="no-highlight">-Round</code> to restore square corners. Requires Windows 11; the option is accepted and has no effect on Linux and macOS.</p>
+    <p id="Round"><strong>Round:</strong> Rounds the window's outer corners, such as for a borderless window which draws its own chrome. Requires Windows 11; has no effect on Linux and macOS.</p>
     <p id="Resize"><strong>Resize:</strong> Makes the window resizable and enables its maximize button in the title bar. To avoid enabling the maximize button, specify <code class="no-highlight">+Resize -MaximizeBox</code>.</p>
     <p><strong>SysMenu</strong> (present by default): Specify <code class="no-highlight">-SysMenu</code> (minus SysMenu) to omit the system menu and icon in the window's upper left corner. This will also omit the minimize, maximize, and close buttons in the title bar.</p>
     <p id="Theme"><strong>Theme:</strong> By specifying <code class="no-highlight">-Theme</code>, all subsequently created controls in the window will have the Classic Theme appearance. To later create additional controls that obey the current theme, turn it back on via <code class="no-highlight">+Theme</code>. Note: This option has no effect if the Classic Theme is in effect. Finally, this setting may be changed for an individual control by specifying <code class="no-highlight">+Theme</code> or <code class="no-highlight">-Theme</code> in its options when it is created.</p>
@@ -470,7 +470,7 @@ MyGui.Opt("+Owner")  <em>; Make the GUI owned by the <a href="../Variables.htm#S
     <p><strong>C:</strong> Color name (see <a href="../misc/Colors.htm">color chart</a>) or RGB value -- or specify the word Default to return to the system's default color (black on most systems). Example values: <code class="no-highlight">cRed</code>, <code class="no-highlight">cFFFFAA</code>, <code class="no-highlight">cDefault</code>. Note: <a href="GuiControls.htm#Button">Button</a>, <a href="GuiControls.htm#DateTime">DateTime</a>, and <a href="GuiControls.htm#StatusBar">StatusBar</a> controls do not obey custom colors. Also, an individual control can be created with a font color other than the current one by including the C option. For example: <code>MyGui.Add("Text", "cRed", "My Text")</code>.</p>
     <p><strong>S:</strong> Size (in points). For example: <code class="no-highlight">s12</code> (specify decimal, not hexadecimal)</p>
     <p><strong>W:</strong> Weight (boldness), which is a number between 1 and 1000 (400 is normal and 700 is bold). For example: <code class="no-highlight">w600</code> (specify decimal, not hexadecimal)</p>
-    <p id="fontq"><strong>Q:</strong> Text rendering quality. For example: <code class="no-highlight">q3</code>. Q should be followed by a number from the following table:</p>
+    <p id="fontq"><strong>Q:</strong> Text rendering quality. For example: <code class="no-highlight">q3</code>. On Linux and macOS, values other than 0 raise an Error. Q should be followed by a number from the following table:</p>
     <table class="info">
       <tr>
         <th>Number</th>
@@ -520,7 +520,7 @@ MyGui.SetFont(, "Arial")
 MyGui.SetFont(, "Verdana")  <em>; Preferred font.</em></pre>
   </dd>
 </dl>
-<h4 id="SetFont_Remarks">Remarks</h4>
+<h4 id="SetFont_Remarks">Remarks</h4><p><em>Options</em> may also be a <a href="Font.htm">Font</a> object, in which case only its specified attributes are applied and <em>FontName</em>, if specified, overrides its Name. A weight of 700 or more is bold; any lower weight is normal.</p>
 <p>Omit both parameters to restore the font to the system's default GUI typeface, size, and color. Otherwise, any font attributes which are not specified will be copied from the previous font.</p>
 <p>To change the font settings for a single control, use <a href="GuiControl.htm#SetFont">GuiControl.SetFont</a>.</p>
 <p>On a related note, the operating system offers standard dialog boxes that prompt the user to pick a font, color, or icon. These dialogs can be displayed via <a href="DllCall.htm">DllCall</a> in combination with <a href="https://learn.microsoft.com/previous-versions/windows/desktop/legacy/ms646914(v=vs.85)">comdlg32\ChooseFont</a>, <a href="https://learn.microsoft.com/previous-versions/windows/desktop/legacy/ms646912(v=vs.85)">comdlg32\ChooseColor</a>, or <a href="https://learn.microsoft.com/windows/win32/api/shlobj_core/nf-shlobj_core-pickicondlg">shell32\PickIconDlg</a>. Search the forums for examples.</p>
@@ -528,7 +528,7 @@ MyGui.SetFont(, "Verdana")  <em>; Preferred font.</em></pre>
 
 <div class="methodShort" id="SetIcon">
 <h3>SetIcon</h3>
-<p>Gives the window an icon of its own, in place of the <a href="../Program.htm#tray-icon">tray icon</a> it was created with. Unlike <a href="TraySetIcon.htm">TraySetIcon</a> this affects only this window, and it applies to a window which is already open.</p>
+<p>Changes this window's icon, which is otherwise the <a href="../Program.htm#tray-icon">tray icon</a> in effect when the window was created.</p>
 <pre class="Syntax">MyGui.<span class="func">SetIcon</span>(FileName <span class="optional">, IconNumber, Options</span>)</pre>
 <h4 id="SetIcon_Parameters">Parameters</h4>
 <dl>
@@ -536,7 +536,7 @@ MyGui.SetFont(, "Verdana")  <em>; Preferred font.</em></pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a> or <a href="Image.htm">Image</a></p>
     <p>The path to an icon or image file, a module holding icon resources such as <code class="no-highlight">"shell32.dll"</code>, a bitmap or icon handle such as <code class="no-highlight">"HICON:" handle</code>, or an <a href="Image.htm">Image</a> object. Specify an asterisk (*), or a blank value, to go back to the script's own icon.</p>
-    <p class="note"><strong>Note:</strong> Addressing an icon inside a module by <em>IconNumber</em> is a Windows facility. On Linux a managed assembly's icon resource can be named, but a numeric index has nothing to index into, and a bad source raises a ValueError.</p>
+    <p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if no icon can be loaded. For a managed .NET DLL, specify an embedded icon resource name for <em>IconNumber</em>.</p>
   </dd>
   <dt>IconNumber</dt>
   <dd>
@@ -547,12 +547,12 @@ MyGui.SetFont(, "Verdana")  <em>; Preferred font.</em></pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>If blank or omitted, the source's own size is kept. Otherwise <strong>Wn</strong> gives the size of the large icon, which is the one the alt-tab task switcher and the taskbar button show; the title bar takes the small size from the same icon. For example: <code class="no-highlight">w64</code>. Window icons are square, so there is no separate height. Any other option is ignored.</p>
-    <p>A source carrying fixed sizes &mdash; an <code class="no-highlight">.ico</code> file, or an icon resource inside a module &mdash; supplies the nearest size it holds, so asking a file with 32 and 48 pixel icons for 40 gives the 48. A source that has to be resampled anyway, such as a PNG, lands on the size exactly. A 256-pixel frame cannot always be selected, so a very large request may settle on a smaller one.</p>
+    <p>An <code class="no-highlight">.ico</code> file or a module supplies the nearest size it holds, and a 256-pixel frame might not be selectable. Other images are resampled to the exact size.</p>
   </dd>
 </dl>
 <h4 id="SetIcon_Remarks">Remarks</h4>
-<p>An icon file carrying several sizes keeps all of them, and each place the icon appears takes the size it wants. <em>Options</em> is only needed to override the large size.</p>
-<p>A window icon is drawn by the window manager, so it reaches as far as the platform's own support does: Windows and Linux under X11 show it, Linux under Wayland resolves a window's icon from its application id instead, and macOS windows have no icon. See <a href="#Appear">Window Appearance</a>.</p>
+<p>An icon file carrying several sizes keeps all of them, and each place the icon appears takes the size it wants.</p>
+<p>Whether the icon is shown depends on the platform; see <a href="#Appear">Window Appearance</a>.</p>
 <h4 id="SetIcon_Examples">Examples</h4>
 <pre class="NoIndent">MyGui := Gui()
 MyGui.SetIcon("shell32.dll", 174)      <em>; An icon from a module.</em>
@@ -619,7 +619,7 @@ MyGui.Show()</pre>
 <h3>ToClr</h3>
 <p>Returns the backing toolkit window as an ordinary <a href="Clr.htm">Clr</a> object.</p>
 <pre class="Syntax">ClrForm := MyGui.<span class="func">ToClr</span>()</pre>
-<p>Its concrete type is platform-dependent and unspecified. Changes made through it bypass the Gui object's own state and event wiring. See <a href="Clr.htm#ToClr">ToClr on built-in objects</a>.</p>
+<p>Its concrete type is platform-dependent and unspecified. Changes made through it bypass the Gui object's own state and event wiring.</p>
 </div>
 
 <div class="methodShort" id="UseGroup">
@@ -700,10 +700,9 @@ WinSetTransColor("EEAA99", MyGui)</pre>
 
 <div class="methodShort" id="FontHandle">
 <h3>FontHandle <span class="ver">[v2.1-alpha.32+]</span></h3>
-<p class="note"><strong>Note:</strong> This property is part of the compatibility target but is not yet implemented by Keysharp.</p>
 <p>Gets a handle to the font set by SetFont.</p>
 <pre class="Syntax">hFont := MyGui.<span class="func">FontHandle</span></pre>
-<p>The return value is a Win32 font handle (HFONT).</p>
+<p>The return value is a native handle describing the GUI's current default font: a Win32 font handle (HFONT) on Windows, a <code class="no-highlight">PangoFontDescription</code> pointer on Linux, or an <code class="no-highlight">NSFont</code> pointer on macOS. The handle is owned by the GUI and remains valid until the GUI's font changes or the GUI is destroyed; do not free it. A SetFont call which changes only the color keeps the same handle.</p>
 </div>
 
 <div class="methodShort" id="Hwnd">
@@ -717,8 +716,8 @@ WinSetTransColor("EEAA99", MyGui)</pre>
 <p>Gets or sets the window's icon, in place of the <a href="../Program.htm#tray-icon">tray icon</a> it was created with. This is the property form of <a href="#SetIcon">SetIcon</a>.</p>
 <pre class="Syntax">ImageObj := MyGui.<span class="func">Icon</span></pre>
 <pre class="Syntax">MyGui.<span class="func">Icon</span> := Source</pre>
-<p>Reading the property returns an <a href="Image.htm">Image</a>, or <code class="no-highlight">""</code> when the window has no icon. An Image holds one bitmap, so what comes back is the frame the window shows at its preferred size rather than the whole icon; the window keeps its own copy, so drawing on the returned Image does not change it.</p>
-<p><em>Source</em> is whatever <a href="TraySetIcon.htm">TraySetIcon</a> accepts &mdash; the path to an icon or image file, a module holding icon resources such as <code class="no-highlight">"shell32.dll"</code>, a bitmap or icon handle such as <code class="no-highlight">"HICON:" handle</code>, or an <a href="Image.htm">Image</a> object &mdash; or an asterisk (*) to go back to the script's own icon.</p>
+<p>Reading the property returns an <a href="Image.htm">Image</a>, or <code class="no-highlight">""</code> when the window has no icon. The Image holds the frame the window shows at its preferred size; drawing on it does not change the window's icon.</p>
+<p><em>Source</em> is any value <a href="#SetIcon">SetIcon</a> accepts for <em>FileName</em>.</p>
 <pre>OtherGui.Icon := MyGui.Icon  <em>; Give another window the same icon.</em></pre>
 </div>
 
@@ -764,6 +763,8 @@ MyGui.Show("w300 h200")</pre>
 <p>If a particular key combination does not work automatically, the use of a <a href="_HotIf.htm">context-sensitive hotkey</a> may be required. However, such hotkeys typically cannot be triggered by <a href="Send.htm">Send</a> and are more likely to interfere with other scripts than a standard keyboard accelerator.</p>
 <p>To remove a window's current menu bar, use <code>MyGui.MenuBar := ""</code> (that is, assign an empty string).</p>
 <p><span class="ver">[v2.1-alpha.29+]</span>: <code>unset</code> can be assigned instead of <code>""</code>. If there is no menu bar, the return value is <a href="../v2.1-changes.htm#CompatMode"><em>blank-unset</em></a>.</p>
+<p>Assigning or removing a menu bar leaves the size of the window as it is: the menu bar takes its height from the client area, which raises the <a href="GuiOnEvent.htm#Size">Size</a> event if the window has been shown.</p>
+<p>On Windows, the menu bar is a control at the top of the window's native client area. Once a menu bar has been assigned, the GUI's controls are children of a panel which fills the space below it, so that positions and sizes keep excluding the menu bar. Each control keeps its HWND when it is moved there. For code which works with window handles directly, this means that the parent of a control (such as returned by <code>DllCall("GetParent", "Ptr", Ctrl.Hwnd, "Ptr")</code>) is that panel, that an <a href="OnMessage.htm">OnMessage</a> callback receives the panel's HWND for mouse messages on the GUI's background and is not called for notifications which controls send to their parent, such as WM_NOTIFY, that drawing on the GUI's own device context (such as from <code>DllCall("GetDC", "Ptr", MyGui.Hwnd, "Ptr")</code>) is clipped away by the panel, and that Win32 client coordinates of the GUI's own HWND start at the menu bar's top, not below it. A GUI which has never had a menu bar has no such panel: its controls are children of the GUI window itself.</p>
 </div>
 
 <div class="methodShort" id="Name">
@@ -790,7 +791,7 @@ MyGui.<span class="func">Visible</span> := NewState</pre>
 
 <div class="methodShort" id="__Item">
 <h3>__Item</h3>
-<p>Gets the control associated with the specified <a href="GuiControl.htm#Name">name</a>, <a href="../misc/ControlID.htm#Text">text</a>, <a href="../misc/ControlID.htm#ClassNN">ClassNN</a> or <a href="../misc/ControlID.htm#HWND">HWND</a>.</p>
+<p>Gets the control associated with the specified <a href="GuiControl.htm#Name">name</a>, <a href="../misc/ControlID.htm#Text">text</a>, <a href="../misc/ControlID.htm#ClassNN">ClassNN</a>, <a href="GuiControl.htm#NetClassNN">NetClassNN</a> or <a href="../misc/ControlID.htm#HWND">HWND</a>.</p>
 <pre class="Syntax">GuiCtrlObj := MyGui[Name]
 GuiCtrlObj := MyGui.<span class="func">__Item</span>[Name]</pre>
 <p><em>GuiCtrlObj</em> is the <a href="GuiControl.htm">GuiControl object</a> of the control.</p>
@@ -804,16 +805,11 @@ GuiCtrlObj := MyGui.<span class="func">__Item</span>[Name]</pre>
 <p>To display a literal ampersand inside the control types mentioned above, specify two consecutive ampersands as in this example: <code>MyGui.Add("Button",, "Save &amp;&amp; Exit")</code>.</p>
 
 <h2 id="Appear">Window Appearance</h2>
-<p>For its icon, a GUI window uses the <a href="../Program.htm#tray-icon">tray icon</a> that was in effect at the time the window was created, so <code><a href="TraySetIcon.htm">TraySetIcon</a>("MyIcon.ico")</code> before <code>Gui()</code> gives every window that follows that icon. <a href="#SetIcon">SetIcon</a> gives one window an icon of its own instead, and applies to a window which is already open:</p>
+<p>For its icon, a GUI window uses the <a href="../Program.htm#tray-icon">tray icon</a> that was in effect at the time the window was created. Thus, to have a different icon, change the tray icon before creating the window. For example: <code><a href="TraySetIcon.htm">TraySetIcon</a>("MyIcon.ico")</code>. To give one window its own icon, including a window which is already shown, use <a href="#SetIcon">SetIcon</a> or <a href="#Icon">Icon</a>:</p>
 <pre>MyGui := Gui()
 MyGui.<a href="#Icon">Icon</a> := "MyIcon.ico"
 MyGui.Show()</pre>
-<p>An icon file carrying several sizes keeps all of them, and each place the window's icon appears takes the size it wants: the title bar a small one, the alt-tab task switcher and the taskbar button a large one. To choose the large size yourself, give <a href="#SetIcon">SetIcon</a> a width:</p>
-<pre>MyGui := Gui()
-MyGui.SetIcon("MyIcon.ico", , "w64")  <em>; Ideal size for alt-tab varies between systems and OS versions.</em>
-MyGui.Show()</pre>
-<p class="note"><strong>Note:</strong> A window icon is drawn by the window manager, so it reaches as far as the platform's own support does. Windows and Linux under X11 show it. Linux under Wayland has no per-window icon protocol and resolves the icon from the window's application id instead, so a window keeps the icon of the installed <code class="no-highlight">.desktop</code> entry. macOS windows have no icon at all.</p>
-<p>The badge and progress bar a desktop shell draws <em>over</em> a taskbar button are separate from the window's icon; see the <a href="Taskbar.htm">Taskbar</a> class.</p>
+<p class="note"><strong>Note:</strong> Window icons are shown on Windows and on Linux under X11. On Linux under Wayland, a window shows the icon of the installed <code class="no-highlight">.desktop</code> entry for its application ID. macOS windows have no icon.</p>
 <p>Due to OS limitations, <a href="GuiControls.htm#CheckBox">CheckBox</a>, <a href="GuiControls.htm#Radio">Radio</a>, and <a href="GuiControls.htm#GroupBox">GroupBox</a> controls for which a non-default text color was specified will take on the Classic Theme appearance.</p>
 <p>Related topic: <a href="#MarginX">window's margin</a>.</p>
 
@@ -823,10 +819,6 @@ MyGui.Show()</pre>
 <p id="deleted">GUI objects follow <a href="../Objects.htm#Lifetime">managed object lifetime</a>, so garbage collection is not a deterministic way to close a window. Call <a href="#Destroy">Destroy</a> when a window and its resources must be released at a known time.</p>
 <p>Retain a normal script reference to a hidden GUI which must continue receiving messages. <a href="ObjAddRef.htm">ObjAddRef</a> is for native COM pointers and must not be used to manage a GUI object's lifetime.</p>
 <p>If the script is not <a href="../Scripts.htm#persistent">persistent</a> for any other reason, it will exit after the last visible GUI is closed; either when the last thread completes or immediately if no threads are running.</p>
-
-<h3 id="macOS">macOS</h3>
-<p>macOS implements standard text-editing shortcuts through an application's Edit menu rather than each text control. A GUI therefore receives a minimal application menu and Edit menu by default. If the script assigns <a href="#MenuBar">Gui.MenuBar</a>, the Edit menu is merged ahead of the script's menus and remains present when the menu bar changes at runtime.</p>
-<p>Use the <a href="#AppMenu"><code>-AppMenu</code></a> option for a borderless, kiosk or similar window which should have no application menu. Standard Command-key editing shortcuts do not work in that window's text controls while the menu is disabled.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="GuiControl.htm">GuiControl object</a>, <a href="GuiFromHwnd.htm">GuiFromHwnd</a>, <a href="GuiCtrlFromHwnd.htm">GuiCtrlFromHwnd</a>, <a href="GuiControls.htm">Control Types</a>, <a href="ListView.htm">ListView</a>, <a href="TreeView.htm">TreeView</a>, <a href="Menu.htm">Menu object</a>, <a href="Control.htm">Control functions</a>, <a href="MsgBox.htm">MsgBox</a>, <a href="FileSelect.htm">FileSelect</a>, <a href="DirSelect.htm">DirSelect</a></p>
@@ -1149,7 +1141,7 @@ Gui_Size(thisGui, MinMax, Width, Height)
 </div>
 
 <div class="ex" id="ExWebBrowser">
-<p><a class="ex_number" href="#ExWebBrowser"></a> Creates a simple web browser using the <a href="https://learn.microsoft.com/dotnet/desktop/winforms/controls/webbrowser-control-windows-forms">WebBrowser control</a>. An address bar allows you to navigate to a specific webpage. <a href="ComObjConnect.htm">ComObjConnect</a> is used to handle the events exposed by the WebBrowser object. This example is Windows-only; the <a href="GuiControls.htm#WebView">WebView</a> control does the same thing on every platform without COM.</p>
+<p><a class="ex_number" href="#ExWebBrowser"></a> Creates a simple web browser using the <a href="https://learn.microsoft.com/dotnet/desktop/winforms/controls/webbrowser-control-windows-forms">WebBrowser control</a>. An address bar allows you to navigate to a specific webpage. <a href="ComObjConnect.htm">ComObjConnect</a> is used to handle the events exposed by the WebBrowser object. This example requires Windows; for a cross-platform browser, see the <a href="GuiControls.htm#WebView">WebView</a> control.</p>
 <pre>MyGui := Gui()
 URL := MyGui.Add("Edit", "w930 r1", "https://example.com/")
 MyGui.Add("Button", "x+6 yp w44 Default", "Go").OnEvent("Click", ButtonGo)

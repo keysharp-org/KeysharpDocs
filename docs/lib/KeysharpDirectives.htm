@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Keysharp Build Directives | Keysharp</title>
-<meta name="description" content="Directives for conditional compilation, build-time messages, and the #App application facts." />
+<meta name="description" content="Directives for conditional compilation and build-time messages." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" type="text/css" />
@@ -20,7 +20,23 @@
 <span class="func">#EndIf</span>
 <span class="func">#Define</span> Name
 <span class="func">#Undef</span> Name</pre>
-<p>Selects which source is compiled. Only the active branch reaches the compiler; excluded code is removed before parsing, so it need not be valid beyond its conditional structure. These follow the C# preprocessor rather than the AutoHotkey v1 <code>#If</code> directive, which set hotkey context and has no equivalent here &mdash; use <a href="_HotIf.htm">#HotIf</a> for that.</p>
+<p>Selects which source is compiled. Only the active branch reaches the compiler; excluded code is removed before parsing, so it need not be valid beyond its conditional structure. For context-sensitive hotkeys, use <a href="_HotIf.htm">#HotIf</a>.</p>
+<pre>#If WINDOWS
+    MsgBox "Windows"
+#ElIf LINUX
+    MsgBox "Linux"
+#ElIf OSX
+    MsgBox "macOS"
+#EndIf
+
+#If !(WINDOWS || LINUX)
+    MsgBox "Not Windows or Linux"
+#EndIf
+
+#Define FEATURE_X
+#If FEATURE_X
+    MsgBox "Feature X enabled"
+#EndIf</pre>
 <p>Directives are resolved per physical line, so a block may split a single statement:</p>
 <pre>x := (
 #If WINDOWS
@@ -29,7 +45,7 @@
     2
 #EndIf
 )</pre>
-<p>Each directive owns its own line: the condition runs to the end of the line, so the whole block cannot be written on one line.</p>
+<p>Each directive must be on its own line.</p>
 
 <h3 id="Conditional_Symbols">Predefined symbols</h3>
 <p>Symbol names are case-insensitive and carry no value; a symbol is either defined or it is not. The following are predefined:</p>
@@ -38,14 +54,15 @@
   <tr><td><code>KEYSHARP</code></td><td>Always.</td></tr>
   <tr><td><code>WINDOWS</code>, <code>LINUX</code>, <code>OSX</code></td><td>Exactly one, matching the platform the running Keysharp build targets.</td></tr>
   <tr><td><code>DEBUG</code></td><td>Only in a debug build of Keysharp itself.</td></tr>
+  <tr><td><code>X64</code>, <code>ARM64</code>, <code>X86</code>, <code>ARM</code></td><td>Exactly one, matching <a href="../Variables.htm#A_ProcessArch">A_ProcessArch</a>.</td></tr>
 </table>
 <p><code>#Define</code> adds a symbol from that point in the file onward and <code>#Undef</code> removes one. <a href="../Program.htm#cmd">--define:NAME</a> predefines symbols for a whole compilation, including any module it imports.</p>
 
 <h3 id="Conditional_Conditions">Conditions</h3>
 <p>A condition may combine defined symbols, <code>true</code> and <code>false</code>, integers (zero is false, in any spelling), <code>!</code>/<code>not</code>, <code>&amp;&amp;</code>/<code>and</code>, <code>||</code>/<code>or</code>, and parentheses. An undefined symbol is false. A name which is both defined and spelled <code>true</code> or <code>false</code> is treated as the symbol.</p>
-<p>There is no <code>defined()</code> operator and no comparison operator; a condition is a symbol test, not an expression. Anything outside this grammar is a compile-time error rather than a silently false condition, so <code>#If defined(WINDOWS)</code> and <code>#If WINDOWS == 1</code> are both rejected. Conditions are checked even in branches which are excluded, so a malformed one is reported on every platform.</p>
-<p><code>#Else</code> and <code>#EndIf</code> take no condition. Unbalanced, duplicated, or misplaced directives &mdash; a missing <code>#EndIf</code>, a second <code>#Else</code>, an <code>#ElIf</code> after <code>#Else</code>, or any of these without an open <code>#If</code> &mdash; are compile-time errors.</p>
-<p>A <code>#Define</code> made in an <a href="_Include.htm">#Include</a>d file is visible to the rest of the including file, because an include is spliced into the same compilation. An <a href="_Import.htm">#Import</a>ed module is compiled separately and once, shared by every importer, so it does not see the importing script's symbols; use <code>--define</code> to configure one.</p>
+<p>Anything else, such as <code>#If defined(WINDOWS)</code> or <code>#If WINDOWS == 1</code>, is a compile-time error, even in an excluded branch.</p>
+<p>A condition after <code>#Else</code> or <code>#EndIf</code> is a compile-time error, as are unbalanced or misplaced directives such as a missing <code>#EndIf</code> or an <code>#ElIf</code> after <code>#Else</code>.</p>
+<p>A <code>#Define</code> made in an <a href="_Include.htm">#Include</a>d file remains defined in the including file. An <a href="_Import.htm">#Import</a>ed module does not see the importing script's symbols; use <code>--define</code> to configure one.</p>
 
 <h2 id="Error">#Error and #Warning</h2>
 <pre class="Syntax"><span class="func">#Error</span> Message
@@ -54,21 +71,11 @@
 <pre>#If !WINDOWS
 #Warning This script has only been tested on Windows.
 #EndIf</pre>
-<p>The message is free-form text taken verbatim to the end of the line, so quotes, commas, apostrophes and braces in it are literal. Both directives are permitted wherever a directive is, including inside a function, class, or block, and neither is reported when it lies in a branch which conditional compilation excluded.</p>
-<p><code>#Warning</code> is distinct from <a href="_Warn.htm">#Warn</a>, which configures the runtime's own warnings about the script; its <code>Off</code>, <code>StdOut</code> and <code>MsgBox</code> modes do not apply here. A <code>#Warning</code> is a message to whoever builds the script, so it is not carried into a compiled executable and does not reappear when that executable runs.</p>
-
-<h2 id="App">#App</h2>
-<pre class="Syntax"><span class="func">#App</span> { Key: Value, ... }</pre>
-<p>Declares final application facts: identity and metadata, packaged assets, generated host shape, presentation defaults, and fixed integration identifiers. See <a href="_App.htm">#App</a> for the full key reference.</p>
-<p>Its blocks merge into one key/value map; no key acts as a source command or observes intermediate state. Standalone directives select compiler or execution policy, such as front-end diagnostics or launch behavior, or express source-ordered state transitions; internal transport does not determine their source syntax.</p>
-
-<h2 id="TrayIcon">#TrayIcon</h2>
-<pre class="Syntax"><span class="func">#TrayIcon</span>
-<span class="func">#TrayIcon</span> FileName <span class="optional">, IconNumber</span></pre>
-<p>Selects and embeds the tray icon with which a script starts, or restores the default when no file is named. See <a href="_TrayIcon.htm">#TrayIcon</a> for path, selector and #NoTrayIcon precedence rules.</p>
+<p>The message is the rest of the line, taken literally. Both directives are permitted anywhere a directive is, including inside a function, class or block.</p>
+<p><a href="_Warn.htm">#Warn</a> settings do not affect <code>#Warning</code>, and a compiled executable does not report it when it runs.</p>
 
 <h2 id="Related">Related</h2>
-<p><a href="_App.htm">#App</a>, <a href="_TrayIcon.htm">#TrayIcon</a>, <a href="../Program.htm#compile">Compiling a Script</a>, <a href="../Program.htm#cmd">command-line switches</a>, <a href="_Warn.htm">#Warn</a>, <a href="_HotIf.htm">#HotIf</a>, <a href="App.htm">App</a></p>
+<p><a href="_App.htm">#App</a>, <a href="_TrayIcon.htm">#TrayIcon</a>, <a href="../Program.htm#compile">Compiling a Script</a>, <a href="../Program.htm#cmd">command-line switches</a>, <a href="_Warn.htm">#Warn</a>, <a href="_HotIf.htm">#HotIf</a></p>
 
 </body>
 </html>

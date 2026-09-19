@@ -14,15 +14,15 @@
 <h1>Crypt</h1>
 <pre class="NoIndent">class Crypt extends Object</pre>
 
-<p>Hashes values and files, encrypts and decrypts with AES, derives keys from passwords, and returns cryptographically secure random values. Every method is called on the class itself; a Crypt object is never constructed.</p>
+<p>Hashes values and files, encrypts and decrypts with AES, derives keys from passwords, and returns cryptographically secure random values. Every method is called on the class itself.</p>
 <p>The class is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { Crypt }</pre>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
   <li><a href="#Hash">Hash</a>: Returns the digest of a value, using any supported algorithm.</li>
+  <li><a href="#Hmac">Hmac</a>: Computes a keyed message authentication code as hexadecimal.</li>
   <li><a href="#HashFile">HashFile</a>: Returns the digest of a file, read as a stream.</li>
-  <li><a href="#Hashes">MD5, SHA1, SHA256, SHA384, SHA512</a>: Return the digest of a value with one named algorithm.</li>
   <li><a href="#CRC32">CRC32</a>: Returns the CRC32 checksum of a value as an integer.</li>
   <li><a href="#Encrypt">Encrypt / Decrypt</a>: Encrypt and decrypt data with AES-256.</li>
   <li><a href="#PBKDF2">PBKDF2</a>: Derives key material from a password.</li>
@@ -41,28 +41,42 @@
 <dl>
   <dt>Value</dt>
   <dd>
-    <p>Type: <a href="../Concepts.htm#strings">String</a>, <a href="Buffer.htm">Buffer</a>, <a href="Array.htm">Array</a> or <a href="File.htm">File</a></p>
+    <p>Type: <a href="../Concepts.htm#strings">String</a>, <a href="StringBuffer.htm">StringBuffer</a>, <a href="Buffer.htm">Buffer</a> or <a href="File.htm">File</a></p>
     <p>The data to hash. See <a href="#Input">Input Values and Text Encoding</a>.</p>
   </dd>
   <dt>Algorithm</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>If omitted, it defaults to <code class="no-highlight">SHA256</code>. Otherwise specify <code class="no-highlight">MD5</code>, <code class="no-highlight">SHA1</code>, <code class="no-highlight">SHA256</code>, <code class="no-highlight">SHA384</code>, <code class="no-highlight">SHA512</code> or <code class="no-highlight">CRC32</code>. The name is not case-sensitive, and may be written with the hyphen other tools print, so <code class="no-highlight">SHA-256</code> is accepted as well as <code class="no-highlight">SHA256</code>.</p>
+    <p>If omitted, it defaults to <code class="no-highlight">SHA256</code>. Otherwise specify <code class="no-highlight">MD5</code>, <code class="no-highlight">SHA1</code>, <code class="no-highlight">SHA256</code>, <code class="no-highlight">SHA384</code>, <code class="no-highlight">SHA512</code> or <code class="no-highlight">CRC32</code>. The name is not case-sensitive and may contain hyphens, as in <code class="no-highlight">SHA-256</code>.</p>
   </dd>
   <dt>Encoding</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>The encoding a String <em>Value</em> is converted to before hashing, named as for <a href="../Variables.htm#FileEncoding">A_FileEncoding</a>. If omitted, it defaults to UTF-8. It has no effect on any other type of value.</p>
+    <p>The encoding a String or StringBuffer <em>Value</em> is converted to before hashing, named as for <a href="../Variables.htm#FileEncoding">A_FileEncoding</a>. If omitted, it defaults to UTF-8. It has no effect on binary inputs.</p>
   </dd>
 </dl>
 
 <h3 id="Hash_Return">Return Value</h3>
 <p>Type: <a href="../Concepts.htm#strings">String</a></p>
 <p>The digest as uppercase hexadecimal. See <a href="#Digest">Digest Format</a>.</p>
+<p class="warning"><strong>Security warning:</strong> MD5 and SHA-1 are unsuitable for collision-resistant security uses. Use SHA-256 or stronger unless compatibility requires an older digest.</p>
 
 <h3 id="Hash_Errors">Error Handling</h3>
 <p>A <a href="Error.htm">ValueError</a> is thrown if <em>Algorithm</em> is not one of the names listed above, or if <em>Value</em> is a File which is not open for reading. A <a href="Error.htm">TypeError</a> is thrown if <em>Value</em> is a type which holds no bytes, such as a number.</p>
 
+<h2 id="Hmac">Hmac</h2>
+<p>Computes a keyed message authentication code.</p>
+<pre class="Syntax">Digest := Crypt.<span class="func">Hmac</span>(Value, Key <span class="optional">, Algorithm := "SHA256", Encoding := "UTF-8"</span>)</pre>
+<dl>
+  <dt>Value</dt><dd><p>The message: a String, StringBuffer, Buffer or open File. <a href="#Input">Text encoding and File position rules</a> are the same as for Hash.</p></dd>
+  <dt>Key</dt><dd><p>The secret key: a String, StringBuffer or Buffer. Strings use <em>Encoding</em>; a Buffer retains its bytes. A File cannot serve as the key.</p></dd>
+  <dt>Algorithm</dt><dd><p>SHA1, SHA256 (the default), SHA384 or SHA512, named as for <a href="#Hash">Hash</a>.</p></dd>
+  <dt>Encoding</dt><dd><p>The encoding for both textual inputs, defaulting to UTF-8. Names are accepted as for <a href="FileEncoding.htm">FileEncoding</a>.</p></dd>
+</dl>
+<h3 id="Hmac_Return">Return Value</h3>
+<p>Returns a String containing uppercase hexadecimal, as <a href="#Hash">Hash</a> does.</p>
+<h3 id="Hmac_Errors">Error Handling</h3>
+<p>An unsupported algorithm or encoding raises <a href="Error.htm#ValueError">ValueError</a>. An input which holds no bytes raises <a href="Error.htm#TypeError">TypeError</a>. A closed or write-only File raises ValueError. File read failures raise <a href="Error.htm#OSError">OSError</a>.</p>
 <h2 id="HashFile">HashFile</h2>
 <p>Returns the digest of a file, read as a stream.</p>
 <pre class="Syntax">Digest := Crypt.<span class="func">HashFile</span>(Path <span class="optional">, Algorithm := "SHA256"</span>)</pre>
@@ -85,40 +99,27 @@
 <p>Type: <a href="../Concepts.htm#strings">String</a></p>
 <p>The digest as uppercase hexadecimal.</p>
 
-<h3 id="HashFile_Remarks">Remarks</h3>
-<p>The file is read a block at a time and is never held in memory as a whole, so the size of the file does not matter. Hashing the same bytes read by <a href="FileRead.htm">FileRead</a> with the <code class="no-highlight">RAW</code> option produces the same digest, at the cost of loading the entire file first.</p>
-
 <h3 id="HashFile_Errors">Error Handling</h3>
 <p>A <a href="Error.htm">ValueError</a> is thrown if <em>Path</em> is empty or <em>Algorithm</em> is not recognized. An <a href="Error.htm">OSError</a> is thrown if the file cannot be opened or read, and <a href="../Variables.htm#LastError">A_LastError</a> is set to the operating system's error code.</p>
-
-<h2 id="Hashes">MD5, SHA1, SHA256, SHA384, SHA512</h2>
-<p>Return the digest of a value with one named algorithm.</p>
-<pre class="Syntax"><span id="MD5">Digest := Crypt.<span class="func">MD5</span>(Value <span class="optional">, Encoding := "UTF-8"</span>)</span>
-<span id="SHA1">Digest := Crypt.<span class="func">SHA1</span>(Value <span class="optional">, Encoding := "UTF-8"</span>)</span>
-<span id="SHA256">Digest := Crypt.<span class="func">SHA256</span>(Value <span class="optional">, Encoding := "UTF-8"</span>)</span>
-<span id="SHA384">Digest := Crypt.<span class="func">SHA384</span>(Value <span class="optional">, Encoding := "UTF-8"</span>)</span>
-<span id="SHA512">Digest := Crypt.<span class="func">SHA512</span>(Value <span class="optional">, Encoding := "UTF-8"</span>)</span></pre>
-<p>Each is <a href="#Hash">Hash</a> with the algorithm fixed, and accepts the same values. The digests are 32, 40, 64, 96 and 128 characters long respectively.</p>
-<p class="warning"><strong>Security warning:</strong> MD5 and SHA-1 are unsuitable for collision-resistant security uses. Use SHA-256 or stronger unless compatibility requires an older digest.</p>
 
 <h2 id="CRC32">CRC32</h2>
 <p>Returns the CRC32 checksum of a value as an integer.</p>
 <pre class="Syntax">Checksum := Crypt.<span class="func">CRC32</span>(Value <span class="optional">, Encoding := "UTF-8"</span>)</pre>
 <p>CRC32 detects accidental corruption; it is not a cryptographic integrity check.</p>
-<p><code class="no-highlight">Crypt.Hash(Value, "CRC32")</code> computes the same checksum but returns it as hexadecimal, which is also how <a href="#HashFile">HashFile</a> reports it.</p>
+<p><code class="no-highlight">Crypt.Hash(Value, "CRC32")</code> computes the same checksum but returns it as hexadecimal.</p>
 
 <h2 id="Encrypt">Encrypt / Decrypt</h2>
 <p>Encrypt encrypts data with a symmetric cipher; <span id="Decrypt">Decrypt</span> reverses it.</p>
 <pre class="Syntax">Data := Crypt.<span class="func">Encrypt</span>(Value, Key <span class="optional">, Algorithm := "AES", Mode := "CBC", IV, Encoding := "UTF-8"</span>)
 Data := Crypt.<span class="func">Decrypt</span>(Value, Key <span class="optional">, Algorithm := "AES", Mode := "CBC", IV, Encoding := "UTF-8"</span>)</pre>
-<p>Both return a <a href="Buffer.htm">Buffer</a>. <em>Algorithm</em> is <code class="no-highlight">AES</code>, which is the only cipher so far; it is a parameter rather than part of the method name, so a cipher added later is a value this accepts instead of a new method. <em>Mode</em> is the chaining mode: <code class="no-highlight">CBC</code> (the default), <code class="no-highlight">ECB</code>, which encrypts each block independently and so reveals where the plaintext repeats, or <code class="no-highlight">CFB</code> — which is CFB8, the feedback size .NET and Windows CNG both default to, and not the CFB128 that OpenSSL's plain <code class="no-highlight">-aes-256-cfb</code> means. Decrypting requires the same algorithm, mode, key and encoding the data was encrypted under; a wrong key, a truncated input or a mismatched mode throws a <a href="Error.htm">ValueError</a>.</p>
-<p><code class="no-highlight">GCM</code> is the fourth mode and the one to prefer: it <strong>authenticates</strong> as well as encrypts, so a message altered after the fact is detected when it is decrypted and raises a <a href="Error.htm">ValueError</a>, where a chaining mode decrypts it to rubbish without complaint. Its nonce is 12 bytes rather than the 16 a chaining mode's vector takes, and its 16-byte authentication tag is appended to the result, so an encrypted message is 28 bytes longer than its plaintext. A nonce must never be reused with one key, which is what the default of drawing a fresh one per call ensures.</p>
+<p>Both return a <a href="Buffer.htm">Buffer</a>. <em>Algorithm</em> is <code class="no-highlight">AES</code>, the only supported cipher. <em>Mode</em> is the chaining mode: <code class="no-highlight">CBC</code> (the default), <code class="no-highlight">ECB</code>, which encrypts each block independently and so reveals where the plaintext repeats, or <code class="no-highlight">CFB</code>, which uses 8-bit feedback (CFB8). Decrypting requires the same algorithm, mode, key and encoding the data was encrypted under; a wrong key, a truncated input or a mismatched mode throws a <a href="Error.htm">ValueError</a>.</p>
+<p><code class="no-highlight">GCM</code> authenticates as well as encrypts: decrypting a message which has been altered throws a <a href="Error.htm">ValueError</a>. A 16-byte authentication tag is appended to the result.</p>
 <p>A String <em>Value</em> or <em>Key</em> is converted using <em>Encoding</em>, so reading decrypted text back requires <a href="StrGet.htm">StrGet</a> with the same one.</p>
 
 <h3 id="IV">The initialization vector</h3>
-<p>AES encrypts in 16-byte blocks, and in CBC mode each block is combined with the ciphertext of the one before it. The first block has no predecessor, so it is combined with a 16-byte value supplied separately: the initialization vector. The vector is not a secret and normally travels with the ciphertext, but it must differ from message to message — a fixed one makes encryption deterministic, which lets anyone holding the output see which encrypted values are equal without decrypting any of them.</p>
-<p>With <em>IV</em> omitted, each call draws a random vector, uses it, and writes it in front of the result, where <a href="#Decrypt">Decrypt</a> reads it back. Encrypting the same text twice therefore returns different data, and the result is 16 bytes longer than the ciphertext alone. This is the recommended form, and it asks nothing of the caller.</p>
-<p>Supply <em>IV</em> — 16 bytes for a chaining mode, 12 for <code class="no-highlight">GCM</code>, as <a href="#RandomBytes">RandomBytes</a> returns them — only to match a format defined elsewhere. It is then used exactly as given and is <strong>not</strong> written to the result, so <a href="#Decrypt">Decrypt</a> must be handed the same vector back. A vector of the wrong length, or any vector at all with <code class="no-highlight">ECB</code>, which uses none, throws a <a href="Error.htm">ValueError</a>. A String vector is converted with <em>Encoding</em>, which is therefore what decides how many bytes it comes to.</p>
+<p>The initialization vector (the nonce, under <code class="no-highlight">GCM</code>) is not secret, but must differ for each message encrypted under the same key.</p>
+<p>With <em>IV</em> omitted, each call draws a random vector, uses it, and writes it in front of the result, where <a href="#Decrypt">Decrypt</a> reads it back. Encrypting the same text twice therefore returns different data.</p>
+<p>Supply <em>IV</em> — 16 bytes for a chaining mode, 12 for <code class="no-highlight">GCM</code>, as <a href="#RandomBytes">RandomBytes</a> returns them — only to match a format defined elsewhere. It is then used exactly as given and is <strong>not</strong> written to the result, so <a href="#Decrypt">Decrypt</a> must be handed the same vector back. A vector of the wrong length, or any vector at all with <code class="no-highlight">ECB</code>, which uses none, throws a <a href="Error.htm">ValueError</a>. A String vector is converted with <em>Encoding</em>.</p>
 
 <p class="warning"><strong>Security warning:</strong> the key is used as it stands, padded to the algorithm's key size rather than stretched by a key-derivation function, so a passphrase is only as strong as its own entropy. Derive a key with <a href="#PBKDF2">PBKDF2</a> rather than passing a passphrase straight to <em>Key</em>.</p>
 <p class="warning"><strong>Security warning:</strong> under a chaining mode — <code class="no-highlight">CBC</code>, <code class="no-highlight">ECB</code> or <code class="no-highlight">CFB</code> — the result carries <strong>no</strong> authentication tag, so a ciphertext altered after the fact decrypts to rubbish instead of being detected. Use <code class="no-highlight">GCM</code> for anything that crosses a boundary where someone could change it.</p>
@@ -126,29 +127,29 @@ Data := Crypt.<span class="func">Decrypt</span>(Value, Key <span class="optional
 <h2 id="PBKDF2">PBKDF2</h2>
 <p>Derives key material from a password.</p>
 <pre class="Syntax">Key := Crypt.<span class="func">PBKDF2</span>(Password, Salt <span class="optional">, Iterations := 600000, Length := 32, Algorithm := "SHA256", Encoding := "UTF-8"</span>)</pre>
-<p>Returns <em>Length</em> bytes as a <a href="Buffer.htm">Buffer</a>. This is what makes a passphrase usable as an encryption key: <a href="#Encrypt">Encrypt</a> takes the key exactly as it is given, zero-padded to the cipher's key size, so handing it <code class="no-highlight">"hunter2"</code> directly gives a key only as strong as that word. Deriving one instead makes each guess an attacker tries cost <em>Iterations</em> hashes.</p>
-<p><em>Salt</em> need not be secret, but must differ per password — otherwise two people who choose the same password derive the same key — and must be stored alongside whatever the key protects, since the same salt is needed to derive the key again. <a href="#RandomBytes">RandomBytes</a> produces one.</p>
-<p><em>Algorithm</em> is <code class="no-highlight">SHA1</code>, <code class="no-highlight">SHA256</code> (the default), <code class="no-highlight">SHA384</code> or <code class="no-highlight">SHA512</code>. <code class="no-highlight">MD5</code> is not offered: .NET declines to iterate it for derivation on every platform. A <a href="Error.htm">ValueError</a> is thrown for any other name, for an iteration count below 1, or for a non-positive length.</p>
-<p>The default of 600000 iterations is the figure OWASP gives for PBKDF2-HMAC-SHA256. Raising it raises the cost of an attacker's guesses and of the script's own derivation equally; lower it only to match a format defined elsewhere.</p>
+<p>Returns <em>Length</em> bytes as a <a href="Buffer.htm">Buffer</a>. Use it to derive a <em>Key</em> for <a href="#Encrypt">Encrypt</a> from a passphrase.</p>
+<p><em>Salt</em> need not be secret, but must differ per password, and the same salt is needed to derive the key again. <a href="#RandomBytes">RandomBytes</a> produces one.</p>
+<p><em>Algorithm</em> is <code class="no-highlight">SHA1</code>, <code class="no-highlight">SHA256</code> (the default), <code class="no-highlight">SHA384</code> or <code class="no-highlight">SHA512</code>. A <a href="Error.htm">ValueError</a> is thrown for any other name, for an iteration count below 1, or for a non-positive length.</p>
+<p>Higher <em>Iterations</em> make both guessing the password and deriving the key slower; lower the default only to match a format defined elsewhere.</p>
 
 <h2 id="RandomBytes">RandomBytes</h2>
 <p>Returns cryptographically secure random bytes.</p>
 <pre class="Syntax">Data := Crypt.<span class="func">RandomBytes</span>(Count)</pre>
-<p>Returns <em>Count</em> bytes as a <a href="Buffer.htm">Buffer</a>, drawn from the same generator as <a href="#SecureRandom">SecureRandom</a>. This is what supplies an initialization vector, a salt, or key material — anywhere bytes rather than a number are needed.</p>
+<p>Returns <em>Count</em> bytes as a <a href="Buffer.htm">Buffer</a>, drawn from the same generator as <a href="#SecureRandom">SecureRandom</a>.</p>
 
 <h2 id="SecureRandom">SecureRandom</h2>
 <p>Returns a cryptographically secure random number.</p>
 <pre class="Syntax">Value := Crypt.<span class="func">SecureRandom</span>(<span class="optional">Min, Max</span>)</pre>
-<p>If both bounds are integers, the result is an integer; if either is floating-point, the result uses floating-point bounds. The range includes <em>Max</em>, as <a href="Random.htm">Random</a>'s does. Omit both to use the implementation's full default numeric range.</p>
+<p>If both bounds are integers, the result is an integer; if either is floating-point, the result uses floating-point bounds. The range includes <em>Max</em>. If both are omitted, the result is an integer from -2147483648 to 2147483647.</p>
 <p>For non-security uses where speed is preferred, use <a href="Random.htm">Random</a>.</p>
 
 <h2 id="Input">Input Values and Text Encoding</h2>
-<p>A String is converted to bytes with <em>Encoding</em>, which defaults to <strong>UTF-8</strong>. That is what other tools mean by the hash of a text, so <code class="no-highlight">Crypt.SHA256("abc")</code> is the SHA-256 checksum that <code class="no-highlight">sha256sum</code>, <code class="no-highlight">Get-FileHash</code> and a published test vector all report for those three bytes. Name another encoding to hash a different byte sequence, such as the UTF-16 one a Windows API works with; a name which cannot be resolved throws a <a href="Error.htm">ValueError</a> rather than falling back to something else, since the digest would otherwise be taken over the wrong bytes.</p>
-<p>A <a href="Buffer.htm">Buffer</a> or an <a href="Array.htm">Array</a> of byte values is hashed exactly as it stands, so no encoding applies to it.</p>
+<p>A String, or a <a href="StringBuffer.htm">StringBuffer</a> taken as its text, is converted to bytes with <em>Encoding</em>, which defaults to <strong>UTF-8</strong>. An <em>Encoding</em> which cannot be resolved throws a <a href="Error.htm">ValueError</a>.</p>
+<p>A <a href="Buffer.htm">Buffer</a> is hashed exactly as it stands, so no encoding applies to it.</p>
 <p>An open <a href="File.htm">File</a> passed to any of the hashing methods has its whole content read as a stream, from the beginning of the file, and is left at the position it was on. Pending writes are flushed first. A stream which cannot seek is read from its current position instead, and a File which is closed or was opened write-only throws a <a href="Error.htm">ValueError</a>. <a href="#Encrypt">Encrypt</a> and <a href="#Decrypt">Decrypt</a> do not accept a File.</p>
 
 <h2 id="Digest">Digest Format</h2>
-<p>A digest is returned as uppercase hexadecimal with no separators. Compare digests case-insensitively — with <code class="no-highlight">=</code> rather than <code class="no-highlight">==</code>, or after <a href="StrLower.htm">StrLower</a> — because the tool a published checksum came from commonly prints it in lowercase.</p>
+<p>A digest is returned as uppercase hexadecimal with no separators. <a href="Hex.htm#Decode">Hex.Decode</a> converts it to a Buffer of raw bytes. Compare digests case-insensitively, such as with <code class="no-highlight">=</code>, since published checksums are often lowercase.</p>
 
 <h2 id="Examples">Examples</h2>
 
@@ -156,8 +157,8 @@ Data := Crypt.<span class="func">Decrypt</span>(Value, Key <span class="optional
 <p><a class="ex_number" href="#ExText"></a> Hashes text, and matches what any other tool reports for it.</p>
 <pre>#Import "Ks" { Crypt }
 
-MsgBox Crypt.SHA256("abc")   <em>; BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD</em>
-MsgBox Crypt.MD5("abc")      <em>; 900150983CD24FB0D6963F7D28E17F72</em></pre>
+MsgBox Crypt.Hash("abc", "SHA256")   <em>; BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD</em>
+MsgBox Crypt.Hash("abc", "MD5")      <em>; 900150983CD24FB0D6963F7D28E17F72</em></pre>
 </div>
 
 <div class="ex" id="ExFile">
@@ -170,14 +171,6 @@ if (Crypt.HashFile(A_ScriptDir "\download.zip") = Expected)
     MsgBox "Checksum matches."
 else
     MsgBox "Checksum does NOT match."</pre>
-</div>
-
-<div class="ex" id="ExAlgorithm">
-<p><a class="ex_number" href="#ExAlgorithm"></a> Chooses the algorithm at run time, from the name a checksum file used.</p>
-<pre>#Import "Ks" { Crypt }
-
-Algorithm := "SHA-512"
-MsgBox Crypt.Hash("abc", Algorithm)</pre>
 </div>
 
 <div class="ex" id="ExCipher">
@@ -193,8 +186,25 @@ MsgBox StrGet(Plain, Plain.Size, "UTF-8")   <em>; hello</em>
 MsgBox Crypt.Encrypt("hello", "my key").Size   <em>; 32: a 16-byte vector plus one 16-byte block</em></pre>
 </div>
 
+<div class="ex" id="ExTotp">
+<p><a class="ex_number" href="#ExTotp"></a> Computes an eight-digit TOTP from a Base32 secret with the 30-second step in <a href="https://www.rfc-editor.org/rfc/rfc6238#appendix-B">RFC 6238</a>. This example uses the RFC's public test secret; <em>UnixTime</em> is seconds since 1970-01-01 UTC.</p>
+<pre>#Import Ks { Crypt, Base32, Hex }
+
+Totp(Secret, UnixTime, Algorithm := &quot;SHA1&quot;) {
+    counter := Buffer(8), steps := UnixTime // 30
+    Loop 8
+        NumPut(&quot;UChar&quot;, (steps &gt;&gt; ((8 - A_Index) * 8)) &amp; 255, counter, A_Index - 1)
+    digest := Hex.Decode(Crypt.Hmac(counter, Base32.Decode(Secret), Algorithm))
+    offset := NumGet(digest, digest.Size - 1, &quot;UChar&quot;) &amp; 15, number := 0
+    Loop 4
+        number := (number &lt;&lt; 8) | NumGet(digest, offset + A_Index - 1, &quot;UChar&quot;)
+    return Format(&quot;{1:08d}&quot;, Mod(number &amp; 0x7fffffff, 100000000))
+}
+
+FileAppend Totp("GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", 59), "*" <em>; 94287082</em></pre>
+</div>
 <h2 id="Related">Related</h2>
-<p><a href="Buffer.htm">Buffer</a>, <a href="File.htm">File</a>, <a href="FileRead.htm">FileRead</a>, <a href="Random.htm">Random</a>, <a href="Base64.htm">Base64</a>, <a href="../Modules.htm#KS">KS module</a></p>
+<p><a href="Buffer.htm">Buffer</a>, <a href="File.htm">File</a>, <a href="FileRead.htm">FileRead</a>, <a href="Random.htm">Random</a>, <a href="Base32.htm">Base32</a>, <a href="Base64.htm">Base64</a>, <a href="Hex.htm">Hex</a>, <a href="../Modules.htm#KS">KS module</a></p>
 
 </body>
 </html>

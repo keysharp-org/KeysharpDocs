@@ -84,7 +84,7 @@ GroupAdd "MyGroup", "ahk_class WordPadClass"
 <p><a href="../Variables.htm#PriorHotkey">A_PriorHotkey</a> and <a href="../Variables.htm#TimeSincePriorHotkey">A_TimeSincePriorHotkey</a> temporarily contain the previous values of the corresponding "This" variables.</p>
 
 <h2 id="optimization">Optimization</h2>
-<p class="note"><strong>Notice:</strong> This section describes interpreter-specific optimization and does not apply. #HotIf expressions are compiled and are not repeatedly reparsed.</p>
+<p class="note"><strong>Note:</strong> This section does not apply to Keysharp.</p>
 <p>#HotIf is optimized to avoid expression evaluation for simple calls to <a href="WinActive.htm">WinActive</a> or <a href="WinExist.htm">WinExist</a>, thereby reducing the <a href="#lag">risk of lag</a> or other issues in such cases. Specifically:</p>
 <ul>
   <li>The expression must contain exactly one call to <a href="WinExist.htm">WinExist</a> or <a href="WinActive.htm">WinActive</a>.</li>

@@ -29,20 +29,19 @@
 
 <h2 id="Return_Value">Return Value</h2>
 <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-<p>This function returns the operating system's name for the specified monitor. The shape of that name is the platform's, not Keysharp's:</p>
+<p>This function returns the operating system's name for the specified monitor. The form of the name depends on the platform:</p>
 <table class="info">
   <tr><th>Platform</th><th>Name</th></tr>
   <tr><td>Windows</td><td>The GDI display device name, such as <code>\\.\DISPLAY1</code>.</td></tr>
   <tr><td>Linux (X11)</td><td>The XRandR output name, such as <code>DP-1</code> or <code>eDP-1</code>.</td></tr>
-  <tr><td>Linux (Wayland)</td><td>The connector name reported by <code>xdg_output</code>, in the same form.</td></tr>
+  <tr><td>Linux (Wayland)</td><td>The connector name, in the same form.</td></tr>
   <tr><td>macOS</td><td>The display's localized name.</td></tr>
 </table>
-<p class="note"><strong>Note:</strong> On a virtual X server with no named output &mdash; <code>Xvfb</code>, for instance &mdash; there is no platform name to report, and a synthetic <code>display-<em>N</em></code> is returned instead. The names are always distinct from one another, so they can be used to tell monitors apart.</p>
+<p>On an X server with no named outputs, such as <code>Xvfb</code>, the name is <code>display-<em>N</em></code>. Names are always distinct.</p>
 <p>For a monitor's model and manufacturer rather than the operating system's device name, see the <a href="Monitor.htm#Identity">Monitor object</a>.</p>
 
 <h2 id="Error_Handling">Error Handling</h2>
 <p>An exception is thrown on failure.</p>
-<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>N</em> is outside the range 1 to <a href="MonitorGetCount.htm">MonitorGetCount</a>. Omitting <em>N</em>, or passing 0, selects the primary monitor and is not an error.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="SysGet.htm">SysGet</a>, <a href="Monitor.htm">Monitor functions</a></p>

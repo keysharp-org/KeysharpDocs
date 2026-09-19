@@ -33,7 +33,6 @@
       <li><a href="#DeleteProp">DeleteProp</a>: Removes an own property from an object.</li>
       <li><a href="#GetOwnPropDesc">GetOwnPropDesc</a>: Returns a descriptor for a given own property, compatible with DefineProp.</li>
       <li><a href="#HasOwnProp">HasOwnProp</a>: Returns 1 (true) if an object owns a property by the specified name.</li>
-      <li><a href="#OwnPropCountMethod">OwnPropCount</a>: Returns the number of own properties.</li>
       <li><a href="#OwnProps">OwnProps</a>: Enumerates an object's own properties.</li>
       <li><a href="#__Ref">__Ref</a> <span class="ver">[v2.1-alpha.10+]</span>: Retrieves a nested struct or virtual reference to a property.</li>
     </ul>
@@ -48,7 +47,6 @@
       <li><a href="#SetBase">ObjSetBase</a>: Set an object's base object.</li>
       <li><a href="#GetCapacity">ObjGetCapacity</a>, <a href="#SetCapacity">ObjSetCapacity</a>: Retrieve or set an Object's capacity to contain properties.</li>
       <li><a href="#OwnPropCount">ObjOwnPropCount</a>: Retrieve the number of own properties contained by an object.</li>
-      <li><a href="#ObjHasProp">ObjHasProp</a>: Checks whether an object or one of its base objects has a property.</li>
       <li>ObjHasOwnProp, ObjOwnProps: Equivalent to the corresponding predefined method, but cannot be overridden.</li>
       <li><a href="#GetDataPtr">ObjGetDataPtr</a> <span class="ver">[v2.1-alpha.3+]</span>: Returns the address of the object's structured data (typed properties).</li>
       <li><a href="#GetDataSize">ObjGetDataSize</a> <span class="ver">[v2.1-alpha.3+]</span>: Returns the size of the object's structure (typed properties), in bytes.</li>
@@ -96,8 +94,6 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
     <p><strong>Call:</strong> The <a href="../misc/Functor.htm">function object</a> to call when the property is called.</p>
     <p>To define a value property, specify an object with the following own property:</p>
     <p><strong>Value:</strong> Any value to assign to the property.</p>
-    <p>The descriptor must name at least one of those four, <em>Value</em> cannot accompany <em>Get</em>, <em>Set</em> or <em>Call</em>, and each of those three must hold a function object. A descriptor which breaks any of these rules throws a <a href="Error.htm#ValueError">ValueError</a> and leaves the property untouched.</p>
-    <p>Each is read as an own value property of the descriptor: one inherited from a base object is not read, nor is a dynamic own property, and a <a href="Map.htm">Map</a> is read through its own properties rather than its items. Own properties other than the four are ignored.</p>
     <p>To define a <a href="../Structs.htm">typed property</a>, specify an object with one or more of the following own properties (only Type is required):</p>
     <p><strong>Type</strong> <span class="ver">[v2.1-alpha.30+]</span>: The struct class identifying the type of the property to define. <em>Obj</em> must be a Prototype. This and the properties above are mutually-exclusive. See <a href="../Structs.htm">Structures</a> for general information and <a href="../Structs.htm#defprop">Using DefineProp</a> for an example.</p>
     <p id="DefinePropPack"><strong>Pack</strong> <span class="ver">[v2.1-alpha.19+]</span>: One of the following integers specifying the maximum alignment requirement for the property: 0, 1, 2, 4 or 8. This affects the alignment of the property and overall struct only if non-zero and less than the type's default alignment requirement, or if non-zero and <em>Type</em> is an integer. When defining a property in a class definition, the most recent <a href="_StructPack.htm">#StructPack</a> directive sets the value for <em>Pack</em>.</p>
@@ -165,12 +161,6 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <p>Returns 1 (true) if an object owns a property by the specified name, otherwise 0 (false).</p>
 <pre class="Syntax">HasOwnProp := Obj.<span class="func">HasOwnProp</span>(Name)</pre>
 <p>The default implementation of this method is also defined as a function: <code>ObjHasOwnProp(Obj, Name)</code>.</p>
-</div>
-
-<div class="methodShort" id="OwnPropCountMethod"><h3>OwnPropCount</h3>
-<p>Returns the number of properties owned by an object.</p>
-<pre class="Syntax">Count := Obj.<span class="func">OwnPropCount</span>()</pre>
-<p>This corresponds to the global <a href="#OwnPropCount">ObjOwnPropCount</a> function.</p>
 </div>
 
 <div class="methodShort" id="OwnProps"><h3>OwnProps</h3>
@@ -259,12 +249,6 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <h3 id="OwnPropCount">ObjOwnPropCount</h3>
 <p>Returns the number of properties owned by an object.</p>
 <pre class="Syntax">Count := <span class="func">ObjOwnPropCount</span>(Obj)</pre>
-
-<h3 id="ObjHasProp">ObjHasProp</h3>
-<p>Returns 1 (true) if <em>Obj</em> or one of its base objects has a property by the specified name, otherwise 0 (false).</p>
-<pre class="Syntax">HasProp := <span class="func">ObjHasProp</span>(Obj, Name)</pre>
-<p><em>Name</em> is a property name. If <em>Obj</em> is not an object, this function returns 0 rather than checking the corresponding primitive prototype. It is not affected by overriding the object's <code>HasProp</code> method.</p>
-<p>See also: <a href="Any.htm#HasProp">HasProp method</a>, <a href="HasProp.htm">HasProp</a></p>
 
 <h3 id="SetCapacity">ObjSetCapacity</h3>
 <p>Sets the current capacity of the object's internal array of own properties.</p>

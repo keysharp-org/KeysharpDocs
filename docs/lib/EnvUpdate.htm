@@ -16,14 +16,13 @@
 <pre class="Syntax"><span class="func">EnvUpdate</span>()</pre>
 
 <h2 id="Remarks">Remarks</h2>
-<p>This function is retained as a cross-platform way to make environment changes visible where the operating system provides such a notification mechanism. It takes no parameters and returns no value.</p>
 
 <h3 id="Windows">Windows</h3>
 <p>Broadcasts the operating system's environment-change notification. Applications which receive the notification decide whether and how to refresh their environments.</p>
 
 <h3 id="Linux">Linux</h3>
-<p>Publishes changes made by <a href="EnvSet.htm">EnvSet</a> since the last successful call to the D-Bus activation environment and the systemd user manager. This affects subsequently activated user services, not processes which are already running. D-Bus does not provide an unset operation, so a deleted variable is represented there by an empty value; it is removed from the systemd user-manager environment.</p>
-<p>The update lasts only for the current login session and does not modify shell startup files or other persistent configuration. Failure to run either session-manager command throws an <a href="Error.htm#OSError">OSError</a>.</p>
+<p>Publishes changes made by <a href="EnvSet.htm">EnvSet</a> since the last successful call to the D-Bus activation environment and the systemd user manager. This affects subsequently activated user services, not processes which are already running. A deleted variable is set to an empty value in the D-Bus activation environment and removed from the systemd user-manager environment.</p>
+<p>The update lasts only for the current login session and does not modify shell startup files or other persistent configuration. A session-manager command which runs but reports an error throws an <a href="Error.htm#OSError">OSError</a>; one which is not installed is skipped.</p>
 
 <h3 id="macOS">macOS</h3>
 <p>Publishes changes made by <a href="EnvSet.htm">EnvSet</a> since the last successful call to the current launchd session. This affects subsequently launched processes in that session, not applications which are already running. The update is not persistent and failure to update launchd throws an <a href="Error.htm#OSError">OSError</a>.</p>

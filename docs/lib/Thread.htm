@@ -16,7 +16,7 @@
 <p>Sets the priority or interruptibility of <a href="../misc/Threads.htm">threads</a>. It can also temporarily disable all <a href="SetTimer.htm">timers</a>.</p>
 <pre class="Syntax"><span class="func">Thread</span> <a href="#SubFunctions">SubFunction</a> <span class="optional">, Value1, Value2</span></pre>
 <p>The <em>SubFunction</em>, <em>Value1</em>, and <em>Value2</em> parameters are dependent upon each other and their usage is described below.</p>
-<p><code>Thread</code> is also the class describing one thread. The current thread is <a href="../Variables.htm#Thread">A_Thread</a>; see <a href="#Object">Thread Object</a> below.</p>
+<p><code>Thread</code> is also the class describing one thread. The current thread is <a href="../Variables.htm#A_Thread">A_Thread</a>; see <a href="#Object">Thread Object</a> below.</p>
 
 <h2 id="SubFunctions">Sub-functions</h2>
 <p>For <em>SubFunction</em>, specify one of the following:</p>
@@ -45,7 +45,7 @@
 <h3 id="Interrupt">Interrupt</h3>
 <p>Changes the duration of interruptibility for newly launched threads.</p>
 <pre class="Syntax"><span class="func">Thread</span> "Interrupt" <span class="optional">, Duration, LineCount</span></pre>
-<p class="note"><strong>Notice:</strong> <em>LineCount</em> is accepted for compatibility but has no effect because compiled scripts do not track execution at script-line granularity. Interruption is controlled by <em>Duration</em>.</p>
+<p class="note"><strong>Note:</strong> <em>LineCount</em> is accepted but ignored; interruptibility is controlled by <em>Duration</em> alone.</p>
 <p class="note"><strong>Note:</strong> This sub-function should be used sparingly because most scripts perform more consistently with settings close to the defaults.</p>
 <p>By default, every newly launched thread is uninterruptible for a <em>Duration</em> of 17 milliseconds or a <em>LineCount</em> of 1000 script lines, whichever comes first. This gives the thread a chance to finish rather than  being immediately interrupted by another thread that is waiting to launch (such as a buffered <a href="../Hotkeys.htm">hotkey</a> or a series of <a href="SetTimer.htm">timed subroutines</a> that are all due to be run).</p>
 <p class="note"><strong>Note:</strong> Any <em>Duration</em> less than 17 might result in a shorter actual duration or immediate interruption, since the system tick count has a minimum resolution of 10 to 16 milliseconds. However, at least one line will execute before the thread becomes interruptible, allowing the script to enable <a href="Critical.htm">Critical</a>, if needed.</p>
@@ -58,7 +58,7 @@
 <h2 id="Object">Thread Object</h2>
 <pre class="NoIndent">class Thread extends Object</pre>
 <p>Describes one <a href="../misc/Threads.htm">thread</a> &mdash; the cooperative unit a hotkey, timer, GUI event or the auto-execute section runs in. This is distinct from a <a href="RealThread.htm">RealThread</a>, which is a real operating-system thread.</p>
-<p>Thread objects are not constructed; calling <code>Thread</code> runs the sub-functions above. Obtain one from <a href="../Variables.htm#Thread">A_Thread</a>, from <a href="#Underlying">Under</a>, or from <a href="RealThread.htm#Threads">RealThread.Threads</a>.</p>
+<p>Thread objects are not constructed; calling <code>Thread</code> runs the sub-functions above. Obtain one from <a href="../Variables.htm#A_Thread">A_Thread</a>, from <a href="#Underlying">Underlying</a>, or from <a href="RealThread.htm#Threads">RealThread.Threads</a>.</p>
 
 <pre>#Import "Ks" { A_Thread }
 MsgBox "This thread has run for " A_Thread.Elapsed " ms"</pre>
@@ -68,7 +68,7 @@ MsgBox "This thread has run for " A_Thread.Elapsed " ms"</pre>
   <dt id="Id">Id</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p>A nearly unique 64-bit identifier: a 48-bit script-wide creation sequence in bits 63-16 and the zero-based stack position in bits 15-0. It is unique for the script's lifetime in practice, but only meaningful while the thread is active.</p>
+    <p>An identifier which is unique for the script's lifetime in practice, but only meaningful while the thread is active.</p>
     <p>A real thread which is not running any script thread &mdash; a worker idling in its event loop, or a thread the runtime adopted &mdash; still answers <code>A_Thread</code>, with an <code>Id</code> of 0. That value identifies no thread and is not unique between real threads.</p>
   </dd>
   <dt id="Index">Index</dt>
@@ -91,7 +91,7 @@ MsgBox "This thread has run for " A_Thread.Elapsed " ms"</pre>
       <tr><td><code>Hotkey</code></td><td>A <a href="../Hotkeys.htm">hotkey</a>.</td></tr>
       <tr><td><code>Hotstring</code></td><td>A <a href="../Hotstrings.htm">hotstring</a>.</td></tr>
       <tr><td><code>Timer</code></td><td><a href="SetTimer.htm">SetTimer</a>.</td></tr>
-      <tr><td><code>Event</code></td><td>A registered handler: <a href="Gui.htm#Events">GUI events</a>, <a href="Menu.htm">menu items</a>, <a href="OnExit.htm">OnExit</a>, <a href="OnClipboardChange.htm">OnClipboardChange</a>. These share one value because they dispatch through one registry.</td></tr>
+      <tr><td><code>Event</code></td><td>A registered handler or event hook: <a href="Gui.htm#Events">GUI events</a>, <a href="Menu.htm">menu items</a>, <a href="OnExit.htm">OnExit</a>, <a href="OnClipboardChange.htm">OnClipboardChange</a>, <a href="Monitor.htm#OnChange">Monitor.OnChange</a>, <a href="Clipboard.htm#OnChange">Clipboard.OnChange</a> and <a href="Audio.htm#OnDeviceChange">Audio.OnDeviceChange</a> hooks, and <a href="Overlay.htm#OnEvent">Overlay pointer handlers</a> (<code>OnEvent</code>).</td></tr>
       <tr><td><code>Message</code></td><td><a href="OnMessage.htm">OnMessage</a>.</td></tr>
       <tr><td><code>Callback</code></td><td>A <a href="CallbackCreate.htm">CallbackCreate</a> pointer invoked from native code.</td></tr>
       <tr><td><code>Input</code></td><td>An <a href="InputHook.htm">InputHook</a> event.</td></tr>
@@ -100,27 +100,31 @@ MsgBox "This thread has run for " A_Thread.Elapsed " ms"</pre>
       <tr><td><code>Clr</code></td><td>A <a href="Clr.htm">CLR</a> event subscription.</td></tr>
       <tr><td><code>RealThread</code></td><td>A <a href="RealThread.htm">RealThread</a> body, or work posted or sent to one.</td></tr>
     </table>
-    <p>Useful for diagnostics: an error handler can report which kind of thread failed without the callback having to pass that along.</p>
   </dd>
   <dt id="Elapsed">Elapsed</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>Milliseconds elapsed since this thread was launched.</p>
   </dd>
+  <dt id="AllowTimers">AllowTimers</dt>
+  <dd>
+    <p>Type: <a href="../Concepts.htm#boolean">Boolean</a></p>
+    <p>Whether <a href="SetTimer.htm">timers</a> may run in this thread. Can be read and set; setting it is the object form of the <a href="#NoTimers">NoTimers</a> sub-function, which sets the inverse. Accepts <code>On</code> and <code>Off</code> as well as a Boolean. Defaults to true.</p>
+  </dd>
   <dt id="PriorityProperty">Priority</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p>This thread's priority. Can be read and set, and reads back what the <a href="#Priority">Priority</a> sub-function set. New threads start at <a href="../Variables.htm#A_Priority">A_Priority</a>.</p>
+    <p>This thread's priority. Can be read and set, and reads back what the <a href="#Priority">Priority</a> sub-function set. Every thread starts at 0 unless its launcher gave it one.</p>
   </dd>
   <dt id="Critical">Critical</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#boolean">Boolean</a></p>
-    <p>Whether this thread is critical, that is, cannot be interrupted. Can be read and set; setting it is equivalent to <a href="Critical.htm">Critical</a> on that thread. <a href="../Variables.htm#IsCritical">A_IsCritical</a> keeps its AutoHotkey spelling; on this object an <code>Is</code> prefix marks a read-only predicate, so a settable mode is named for the mode itself.</p>
+    <p>Whether this thread is critical, that is, cannot be interrupted. Can be read and set; setting it is equivalent to <a href="Critical.htm">Critical</a> on that thread.</p>
   </dd>
   <dt id="Paused">Paused</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#boolean">Boolean</a></p>
-    <p>Whether this thread is paused. Can be read and set; setting it takes effect when that thread next resumes, which is the same flag <code>Pause 1</code> sets. <a href="../Variables.htm#IsPaused">A_IsPaused</a> is this property on <a href="#Underlying">Under</a>, because <a href="Pause.htm">Pause</a> targets the thread beneath the one calling it.</p>
+    <p>Whether this thread is paused. Can be read and set; setting it takes effect when that thread next resumes, which is the same flag <code>Pause 1</code> sets. <a href="../Variables.htm#IsPaused">A_IsPaused</a> is this property on <a href="#Underlying">Underlying</a>.</p>
   </dd>
   <dt id="IsInterruptible">IsInterruptible</dt>
   <dd>
@@ -132,16 +136,21 @@ MsgBox "This thread has run for " A_Thread.Elapsed " ms"</pre>
     <p>Type: Thread or <a href="../Concepts.htm#strings">String</a></p>
     <p>The thread this one interrupted, or an empty string when this is the oldest thread on its real thread.</p>
   </dd>
+  <dt id="ExitCode">ExitCode</dt>
+  <dd>
+    <p>Type: <a href="../Concepts.htm#numbers">Integer</a> or <a href="../Concepts.htm#strings">String</a></p>
+    <p>The code which <a href="Exit.htm">Exit</a> or the <a href="#Exit">Exit</a> method ended this thread with. It is set as the exit takes effect and the thread begins to unwind, and is readable from any thread from then on, including after the thread has ended. It is an empty string before that, and for a thread which ended another way, such as by returning.</p>
+  </dd>
 </dl>
 
 <h3 id="Exit">Exit</h3>
 <pre class="Syntax">ThreadId := ThreadObj.<span class="func">Exit</span>(<span class="optional">ExitCode</span>)</pre>
-<p>Requests that this thread exit, and returns its <a href="#Id">Id</a>. <em>ExitCode</em> defaults to 0 and is the process exit code to apply when the thread exits.</p>
+<p>Requests that this thread exit, and returns its <a href="#Id">Id</a>. <em>ExitCode</em> defaults to 0. It becomes this thread's <a href="#ExitCode">ExitCode</a>, and the process exit code as <a href="Exit.htm">Exit</a> describes.</p>
 <p>The current thread exits immediately, so a call on it does not return. Any other thread is marked and unwinds when it next resumes and processes events; this is cooperative and does not asynchronously abort running code. A later request replaces a pending exit code. <a href="Exit.htm">Exit</a> is the equivalent for the current thread.</p>
 
 <h3 id="ToString">ToString</h3>
 <pre class="Syntax">String := ThreadObj.<span class="func">ToString</span>()</pre>
-<p>Returns <code class="no-highlight">Thread <em>Id</em></code>, so a thread prints legibly in a debug message. It reads the captured <a href="#Id">Id</a>, so it keeps working after the thread has ended.</p>
+<p>Returns <code class="no-highlight">Thread <em>Id</em></code>, including after the thread has ended.</p>
 
 <h3 id="Identity">Identity</h3>
 <p>Exactly one object exists per thread, so <code>==</code> answers whether a thread is the one the calling code is in:</p>
@@ -150,7 +159,7 @@ if thr == A_Thread
     MsgBox "this is the running thread"</pre>
 
 <h3 id="Lifetime">Object lifetime</h3>
-<p>Thread state is pooled and reused, so every object captures the identity of the thread it was made for and re-checks it on each access. Once that thread ends, <a href="#Id">Id</a> and <a href="#Index">Index</a> keep answering from the captured values and <a href="#IsActive">IsActive</a> reports 0, but every other property or method throws <a href="Error.htm#TargetError">TargetError</a>. A stored object therefore reports itself inactive rather than silently describing a later, unrelated thread.</p>
+<p>A Thread object describes only the thread it was made for. Once that thread ends, <a href="#Id">Id</a>, <a href="#Index">Index</a> and <a href="#ExitCode">ExitCode</a> keep answering from the captured values and <a href="#IsActive">IsActive</a> reports 0, but every other property or method throws <a href="Error.htm#TargetError">TargetError</a>.</p>
 <pre>#Import "Ks" { A_Thread }
 global captured := 0
 SetTimer(() => captured := A_Thread, -1)

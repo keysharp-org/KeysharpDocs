@@ -13,7 +13,7 @@
 
 <h1>OnClipboardChange</h1>
 <p>Registers a <a href="../Functions.htm">function</a> to be called automatically whenever the clipboard's content changes.</p>
-<p class="note"><strong>Note:</strong> Adding a callback can require ClipboardMonitoring. Removing a callback does not request permission.</p>
+<p class="note"><strong>Note:</strong> Adding a callback can require ClipboardMonitoring.</p>
 
 <pre class="Syntax"><span class="func">OnClipboardChange</span> Callback <span class="optional">, AddRemove</span></pre>
 <h2 id="Parameters">Parameters</h2>
@@ -52,7 +52,7 @@
 <p>If the clipboard changes while a callback is already running, that notification event is lost. If this is undesirable, use <a href="Critical.htm">Critical</a>. However, this will also buffer/defer other <a href="../misc/Threads.htm">threads</a> (such as the press of a hotkey) that occur while the OnClipboardChange thread is running.</p>
 <p>If the script itself changes the clipboard, the callbacks are typically not executed immediately; that is, statements immediately below the statement that changed the clipboard are likely to execute beforehand. To force the callbacks to execute immediately, use a short delay such as <code><a href="Sleep.htm">Sleep</a> 20</code> after changing the clipboard.</p>
 
-<p>This chain is separate from <a href="Clipboard.htm#OnChange">Clipboard.OnChange</a>. A hook registered there cannot stop these callbacks, and these callbacks cannot stop a hook; both drive one native clipboard monitor.</p>
+<p><a href="Clipboard.htm#OnChange">Clipboard.OnChange</a> hooks are independent of these callbacks; neither can stop the other.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="A_Clipboard.htm">A_Clipboard</a>, <a href="Clipboard.htm#OnChange">Clipboard.OnChange</a>, <a href="OnExit.htm">OnExit</a>, <a href="OnMessage.htm">OnMessage</a>, <a href="CallbackCreate.htm">CallbackCreate</a></p>

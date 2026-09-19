@@ -15,7 +15,7 @@
 <h1>OnMessage (GUI) <span class="ver">[v2.1-alpha.1+]</span></h1>
 <p>Registers a function or method to be called whenever the GUI window or control receives the specified message.</p>
 
-<p class="note"><strong>Note:</strong> Window messages exist only on Windows. On Linux and macOS the registration is accepted, so a cross-platform script still loads, but the callback is never called.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS, only mouse and keyboard input messages (WM_MOUSEMOVE, the left, right and middle button down, up and double-click messages, WM_MOUSEWHEEL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP and WM_CHAR) are delivered; callbacks for other messages are never called.</p>
 <pre class="Syntax"><a href="Gui.htm">Gui</a>.<span class="func">OnMessage</span>(MsgNumber, Callback <span class="optional">, AddRemove</span>)
 <a href="GuiControl.htm">GuiCtrl</a>.<span class="func">OnMessage</span>(MsgNumber, Callback <span class="optional">, AddRemove</span>) <em>; Requires <span class="ver">[v2.1-alpha.7+]</span></em></pre>
 
@@ -43,7 +43,7 @@
     </ol>
     <p>You can omit one or more parameters from the end of the callback's parameter list if the corresponding information is not needed, but in this case an asterisk must be specified as the final parameter, e.g. <code>MyCallback(Param1, *)</code>.</p>
     <p>However, refer to the <a href="GuiOnEvent.htm#Callback_Parameters">notes for OnEvent</a>, especially regarding <code>this</code> and the <em>GuiOrCtrlObj</em> parameter.</p>
-    <p>If the callback returns a non-empty value, it is used as the message's reply, any remaining callbacks are not called, and the GUI window's default processing of the message is suppressed.</p>
+    <p>If the callback returns a non-empty value, including 0, it is used as the message's reply, any remaining callbacks are not called, and the GUI window's default processing of the message is suppressed. A non-numeric string replies 0. A callback whose thread ends with an error also stops the remaining callbacks, while one which calls <a href="Exit.htm">Exit</a> passes the message to the next.</p>
     <p>The callback should return either an integer or an empty string, or not explicitly return.</p>
   </dd>
   
@@ -56,7 +56,7 @@
       <li>-1 = Call the callback before any previously registered callbacks.</li>
       <li>0 = Do not call the callback.</li>
     </ul>
-    <p>Any other value raises a <a href="Error.htm#ValueError">ValueError</a>: a GUI event runs only one thread at a time, so this parameter is an ordering and removal switch rather than a thread count.</p>
+    <p>Any other value raises a <a href="Error.htm#ValueError">ValueError</a>.</p>
   </dd>
 </dl>
 

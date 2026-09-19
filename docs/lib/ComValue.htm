@@ -14,8 +14,7 @@
 
 <h1>ComValue</h1>
 
-<p>Wraps a value, SafeArray or COM object for use by the script or for passing to a COM method. On Linux, states the D-Bus wire type a value is sent as.</p>
-<p class="note"><strong>Notice:</strong> On macOS the first parameter is a four-character Apple Events descriptor type, such as <code>"utxt"</code> or <code>"enum"</code>, rather than a VT_ constant.</p>
+<p>Wraps a value, SafeArray or COM object for use by the script or for passing to a COM method.</p>
 <pre class="Syntax">ComObj := <span class="func">ComValue</span>(VarType, Value <span class="optional">, Flags</span>)</pre>
 <p><code>ComValue</code> itself is a <a href="Class.htm">class</a> derived from <code>Any</code>, but is used only to create or identify COM wrapper objects.</p>
 
@@ -27,6 +26,7 @@
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>An integer indicating the type of value. See <a href="ComObjType.htm#vt">ComObjType</a> for a list of types.</p>
     <p>On Linux, a <a href="https://dbus.freedesktop.org/doc/dbus-specification.html#type-system">D-Bus type signature</a> naming a single complete type, such as <code>"u"</code> for unsigned 32-bit, <code>"o"</code> for an object path, or <code>"a{sv}"</code> for a dictionary. A VT_ integer is also accepted where it maps unambiguously, so <code>VT_UI4</code> and <code>"u"</code> are equivalent; an integer with no D-Bus counterpart throws. A signature which is malformed, or which describes more than one type, throws.</p>
+    <p>On macOS, a four-character Apple Events descriptor type, such as <code>"utxt"</code> or <code>"enum"</code>. A VT_ integer is also accepted where it maps unambiguously; an integer with no Apple Events counterpart throws.</p>
   </dd>
 
   <dt>Value</dt>
@@ -58,7 +58,7 @@
 <h2 id="Ptr">Ptr</h2>
 <p>If a wrapper object's <a href="ComObjType.htm#vt"><em>VarType</em></a> is VT_UNKNOWN (13) or includes the VT_BYREF (0x4000) flag or VT_ARRAY (0x2000) flag, the <code class="no-highlight">Ptr</code> property can be used to retrieve the address of the object, typed variable or SafeArray. This allows the ComObject itself to be passed to any <a href="DllCall.htm">DllCall</a> or <a href="ComCall.htm">ComCall</a> parameter which has the <code>"Ptr"</code> type, but can also be used explicitly. For example, <code>ComObj.Ptr</code> is equivalent to <code>ComObjValue(ComObj)</code> in these cases.</p>
 <p>If a wrapper object's <a href="ComObjType.htm#vt"><em>VarType</em></a> is VT_UNKNOWN (13) or VT_DISPATCH (9) and the wrapped pointer is null (0), the <code class="no-highlight">Ptr</code> property can be used to retrieve the current null value or to assign a pointer to the wrapper object. Once assigned (if non-null), the pointer will be released automatically when the wrapper object is freed. This can be used with <a href="DllCall.htm">DllCall</a> or <a href="ComCall.htm">ComCall</a> output parameters of type <code>"Ptr*"</code> or <code>"PtrP"</code> to ensure the pointer will be released automatically, such as if an error occurs. For an example, see <a href="ComObjQuery.htm#ExIE">ComObjQuery</a>.</p>
-<p>When a wrapper object with <em>VarType</em> VT_DISPATCH (9) and a null (0) pointer value is assigned a non-null pointer value, its type changes from <code>ComValue</code> to <code>ComObject</code>. The properties and methods of the wrapped object become available and the <code class="no-highlight">Ptr</code> property becomes unavailable.</p>
+<p>When a wrapper object with <em>VarType</em> VT_DISPATCH (9) and a null (0) pointer value is assigned a non-null pointer value, the properties and methods of the wrapped object become available. The wrapper is a <code>ComObject</code> both before and after the assignment, and its <code class="no-highlight">Ptr</code> property remains available.</p>
 
 <h2 id="VarType">VarType</h2>
 <p>Gets or sets the wrapper object's <a href="ComObjType.htm#vt">variant type</a>.</p>
@@ -66,6 +66,7 @@
 <pre class="Syntax">ComObj.<span class="func">VarType</span> := NewType</pre>
 <p>Reading it is equivalent to <code><a href="ComObjType.htm">ComObjType</a>(ComObj)</code>. For a SafeArray the value includes the VT_ARRAY (0x2000) flag, so the element type is <code>ComObj.VarType &amp; ~0x2000</code>.</p>
 <p class="warning"><strong>Note:</strong> Assigning to this property changes how the wrapped value is interpreted, without converting it. Setting a type which does not match the underlying data produces undefined results.</p>
+<p>On Linux and macOS, this property returns the type as it was given: the integer when a VT_ constant was given, otherwise the D-Bus signature (Linux) or four-character descriptor type (macOS), such as <code>"u"</code> or <code>"enum"</code>. Assigning accepts either notation, throws for any type the <a href="#Parameters">VarType parameter</a> rejects, and converts the value when the call is made. <a href="ComObjType.htm">ComObjType</a> throws a TypeError for a ComValue.</p>
 
 <h2 id="ByRef">ByRef</h2>
 <p>If a wrapper object's <a href="ComObjType.htm#vt"><em>VarType</em></a> includes the VT_BYREF (0x4000) flag, empty brackets <code>[]</code> can be used to read or write the referenced value.</p>
@@ -92,8 +93,7 @@ MsgBox some_var</pre>
 <p><b>Known limitation:</b> Each time a COM object is wrapped, a new wrapper object is created. Comparisons and assignments such as <code>obj1 == obj2</code> and <code>arr[obj1] := value</code> treat the two wrapper objects as unique, even when they contain the same variant type and value.</p>
 
 <h3 id="Linux">Linux</h3>
-<p>Most calls need no wrapper. Argument types are taken from the service's introspection data, and a value is converted to the declared type, so a plain number or string is usually enough.</p>
-<p>A wrapper is needed where the declared type is a variant, because the type is then not stated anywhere the runtime can read. This is most common in an <code class="no-highlight">a{sv}</code> dictionary, where each value carries its own type.</p>
+<p>Argument types are taken from the service's introspection data, and a value is converted to the declared type, so a wrapper is needed only where the declared type is a variant, most commonly for the values of an <code class="no-highlight">a{sv}</code> dictionary.</p>
 <p>An unwrapped value placed in a variant is sent as its closest match: a string as <code class="no-highlight">s</code>, a true/false value as <code class="no-highlight">b</code>, a floating-point number as <code class="no-highlight">d</code>, and an integer as <code class="no-highlight">i</code> when it fits in 32 bits and <code class="no-highlight">x</code> otherwise. Wrap the value when the service expects a different type, such as an unsigned integer or an object path.</p>
 
 <h2 id="Related">Related</h2>

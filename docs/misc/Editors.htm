@@ -20,15 +20,7 @@
   <li>Syntax highlighting, like what is used in this documentation. With syntax highlighting, words, symbols and segments of code are colour-coded to indicate their meaning. For instance, literal text, comments and variable names are displayed in different colours.</li>
   <li>Auto-complete, which typically offers a list of suggestions when you start typing the name of a known function or variable.</li>
   <li>Calltips may show you what the parameters are for a function while you are writing code to call the function.</li>
-  <li><a href="../Scripts.htm#idebug">Interactive debugging</a>, such as to step through the script line by line and inspect variables at each step, or to view and modify variables or objects, beyond what <a href="../lib/ListVars.htm">ListVars</a> allows.</li>
 </ul>
-<p>Options:</p>
-<ul>
-  <li><strong>Keyview</strong> is distributed with Keysharp and is the most directly Keysharp-oriented option.</li>
-  <li>VS Code with AutoHotkey v2 Language Support provides language tooling and can be configured to launch <code class="no-highlight">Keysharp.exe</code>.</li>
-  <li>SciTE4AutoHotkey and other AutoHotkey tools can provide compatible editing features, but their run/debug commands may require manual Keysharp configuration.</li>
-</ul>
-<p class="note"><strong>Third-party notice:</strong> The projects below are not part of Keysharp. References are provided for compatibility and convenience.</p>
 
 <h2 id="SciTE4AutoHotkey">SciTE4AutoHotkey</h2>
 <p>SciTE4AutoHotkey is a custom version of the text editor known as SciTE. Its features include:</p>
@@ -59,11 +51,10 @@
 </ul>
 <p>Additional notes:</p>
 <ul>
-  <li>Set the extension's interpreter/executable path to your installed <code class="no-highlight">Keysharp.exe</code> when you want its run command to execute Keysharp.</li>
+  <li>To run scripts with Keysharp, set the extension's interpreter path as described in <a href="../howto/Install.htm#Editor">Using an Editor</a>.</li>
   <li>This extension only supports AutoHotkey v2, but can also detect v1 scripts and automatically switch over to a v1 extension if one is installed.</li>
   <li>This extension can also be used with other editors, such as <b>vim</b>, <b>neovim</b> and <b>Sublime Text 4</b>. For details, see <a href="https://github.com/thqby/vscode-autohotkey2-lsp#use-in-other-editors">Use in other editors</a>. However, VS Code likely provides the best experience, with easiest setup.</li>
 </ul>
-<p><a href="https://marketplace.visualstudio.com/items?itemName=zero-plusplus.vscode-autohotkey-debug">vscode-autohotkey-debug</a> provides support for interactive debugging of v1 and v2 scripts.</p>
 
 <h2 id="Notepad++">Notepad++</h2>
 <p>Notepad++ can be configured to support the following features:</p>

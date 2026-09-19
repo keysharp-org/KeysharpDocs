@@ -419,8 +419,8 @@ Method()
 
 <h3 id="__Await">__Await Method</h3>
 <pre class="Syntax">__Await()</pre>
-<p>The __Await method lets an object expose work which finishes later without inheriting from <a href="lib/Task.htm">Task</a>. It takes no arguments and must return a Task, CLR Task or ValueTask, or another object implementing <code>__Await()</code>. A <a href="lib/RealThread.htm">RealThread</a> is not one of them; return <a href="lib/RealThread.htm#Task">worker.Task</a> or <a href="lib/RealThread.htm#Terminated">worker.Terminated</a>. Protocol chains are followed until native work is reached; a cycle or invalid return raises an error.</p>
-<p><a href="lib/Await.htm">Await</a>, <code class="no-highlight">Task(Value)</code>, <a href="lib/Task.htm#Combinators">Task combinators</a>, work returned directly from either <a href="lib/Task.htm#Then">Then</a> callback, and values passed to the <a href="lib/Task.htm#Create">Task.Create</a> <code>Succeed</code> function recognize this method. The method is called synchronously each time an operation consumes the object, so cache stable work rather than creating a fresh operation on every call (especially for a ValueTask). An exception raised here is synchronous unless the method is being consumed through Then or Succeed, where it becomes that operation's outcome.</p>
+<p>The __Await method lets an object be passed as work which finishes later wherever <a href="lib/Await.htm">Await</a> or the <a href="lib/Task.htm">Task</a> class accepts such work. It takes no arguments and must return a Task, CLR Task or ValueTask, or another object implementing <code>__Await()</code>; any other return value, or a cycle of such objects, raises an error.</p>
+<p>The method is called each time an operation consumes the object, so cache stable work rather than starting a new operation on each call, especially for a ValueTask. An exception it raises is thrown to the caller, except through <a href="lib/Task.htm#Then">Then</a> or the <a href="lib/Task.htm#Create">Task.Create</a> <code>Succeed</code> function, where it becomes that operation's outcome.</p>
 <pre>class Download {
     __New(Url) {
         this.Task := StartDownload(Url)
@@ -433,7 +433,7 @@ body := Await(Download("https://example.com"))</pre>
 <h3 id="__Enum">__Enum Method</h3>
 <pre class="Syntax">__Enum(NumberOfVars)</pre>
 <p>The __Enum method is called when the object is passed to a <a href="lib/For.htm">for-loop</a>. This method should return an <a href="lib/Enumerator.htm">enumerator</a> which will return items contained by the object, such as array elements. If left undefined, the object cannot be passed directly to a for-loop unless it has an <a href="lib/Enumerator.htm#Call">enumerator-compatible Call method</a>.</p>
-<p><em>NumberOfVars</em> contains the number of variables passed to the for-loop. If <em>NumberOfVars</em> is 2, the enumerator is expected to assign the key or index of an item to the first parameter and the value to the second parameter. Each key or index should be accepted as a parameter of the <a href="#__Item">__Item</a> property. This also gives inspection tools a consistent way to retrieve a specific item after listing it by invoking the enumerator.</p>
+<p><em>NumberOfVars</em> contains the number of variables passed to the for-loop. If <em>NumberOfVars</em> is 2, the enumerator is expected to assign the key or index of an item to the first parameter and the value to the second parameter. Each key or index should be accepted as a parameter of the <a href="#__Item">__Item</a> property.</p>
 <h3 id="__Item">__Item Property</h3>
 <p>The __Item property is invoked when the indexing operator (array syntax) is used with the object. In the following example, the property is declared as static so that the indexing operator can be used on the Env class itself. For another example, see <a href="#Array2D">Array2D</a>.</p>
 <pre>class Env {
@@ -575,23 +575,21 @@ MsgBox "".test  <em>; 1</em>
 <h2 id="Implementation">Implementation</h2>
 <span id="Refs"></span><h3 id="Reference_Counting">Object Lifetime</h3>
 <span id="Lifetime"></span><span id="refs-problems"></span>
-<p>Script values follow the .NET memory model. Variables hold managed objects; there is no separate string-versus-number variable cache.</p>
-<p>An object becomes eligible for garbage collection after it is no longer reachable. Collection and finalization are non-deterministic, so assigning a variable an empty value does not guarantee immediate destruction. Temporary values can remain reachable until the current scope ends:</p>
+<p>Temporary values can remain reachable until the current scope ends:</p>
 <pre>FileOpen("test.txt", "w").Write("hello")  <em>; The temporary File can remain alive until this scope ends.</em></pre>
-<p>A <a href="#Custom_NewDelete"><code>__Delete</code></a> method is implemented as a managed finalizer. Finalization support is attached when an instance is created if its prototype chain already contains <code>__Delete</code>, or when <code>__Delete</code> is defined. Adding it later to an existing prototype chain does not automatically activate finalization for existing instances; temporarily assigning another Base and restoring it forces the instance to refresh that state.</p>
-<p><a href="lib/Collect.htm">Collect</a> can request garbage collection, but it cannot finalize an object which remains reachable and does not guarantee immediate cleanup.</p>
+<p>A <a href="#Custom_NewDelete"><code>__Delete</code></a> method is called at some time after the object becomes unreachable. Defining <code>__Delete</code> on a prototype does not make it apply to instances which already exist, unless their Base is set to another object and back.</p>
+<p><a href="lib/Collect.htm">Collect</a> requests a garbage collection.</p>
 <p id="ref-dispose"><strong>Deterministic cleanup:</strong> Define an explicit <code>Dispose</code>, <code>Close</code>, <code>Destroy</code> or <code>Stop</code> method for resources which must be released at a known time. Make it safe to call more than once, and optionally call it from <code>__Delete</code> as a fallback.</p>
-<p>Managed garbage collection can reclaim reference cycles once the cycle is unreachable. A timer, callback registration or native resource can still keep an object reachable, so explicitly stop or unregister long-running operations.</p>
-<p>During script shutdown, non-local variables, including class static variables, are enumerated. Their managed finalizers are disabled and <code>__Delete</code> is called directly where present.</p>
+<p>When the script exits, <code>__Delete</code> is called for objects held by global and static variables.</p>
 
 <h3 id="ObjPtr">Pointers to Objects</h3>
-<p class="note"><strong>Notice:</strong> The object-pointer conversion functions are available only on Windows.</p>
+<p class="note"><strong>Note:</strong> The object-pointer conversion functions are available only on Windows.</p>
 <p><code>ObjPtr(Object)</code> returns an IUnknown <a href="lib/ComValue.htm">ComValue</a> whose <code>Ptr</code> property contains the pointer. <code>ObjPtrAddRef(Object)</code> instead returns the raw integer pointer and adds a native COM reference.</p>
 <pre>wrapped := ObjPtr(myObject)
 address := ObjPtrAddRef(myObject)
 try DllCall("NativeFunction", "Ptr", address)
 finally ObjRelease(address)</pre>
-<p><a href="lib/ObjAddRef.htm">ObjAddRef and ObjRelease</a> operate on native COM references; they do not control ordinary managed object lifetime.</p>
+<p>See <a href="lib/ObjAddRef.htm">ObjAddRef and ObjRelease</a>.</p>
 <p id="ObjFromPtr"><code>ObjFromPtr(Address)</code> converts an IUnknown pointer back to a managed object or wrapped COM object and consumes the supplied COM reference where applicable. <code>ObjFromPtrAddRef(Address)</code> converts it while retaining an additional reference.</p>
 
 </body>

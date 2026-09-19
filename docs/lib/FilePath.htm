@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<title>FileDirName and FileFullPath | Keysharp</title>
-<meta name="description" content="Functions for resolving a file path or retrieving its directory." />
+<title>FileFullPath and FileCreateTemp | Keysharp</title>
+<meta name="description" content="Functions for resolving a file path or creating a temporary file." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" type="text/css" />
@@ -12,26 +12,22 @@
 <body>
 
 <h1>File Path Functions</h1>
-<p>Resolve a file path, retrieve the directory portion of a file name, or create a temporary file.</p>
+<p>Resolve a file path or create a temporary file.</p>
 <p>These functions are exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
 
 <h2 id="FileCreateTemp">FileCreateTemp</h2>
 <pre class="Syntax">Filename := <span class="func">FileCreateTemp</span>()</pre>
 <p>Creates an empty temporary file and returns its full path.</p>
-<p>The file is created in the system temporary directory, exists on return and is not removed automatically. Delete it with <a href="FileDelete.htm">FileDelete</a> when it is no longer needed.</p>
-
-<h2 id="FileDirName">FileDirName</h2>
-<pre class="Syntax">Directory := <span class="func">FileDirName</span>(Filename)</pre>
-<p>Returns the full path to <em>Filename</em> without the file name or trailing directory separator.</p>
+<p>The file is created in the system temporary directory and is not deleted automatically.</p>
 
 <h2 id="FileFullPath">FileFullPath</h2>
 <pre class="Syntax">FullPath := <span class="func">FileFullPath</span>(Filename)</pre>
-<p>Returns the full path to <em>Filename</em>.</p>
+<p>Returns the full path to <em>Filename</em>, resolved against <a href="../Variables.htm#WorkingDir">A_WorkingDir</a> when it is relative.</p>
 
 <h2 id="Examples">Examples</h2>
-<pre>#Import "Ks" { FileDirName, FileFullPath }
+<pre>#Import "Ks" { FileFullPath }
 Full := FileFullPath("data\items.txt")
-Parent := FileDirName(Full)</pre>
+SplitPath Full, , &amp;Parent</pre>
 
 <div class="ex" id="ExTemp">
 <p><a class="ex_number" href="#ExTemp"></a> Writes to a temporary file and removes it afterwards.</p>

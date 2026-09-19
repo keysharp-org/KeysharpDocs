@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>EventHook Object | Keysharp</title>
+<meta name="description" content="The base class of every event subscription: how Start and Stop behave, why a hook ended, and which hooks keep the script running." />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="../static/theme.css" rel="stylesheet" type="text/css" />
+<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" type="text/javascript"></script>
+</head>
+<body>
+
+<h1>EventHook Object</h1>
+<pre class="NoIndent">class EventHook extends Object</pre>
+<p>The base class of every event subscription a script holds. A script never creates one directly; each kind of hook is its own subclass:</p>
+<table class="info">
+  <tr><th>Class</th><th>Created by</th><th>Initial state</th></tr>
+  <tr><td><a href="WinEvent.htm">WinEvent</a></td><td><code>WinEvent(WinTitle, WinText, ExcludeTitle, ExcludeText)</code></td><td>Idle until <code>Start()</code></td></tr>
+  <tr><td><a href="Monitor.htm#OnChange">MonitorHook</a></td><td><code>Monitor.OnChange</code></td><td>Running</td></tr>
+  <tr><td><a href="Clipboard.htm#ClipboardHook">ClipboardHook</a></td><td><code>Clipboard.OnChange</code></td><td>Running</td></tr>
+  <tr><td><a href="Audio.htm#DeviceHook">Audio.DeviceHook</a></td><td><code>Audio.OnDeviceChange</code></td><td>Running</td></tr>
+  <tr><td><a href="Clr.htm#Events">Clr.EventSubscription</a></td><td><code>OnEvent</code> on a CLR object or type</td><td>Running</td></tr>
+  <tr><td><a href="InputHook.htm">InputHook</a></td><td><code>InputHook()</code></td><td>Idle until <code>Start()</code></td></tr>
+</table>
+<p>This class is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
+
+<h2 id="Members">Members</h2>
+<table class="info">
+  <tr><th>Member</th><th>Description</th></tr>
+  <tr id="InProgress"><td><code>InProgress</code></td><td>1 while the hook is running, so that its callback is called when the event occurs; otherwise 0. Read-only.</td></tr>
+  <tr id="EndReason"><td><code>EndReason</code></td><td>An empty string while the hook is running; otherwise <a href="#EndReasons">why it is not</a>. Read-only.</td></tr>
+  <tr id="Start"><td><code>Start()</code></td><td>Begins a new run. It does nothing to a hook which is running.</td></tr>
+  <tr id="Stop"><td><code>Stop()</code></td><td>Ends the run with <code>EndReason</code> <code class="no-highlight">"Stopped"</code> and releases its native event source. It does nothing to a hook which is not running.</td></tr>
+</table>
+<p>Some subclasses add members of their own, such as a WinEvent's <a href="WinEvent.htm#Slots">event slots</a> and a CLR subscription's <code>EventName</code> and <code>Target</code>; MonitorHook, ClipboardHook and Audio.DeviceHook add none.</p>
+<p>A hook's callback is checked when it is given: a value which is not an object raises a <a href="Error.htm#TypeError">TypeError</a>, an object which cannot be called raises a <a href="Error.htm#MethodError">MethodError</a>, and a callback which cannot take the arguments the hook passes raises a <a href="Error.htm#ValueError">ValueError</a>.</p>
+<p><code>InProgress</code> describes the subscription, not what the platform delivers. An event source which installed but reports nothing &mdash; a window event the platform does not expose, for example &mdash; leaves the hook reading 1.</p>
+
+<h2 id="States">States</h2>
+<p id="EndReasons">When a hook is not running, <code>EndReason</code> is one of these, the first reason its last run ended for:</p>
+<table class="info">
+  <tr><th>EndReason</th><th>Meaning</th></tr>
+  <tr><td><code class="no-highlight">"Stopped"</code></td><td><code>Stop()</code> was called, or the hook has not been started yet.</td></tr>
+  <tr><td><code class="no-highlight">"Exit"</code></td><td>The <a href="RealThread.htm">real thread</a> which started the run ended, or the script is exiting.</td></tr>
+  <tr><td><code class="no-highlight">"Failed"</code></td><td>The native event source could not be installed, for example because a platform component it needs is missing. <code>Monitor.OnChange</code>, <code>Clipboard.OnChange</code> and <code>Audio.OnDeviceChange</code> return the hook already ended in this case, and <code>Start()</code> leaves a hook ended in the same way. <code>OnEvent</code> on a CLR object or type, and <code>Start()</code> on its subscription, raise an error instead.</td></tr>
+</table>
+<p><a href="InputHook.htm">InputHook</a> reports <a href="InputHook.htm#EndReasons">its own end reasons</a> instead, which include <code class="no-highlight">"Stopped"</code> and <code class="no-highlight">"Failed"</code> but not <code class="no-highlight">"Exit"</code>.</p>
+<p>On Windows, for Notepad, a hook reads as not running until it is started:</p>
+<pre>#Import "Ks" { WinEvent }
+
+Hook := WinEvent("ahk_exe notepad.exe")
+Hook.OnActive := (Hook, Hwnd, Time) =&gt; ToolTip("Notepad is active")
+MsgBox Hook.InProgress " [" Hook.EndReason "]"   <em>; 0 [Stopped]</em>
+Hook.Start()
+MsgBox Hook.InProgress " [" Hook.EndReason "]"   <em>; 1 []</em>
+Hook.Stop()
+MsgBox Hook.InProgress " [" Hook.EndReason "]"   <em>; 0 [Stopped]</em></pre>
+
+<h2 id="Cancel">Starting and Stopping</h2>
+<p><code>Start()</code> begins a fresh run of a hook which is not running, including one which has been stopped:</p>
+<ul>
+  <li>A hook returned by <code>Monitor.OnChange</code>, <code>Clipboard.OnChange</code>, <code>Audio.OnDeviceChange</code> or <code>OnEvent</code> keeps its callback and filter, so it runs as it did before.</li>
+  <li>A <a href="WinEvent.htm">WinEvent</a> runs with the callbacks its slots hold when it starts.</li>
+  <li>An <a href="InputHook.htm">InputHook</a> begins a new Input with an empty buffer.</li>
+</ul>
+<p>An event which occurred while the hook was not running is not reported. The callbacks of a run are called on the <a href="RealThread.htm">real thread</a> which started it: the one which called <code>Start()</code> or the subscribing method. An InputHook is the exception: each of its callbacks is called on the real thread which assigned it, or on the main thread once that thread has ended.</p>
+<p><code>Stop()</code> takes effect when it is called. An event which has already arrived but whose callback has not started is discarded, and a callback which is already running finishes. A discarded event is not reported by a later <code>Start()</code>. For how an <a href="InputHook.htm">InputHook</a> differs, see <a href="InputHook.htm#Stop">its Stop method</a>.</p>
+
+<h2 id="Once">Handling an Event Once</h2>
+<p>Call <code>Stop()</code> as the first statement of the callback. On Windows, for Notepad:</p>
+<pre>#Import "Ks" { WinEvent }
+
+Hook := WinEvent("ahk_exe notepad.exe")
+Hook.OnActive := OnNotepad
+Hook.Start()
+
+OnNotepad(Hook, Hwnd, Time) {
+    Hook.Stop()
+    MsgBox "Notepad was activated."
+}</pre>
+<p>A second event which arrived before the callback started is then discarded. The callback can still run twice if it waits before stopping &mdash; with <a href="Sleep.htm">Sleep</a>, <a href="MsgBox.htm">MsgBox</a>, <a href="WinWait.htm">WinWait</a> or anything else which lets another <a href="../misc/Threads.htm">thread</a> run &mdash; because the next event's callback can start during that wait. Guard such a callback with a static flag.</p>
+
+<h2 id="Lifetime">Lifetime</h2>
+<p>A run lasts until <code>Stop()</code>, until the real thread which started it ends, or until the script exits. Letting go of the hook object does not stop it, so the return value need not be kept; the class's <a href="#Hooks">Hooks</a> list still reaches it.</p>
+<p>An <a href="InputHook.htm">InputHook</a>'s Input does not end when a real thread ends.</p>
+
+<h2 id="Persistence">Keeping the Script Running</h2>
+<p>Whether a running hook keeps the script running:</p>
+<table class="info">
+  <tr><th>Hook</th><th>Keeps the script running</th></tr>
+  <tr><td><a href="WinEvent.htm">WinEvent</a></td><td>Yes</td></tr>
+  <tr><td><a href="Clipboard.htm#OnChange">Clipboard.OnChange</a></td><td>Yes</td></tr>
+  <tr><td><a href="InputHook.htm">InputHook</a></td><td>Yes</td></tr>
+  <tr><td><a href="Monitor.htm#OnChange">Monitor.OnChange</a></td><td>No</td></tr>
+  <tr><td><a href="Audio.htm#OnDeviceChange">Audio.OnDeviceChange</a></td><td>No</td></tr>
+  <tr><td><a href="Clr.htm#Events">OnEvent</a> on a CLR object or type</td><td>No</td></tr>
+</table>
+<p>A script which responds only to hooks of the second kind calls <a href="Persistent.htm">Persistent</a> to keep waiting for events. Such a hook started on a <a href="RealThread.htm">real thread</a> does not keep that thread running either.</p>
+
+<h2 id="Hooks">Listing Running Hooks</h2>
+<pre class="Syntax">Hooks := WinEvent.<span class="func">Hooks</span>
+Hooks := Monitor.<span class="func">Hooks</span>
+Hooks := Clipboard.<span class="func">Hooks</span>
+Hooks := Audio.<span class="func">Hooks</span>
+Hooks := Clr.<span class="func">Hooks</span></pre>
+<p>Each class which creates hooks has a static <code>Hooks</code> property: an <a href="Array.htm">Array</a> of that class's hooks which are running, in the order they were started, as they stood when it was read. A hook which is restarted moves to the end. It covers the hooks started by every real thread. <code>Clr.Hooks</code> mixes instance and static events, which a hook's <code>Target</code> tells apart. InputHook has no such list.</p>
+<p>To stop every hook of a class, iterate <code>Hooks</code>:</p>
+<pre>#Import "Ks" { WinEvent }
+
+for Hook in WinEvent.Hooks
+    Hook.Stop()</pre>
+
+<h2 id="Related">Related</h2>
+<p><a href="WinEvent.htm">WinEvent</a>, <a href="Monitor.htm#OnChange">Monitor.OnChange</a>, <a href="Clipboard.htm#OnChange">Clipboard.OnChange</a>, <a href="Audio.htm#OnDeviceChange">Audio.OnDeviceChange</a>, <a href="Clr.htm#Events">Clr events</a>, <a href="InputHook.htm">InputHook</a>, <a href="Persistent.htm">Persistent</a></p>
+
+</body>
+</html>

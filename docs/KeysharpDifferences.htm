@@ -13,8 +13,7 @@
 
 <h1>Changes from AutoHotkey to Keysharp</h1>
 
-<p>Keysharp targets the AutoHotkey v2.1-alpha.32 language on .NET, and runs on Windows, Linux and macOS. Most scripts behave as their AutoHotkey documentation describes. This page explains the differences which are structural &mdash; the ones worth understanding before porting a script &mdash; and then indexes the pages which state each exact contract.</p>
-<p class="note"><strong>Note:</strong> The absence of an item here does not prove that inherited behavior has been verified on every platform. See <a href="Platforms.htm">Platform Support</a> and the platform remarks on the affected page.</p>
+<p>This page summarizes the structural differences between Keysharp and its <a href="Keysharp.htm">AutoHotkey compatibility target</a>, then indexes the pages which state each exact contract.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
@@ -31,7 +30,6 @@
       <li><a href="#Runtime">Runtime and Language</a></li>
       <li><a href="#Interop">Memory and Interop</a></li>
       <li><a href="#GUI">GUI and Desktop Integration</a></li>
-      <li><a href="#Extensions">Additional APIs</a></li>
       <li><a href="#Unavailable">Unavailable or Reduced Inherited Behavior</a></li>
     </ul>
   </li>
@@ -41,28 +39,25 @@
 
 <h3 id="Compiled">Scripts are compiled, not interpreted</h3>
 <p>AutoHotkey interprets a script. Keysharp reads it, lowers it to C#, and has Roslyn compile it to a .NET assembly which is then executed. <a href="Program.htm#execution-model">How a Script Executes</a> describes the pipeline, and the <code class="no-highlight">--transpile</code> and <code class="no-highlight">--compile</code> options expose its intermediate results.</p>
-<p>Several inherited behaviors follow from this rather than from any deliberate design choice:</p>
+<p>As a result:</p>
 <ul>
-  <li>A syntax error anywhere in the script is reported before any of it runs, so a script cannot begin executing and fail later on a line which does not parse.</li>
   <li>An <a href="lib/Error.htm#Stack">error's stack</a> reports managed call frames, which name the C# methods the script was compiled into. A few built-in classes carry an <a href="Program.htm#internal-names">internal type name</a> in that output.</li>
   <li><a href="lib/ListLines.htm">ListLines</a> has no compiled equivalent, and <a href="lib/Thread.htm">Thread</a> is not line-aware.</li>
 </ul>
 
 <h3 id="CrossPlatform">Three platforms, one language</h3>
-<p>AutoHotkey is a Windows automation tool, and much of its library is defined in terms of Win32. Keysharp runs the same language on Windows, Linux and macOS, which means a page describing a Win32 behavior describes an <em>intent</em> that each platform meets to a different degree.</p>
-<p><a href="Platforms.htm">Platform Support</a> is therefore a primary reference rather than an appendix: it covers X11, Wayland, macOS permissions and foreign-window automation. On Linux and macOS, input and window control depend on OS-level permissions and helpers, and a script can declare what it needs with <a href="lib/_Requires.htm#CapabilityNames">#Requires</a> or <a href="lib/RequestCapabilities.htm">RequestCapabilities</a>.</p>
-<p>The GUI is built on a cross-platform toolkit rather than Win32 common controls. Window styles, control messages and other Win32-level facilities are consequently unavailable or approximated; <a href="lib/GuiControls.htm">GUI Control Types</a> and <a href="lib/GuiOnEvent.htm">GUI Events</a> record where.</p>
+<p>Much of the inherited library is defined in terms of Win32, and each platform meets that behavior to a different degree. <a href="Platforms.htm">Platform Support</a> covers X11, Wayland, macOS permissions and foreign-window automation. On Linux and macOS, input and window control depend on OS-level permissions and helpers, and a script can declare what it needs with <a href="lib/_Requires.htm#CapabilityNames">#Requires</a> or <a href="lib/RequestCapabilities.htm">RequestCapabilities</a>.</p>
+<p>On Linux and macOS, window styles, control messages and other Win32-level GUI facilities are unavailable or approximated; <a href="lib/GuiControls.htm">GUI Control Types</a> and <a href="lib/GuiOnEvent.htm">GUI Events</a> record where.</p>
 
 <h3 id="Managed">A managed object model</h3>
-<p>Objects are .NET objects. <a href="Objects.htm#Lifetime">Object lifetime and finalization</a> follow the garbage collector instead of reference counting, so <code>__Delete</code> runs when the collector reclaims the object rather than when the last reference goes away, and the reference-counting functions reflect the managed runtime.</p>
+<p>Objects are .NET objects. <a href="Objects.htm#Lifetime">Object lifetime and finalization</a> follow the garbage collector instead of reference counting, so <code>__Delete</code> runs when the collector reclaims the object rather than when the last reference goes away, and the <a href="lib/ObjAddRef.htm">reference-counting functions</a> reflect the managed runtime.</p>
 <p>The same applies wherever a script reaches outside itself for memory: <a href="lib/DllCall.htm">DllCall</a>, <a href="lib/CallbackCreate.htm">CallbackCreate</a>, <a href="lib/StrPtr.htm">StrPtr</a> and <a href="Objects.htm#ObjPtr">ObjPtr</a> operate on managed values, and <a href="lib/StringBuffer.htm">StringBuffer</a> is the writable string-memory type to pass to native code. For calling .NET directly, <a href="lib/Clr.htm">Clr</a> is available.</p>
 
 <h3 id="Language">Language additions</h3>
-<p>Keysharp adds facilities which have no AutoHotkey counterpart. A script which uses them will not run under AutoHotkey:</p>
+<p>Keysharp adds:</p>
 <ul>
-  <li><a href="lib/Preprocessor.htm">Conditional compilation</a> and <a href="lib/KeysharpDirectives.htm">build directives</a>, which act at compile time.</li>
+  <li><a href="lib/KeysharpDirectives.htm#Conditional">Conditional compilation</a> and <a href="lib/KeysharpDirectives.htm">build directives</a>, which act at compile time.</li>
   <li><a href="Modules.htm#KS">The KS module</a>, which holds the Keysharp-specific API surface, imported explicitly.</li>
-  <li>Additional built-in variables, functions and classes, indexed under <a href="#Extensions">Additional APIs</a> below.</li>
 </ul>
 
 <h2 id="Index">Detailed Index</h2>
@@ -70,56 +65,29 @@
 
 <h3 id="Runtime">Runtime and Language</h3>
 <ul>
-  <li><a href="Program.htm#execution-model">Scripts compile to .NET assemblies</a> instead of being interpreted, and a few built-in classes carry an <a href="Program.htm#internal-names">internal type name</a> that can appear in diagnostic output.</li>
-  <li><a href="Objects.htm#Lifetime">Object lifetime and finalization</a> follow the .NET garbage collector.</li>
   <li><a href="Variables.htm#IncDec">Increment/decrement</a>, <a href="Variables.htm#AssignOp">concatenation assignment</a>, <a href="Concepts.htm#numbers">numeric literals</a>, <a href="Concepts.htm#unset">unset values</a> and <a href="Variables.htm#deref">dynamic dereferencing</a> have documented implementation differences.</li>
-  <li><a href="Functions.htm#ByRef">Reference parameters</a> accept additional target forms, while <a href="Variables.htm#ref">the reference operator</a> returns a VarRef rather than a raw address.</li>
-  <li><a href="lib/Preprocessor.htm">Conditional-compilation directives</a> and <a href="lib/KeysharpDirectives.htm">Keysharp build directives</a> extend the language.</li>
-  <li><a href="Modules.htm#KS">The KS module</a> contains Keysharp-specific APIs.</li>
+  <li><a href="Functions.htm#ByRef">Reference parameters</a> accept additional target forms.</li>
 </ul>
 
 <h3 id="Interop">Memory and Interop</h3>
 <ul>
-  <li><a href="lib/StringBuffer.htm">StringBuffer</a> is the preferred writable string-memory type for native calls.</li>
-  <li><a href="lib/StrPtr.htm">StrPtr</a>, <a href="Objects.htm#ObjPtr">ObjPtr</a>, <a href="lib/ObjAddRef.htm">reference counting</a>, <a href="lib/CallbackCreate.htm">CallbackCreate</a> and <a href="lib/DllCall.htm">DllCall</a> reflect the managed runtime.</li>
-  <li><a href="lib/Clr.htm">Clr</a> provides experimental direct .NET interop.</li>
-  <li><a href="lib/_Package.htm">#Package</a> makes a NuGet package's assemblies available to <a href="lib/Clr.htm">Clr</a>, so a library can be named rather than located and shipped by hand.</li>
+  <li><a href="lib/_Package.htm">#Package</a> makes a NuGet package's assemblies available to <a href="lib/Clr.htm">Clr</a>.</li>
 </ul>
 
 <h3 id="GUI">GUI and Desktop Integration</h3>
 <ul>
   <li><a href="lib/Gui.htm">Gui</a> includes container-relative positioning, GroupBox containers, automatic scrolling, macOS application menus and visibility access.</li>
-  <li><a href="lib/GuiControls.htm">GUI controls</a> document toolkit-specific additions and unavailable Win32 behavior.</li>
   <li><a href="lib/GuiControl.htm">GuiControl</a>, <a href="lib/ListView.htm">ListView</a>, <a href="lib/TreeView.htm">TreeView</a> and <a href="lib/Menu.htm">Menu</a> have additional methods and properties.</li>
   <li><a href="lib/WinEvent.htm">WinEvent</a>, <a href="lib/Overlay.htm">Overlay</a> and <a href="lib/Image.htm">Image</a> add cross-platform desktop facilities.</li>
-  <li><a href="Platforms.htm">Platform Support</a> describes X11, Wayland, macOS permissions and foreign-window automation.</li>
-</ul>
-
-<h3 id="Extensions">Additional APIs</h3>
-<ul>
-  <li><a href="Variables.htm#KS">Keysharp built-in variables</a></li>
-  <li><a href="lib/StringFunctions.htm">String and Base64 functions</a></li>
-  <li><a href="lib/Crypto.htm">Crypt: hashing, AES and secure random numbers</a></li>
-  <li><a href="lib/FilePath.htm">File path functions</a></li>
-  <li><a href="lib/RegExCs.htm">C# regular-expression functions</a></li>
-  <li><a href="lib/FormatCs.htm">FormatCs</a></li>
-  <li><a href="lib/RequestCapabilities.htm">RequestCapabilities</a></li>
-  <li><a href="lib/Clipboard.htm">Clipboard</a></li>
-  <li><a href="lib/RunScript.htm">RunScript and ProcessInfo</a></li>
-  <li><a href="lib/RealThread.htm">RealThread</a>, <a href="lib/Task.htm">Task</a>, <a href="lib/Await.htm">Await</a> and <a href="lib/Lock.htm">Lock</a></li>
-  <li><a href="lib/Mail.htm">Mail</a></li>
-  <li><a href="lib/Collect.htm">Collect</a></li>
 </ul>
 
 <h3 id="Unavailable">Unavailable or Reduced Inherited Behavior</h3>
 <p>The affected reference pages document the exact boundary. Notable areas include:</p>
 <ul>
   <li><a href="Scripts.htm#idebug">interactive debugging and DBGp</a> are not implemented;</li>
-  <li><a href="lib/ListLines.htm">ListLines</a>;</li>
   <li><a href="lib/FormatTime.htm">FormatTime</a> flags and <a href="lib/PixelGetColor.htm">PixelGetColor</a> mode;</li>
-  <li><a href="lib/DirSelect.htm">DirSelect</a> and <a href="lib/MsgBox.htm">MsgBox</a> modality;</li>
-  <li><a href="lib/OnMessage.htm">OnMessage</a> dispatch, <a href="lib/Thread.htm">Thread</a> line awareness and <a href="lib/Download.htm">Download</a> options; and</li>
-  <li>toolkit-specific control behavior in <a href="lib/GuiControls.htm">GUI Control Types</a> and <a href="lib/GuiOnEvent.htm">GUI Events</a>.</li>
+  <li><a href="lib/DirSelect.htm">DirSelect</a> and <a href="lib/MsgBox.htm">MsgBox</a> modality; and</li>
+  <li><a href="lib/OnMessage.htm">OnMessage</a> dispatch and <a href="lib/Download.htm">Download</a> options.</li>
 </ul>
 
 <h2 id="Versions">Version Differences</h2>

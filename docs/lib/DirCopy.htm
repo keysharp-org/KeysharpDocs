@@ -24,15 +24,15 @@
   <dd>
       <p>Type: <a href="../Concepts.htm#strings">String</a></p>
       <p>Name of the source directory (with no trailing backslash), which is assumed to be in <a href="../Variables.htm#WorkingDir">A_WorkingDir</a> if an absolute path isn't specified. For example: <code>"C:\My Folder"</code></p>
-      <p><em>Source</em> can also be the path of an archive file, in which case its contents are extracted into the destination directory. Keysharp extracts archives itself instead of delegating to the OS shell, so the supported formats do not vary by operating system or OS version: <code>.zip</code>, <code>.tar</code>, <code>.tar.gz</code> and <code>.tgz</code>. Other formats, such as RAR and 7z, are not supported.</p>
-      <p>A <code>.gz</code> file which is not a compressed tar holds a single compressed file rather than an archive of entries, so it is decompressed rather than extracted. See <em>Dest</em> below.</p>
+      <p><em>Source</em> can also be the path of an archive file, in which case its contents are extracted into the destination directory. The supported formats are <code>.zip</code>,<code>.tar</code>, <code>.tar.gz</code> and <code>.tgz</code>. Other formats, such as RAR and 7z, are not supported.</p>
+      <p>A plain <code>.gz</code> file is decompressed to a single file; see <em>Dest</em>.</p>
   </dd>
 
   <dt>Dest</dt>
   <dd>
       <p>Type: <a href="../Concepts.htm#strings">String</a></p>
       <p>Name of the destination directory (with no trailing baskslash), which is assumed to be in <a href="../Variables.htm#WorkingDir">A_WorkingDir</a> if an absolute path isn't specified. For example: <code>"C:\Copy of My Folder"</code></p>
-      <p class="note"><strong>Note:</strong> When <em>Source</em> is a plain <code>.gz</code> file rather than a <code>.tar.gz</code> or <code>.tgz</code>, <em>Dest</em> is the path of the decompressed <em>file</em>, not a directory. Any missing parent directories are created.</p>
+      <p class="note"><strong>Note:</strong> When <em>Source</em> is a plain <code>.gz</code> file, <em>Dest</em> is the path of the decompressed file. Any missing parent directories are created.</p>
   </dd>
 
   <dt>Overwrite</dt>

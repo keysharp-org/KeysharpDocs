@@ -6,7 +6,6 @@ tocData = [
   [
     ["Built-in Variables","Variables.htm#KS"],
     ["App","lib/App.htm"],
-    ["Conditional Compilation","lib/Preprocessor.htm"],
     ["Build Directives","lib/KeysharpDirectives.htm"],
     ["Capabilities and Permissions","",
     [
@@ -17,6 +16,8 @@ tocData = [
     [
       ["StringBuffer","lib/StringBuffer.htm"],
       ["String Functions","lib/StringFunctions.htm"],
+      ["Hex","lib/Hex.htm"],
+      ["Base32","lib/Base32.htm"],
       ["Base64","lib/Base64.htm"],
       ["Url","lib/Url.htm"],
       ["C# Regular Expressions","lib/RegExCs.htm"],
@@ -28,7 +29,7 @@ tocData = [
     ["Files and Processes","",
     [
       ["File Path Functions","lib/FilePath.htm"],
-      ["RunScript / ProcessInfo","lib/RunScript.htm"],
+      ["RunScript / ScriptProcess","lib/RunScript.htm"],
       ["Http","lib/Http.htm"],
       ["Mail","lib/Mail.htm"]
     ]],
@@ -40,9 +41,9 @@ tocData = [
       ["Taskbar","lib/Taskbar.htm"],
       ["Font","lib/Font.htm"],
       ["ClipCursor","lib/ClipCursor.htm"],
+      ["EventHook","lib/EventHook.htm"],
       ["WinEvent","lib/WinEvent.htm"],
       ["WinFromPoint","lib/WinFromPoint.htm"],
-      ["WinMaximizeAll","lib/WinMaximizeAll.htm"],
       ["Clipboard","lib/Clipboard.htm"],
       ["Audio","lib/Audio.htm"]
     ]],
@@ -54,8 +55,8 @@ tocData = [
       ["Lock","lib/Lock.htm"],
       ["Collect","lib/Collect.htm"],
       ["ObjFree","lib/ObjFree.htm"],
-      ["ComponentAvailable","lib/ComponentAvailable.htm"],
-      ["ParseScript","lib/ParseScript.htm"],
+      ["IsComponentAvailable","lib/IsComponentAvailable.htm"],
+      ["ValidateScript / CompileScript","lib/ValidateScript.htm"],
       ["Clr Interop","lib/Clr.htm"],
       ["#Package","lib/_Package.htm"],
       ["#CSharp","lib/_CSharp.htm"]

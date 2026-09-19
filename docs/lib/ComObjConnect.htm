@@ -13,7 +13,7 @@
 
 <h1>ComObjConnect</h1>
 <p>Connects a COM object's event source to the script, enabling events to be handled.</p>
-<p class="note"><strong>Notice:</strong> On macOS this subscribes to the application's distributed notifications, which no scripting definition describes and which many applications never publish. Names are matched by the target's bundle identifier, which is a convention rather than a rule &mdash; Music still posts under <code>com.apple.iTunes</code> &mdash; so an application that changed its bundle identifier publishes names this does not match.</p>
+<p class="note"><strong>Note:</strong> On macOS, this function subscribes to the application's distributed notifications whose names begin with its bundle identifier. Many applications publish none.</p>
 <pre class="Syntax"><span class="func">ComObjConnect</span> ComObj <span class="optional">, PrefixOrSink, Debug</span></pre>
 
 <h2 id="Parameters">Parameters</h2>
@@ -67,9 +67,7 @@
 <p>An exception is thrown on failure.</p>
 
 <h3 id="Linux">Linux</h3>
-<p>Subscribes to the D-Bus signals of every interface the object exposes. A signal named <code>StateChanged</code> calls <code><i>Prefix</i>StateChanged</code>, receiving the signal's arguments followed by the object, exactly as an event handler does on Windows.</p>
-<p>Handlers run on the script's thread, so they do not need to be thread-safe, and an error raised by a handler does not disturb other subscriptions. Only signals emitted by the service which owned the bus name at the time of the call are delivered; if the service restarts, call this function again.</p>
-<p>Signal handlers have no return value on D-Bus; a value returned by a handler is discarded.</p>
+<p>Subscribes to the D-Bus signals of every interface the object exposes; a signal named <code>StateChanged</code> calls <code><i>Prefix</i>StateChanged</code>. Only signals emitted by the service which owned the bus name at the time of the call are delivered; if the service restarts, call this function again. A value returned by a handler is discarded.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="ComObject.htm">ComObject</a>, <a href="ComObjGet.htm">ComObjGet</a>, <a href="ComObjActive.htm">ComObjActive</a>, <a href="https://learn.microsoft.com/previous-versions/ccxe1xe6(v=vs.85)">WScript.ConnectObject (Microsoft Docs)</a></p>

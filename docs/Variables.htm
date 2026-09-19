@@ -20,7 +20,6 @@
   <li><a href="#Operators">Operators in Expressions</a></li>
   <li><a href="#BuiltIn">Built-in Variables</a>
     <ul>
-      <li><a href="#additional">Compatibility Variables</a></li>
       <li><a href="#KS">KS Module Variables</a></li>
     </ul>
   </li>
@@ -93,7 +92,7 @@ MsgBox(1.00)  <em>; Shows 1.0</em></pre>
       <p>If there are any adjoining <em>%Expr%</em> sequences and partial <a href="Concepts.htm#names">names</a> (without any spaces or other characters between them), they are combined to form a single name.</p>
       <p>An <a href="lib/Error.htm">Error</a> is typically thrown if the variable does not already exist, or if it is uninitialized and its value is being read. The <a href="#or-maybe">or-maybe operator (??)</a> can be used to avoid that case by providing a default value. For example: <code>%'novar'% ?? 42</code>.</p>
       <p>Although this is historically known as a "double-deref", this term is inaccurate when <em>Expr</em> does not contain a variable (first deref), and also when the resulting variable is the target of an assignment, not being dereferenced (second deref).</p>
-      <p>Within a function, dynamic dereferencing causes a capture object containing the function's local variables to be created for each call. Avoid it in performance-sensitive functions when a Map, object property or direct variable reference can express the same operation.</p>
+      <p>Dynamic dereferencing within a function adds an allocation to every call of that function. In performance-sensitive functions, prefer a Map, object property or direct variable reference.</p>
     </td>
   </tr>
   <tr id="objdot">
@@ -120,7 +119,6 @@ MsgBox(1.00)  <em>; Shows 1.0</em></pre>
     <td>
       <p><strong>Pre- and post-increment/decrement</strong>. Adds or subtracts 1 from a variable. The operator may appear either before or after the variable's name. If it appears <em>before</em> the name, the operation is performed and its result is used by the next operation (the result is a variable reference in this case). For example, <code>Var := ++X</code> increments X and then assigns its value to <em>Var</em>. Conversely, if the operator appears <em>after</em> the variable's name, the result is the value of X prior to performing the operation. For example, <code>Var := X++</code> increments X but <em>Var</em> receives the value X had before it was incremented.</p>
       <p>These operators can also be used with a property of an object, such as <code>myArray.Length++</code> or <code>--myArray[i]</code>. In these cases, the result of the sub-expression is always a number, not a variable reference.</p>
-      <p>If the target variable is unset, it is initialized to zero before the operation. Therefore, a statement consisting only of <code class="no-highlight">x++</code> leaves <em>x</em> set to 1.</p>
     </td>
   </tr>
   <tr id="pow">
@@ -145,7 +143,7 @@ MsgBox(1.00)  <em>; Shows 1.0</em></pre>
       <p>Taking a reference to a built-in variable such as <a href="lib/A_Clipboard.htm">A_Clipboard</a> is supported only when it is being passed directly to an <em>OutputVar</em> parameter of a built-in function.</p>
       <p><span class="ver">[v2.1-alpha.10]</span>: Built-in variables which allow assignment are fully supported.</p>
       <p><span class="ver">[v2.1-alpha.10]</span>: Applying the operator to a property causes the __Ref method to be called with the property name as a parameter. For example, <code>&amp;x.y</code> is equivalent to <code>x.__Ref('y')</code>. This typically corresponds to <a href="lib/Object.htm#__Ref">__Ref (Object)</a>, which returns a nested struct or virtual reference to the property.</p>
-      <p>Class members, Array elements and Map values can be passed by reference, such as <code class="no-highlight">&amp;obj.Prop</code>, <code class="no-highlight">&amp;arr[5]</code> or <code class="no-highlight">&amp;map["key"]</code>.</p>
+      <p>Indexing is also supported, such as <code class="no-highlight">&amp;arr[5]</code> or <code class="no-highlight">&amp;map["key"]</code>.</p>
     </td>
   </tr>
   <tr id="MulDiv">
@@ -314,7 +312,7 @@ MsgBox(A || B || C) <em>; Shows "0" (C).</em></pre>
     <p>Assigning <code>unset</code> may have <a href="Language.htm#unset-assign">special meaning</a>, such as deleting a property or map element, or other effects if the target is a dynamic property. If the target is a variable, its value is removed. For example: <code>Var := unset</code>, <code>Var1 := (Var2?)</code>.</p>
     <p>An assignment can also target a property of an object, such as <code>myArray.Length += n</code> or <code>myArray[i] .= t</code>. When assigning to a property, the result of the sub-expression is the value being assigned, not a variable reference.</p>
     <p id="maybe-assign"><span class="ver">[v2.1-alpha.2+]</span>: <code>x ??= y</code> is shorthand for <code>x := x ?? y</code>. <em>y</em> is evaluated and assigned to <em>x</em> only if <em>x</em> is <a href="Concepts.htm#unset">unset</a>. This provides a succinct way to initialize a variable, property or array/map element only if it didn't already have a value.</p>
-    <p>The <code class="no-highlight">.=</code> operator creates a new string rather than modifying the left operand in place. For many concatenations, especially in a loop, use <a href="lib/StringBuffer.htm">StringBuffer</a>.</p>
+    <p>Each use of <code class="no-highlight">.=</code> creates a new string. For many concatenations, especially in a loop, use <a href="lib/StringBuffer.htm">StringBuffer</a>.</p>
     </td>
   </tr>
   <tr id="fat-arrow">
@@ -411,7 +409,6 @@ sumfn := Sum</pre>
   <li>Operating System and User Info: <a href="#OSVersion">A_OSVersion</a>, <a href="#Screen">A_ScreenWidth</a>, <a href="#Screen">A_ScreenHeight</a>, <a href="#os">(...more...)</a></li>
   <li>Misc: <a href="#Clipboard">A_Clipboard</a>, <a href="#Cursor">A_Cursor</a>, <a href="#EventInfo">A_EventInfo</a>, <a href="#misc">(...more...)</a></li>
   <li>Loop: <a href="#Index">A_Index</a>, <a href="#loop">(...more...)</a></li>
-  <li><a href="#additional">Compatibility Variables</a></li>
 </ul>
 <h3 id="Special_Characters">Special Characters</h3>
 <table class="info">
@@ -476,7 +473,7 @@ sumfn := Sum</pre>
   </tr>
   <tr id="LineNumber">
     <td>A_LineNumber</td>
-    <td><p>The approximate number of the currently executing source line. Preprocessing condenses source before parsing and compilation, so this value is not a reliable exact line number.</p></td>
+    <td><p>The approximate number of the currently executing source line.</p></td>
   </tr>
   <tr id="LineFile">
     <td>A_LineFile</td>
@@ -488,11 +485,11 @@ sumfn := Sum</pre>
   </tr>
   <tr id="ThisFunc">
     <td>A_ThisFunc</td>
-    <td>The exact AHK-visible name of the <a href="Functions.htm">user-defined function</a> that is currently executing, or blank if none. A top-level function reports a name such as <code>MyFunction</code>; static and instance methods report names such as <code>MyClass.MyMethod</code> and <code>MyClass.Prototype.MyMethod</code>; property accessors append <code>.get</code>/<code>.set</code>, or <code>.Get</code>/<code>.Set</code> when the accessor keyword begins with an uppercase letter. See also: <a href="lib/Func.htm#Name">Name property (Func)</a>.</td>
+    <td>The name of the <a href="Functions.htm">user-defined function</a> that is currently executing (blank if none); for example: MyFunction. See also: <a href="lib/Func.htm#Name">Name property (Func)</a></td>
   </tr>
   <tr id="AhkVersion">
     <td>A_AhkVersion</td>
-    <td>Contains the AutoHotkey compatibility version targeted by the running Keysharp build, such as <code class="no-highlight">2.1-alpha.32</code>. It does not identify the Keysharp release; use <a href="#A_KsVersion">A_KsVersion</a> for that. The version string can be compared with <a href="lib/VerCompare.htm">VerCompare</a>, and <a href="lib/_Requires.htm">#Requires</a> selects the script's compatibility mode.</td>
+    <td>Contains the AutoHotkey compatibility version targeted by the running Keysharp build, such as <code class="no-highlight">2.1-alpha.32</code>. It does not identify the Keysharp release; use <a href="#A_KsVersion">A_KsVersion</a> for that. See also: <a href="lib/_Requires.htm">#Requires</a> and <a href="lib/VerCompare.htm">VerCompare</a></td>
   </tr>
   <tr id="AhkPath">
     <td>A_AhkPath</td>
@@ -733,9 +730,9 @@ MsgBox ElapsedTime " milliseconds have elapsed."</pre>
     <td>A_TimeIdle</td>
     <td>
       <p>The number of milliseconds that have elapsed since the system last received keyboard, mouse, or other input. This is useful for determining whether the user is away. Physical input from the user as well as artificial input generated by <strong>any</strong> program or script (such as the <a href="lib/Send.htm">Send</a> or <a href="lib/MouseMove.htm">MouseMove</a> functions) will reset this value back to zero. Since this value tends to increase by increments of 10, do not check whether it is equal to another value. Instead, check whether it is greater or less than another value. For example:</p>
-      <p>On Linux, this value comes from activity observed by <code class="no-highlight">keysharp-input</code> on its evdev devices, on both X11 and Wayland. Keysharp's own replay and synthesis do not reset that counter. The query does not request an interactive grant and returns 0 if the component or an activity sample is unavailable. The hook-based variables below still use their respective hook histories when installed.</p>
       <pre>if A_TimeIdle &gt; 600000
     MsgBox "Last activity was 10 minutes ago"</pre>
+      <p>On Linux, this value requires <code class="no-highlight">keysharp-input</code> and is 0 when that component cannot report it; reading it does not prompt for permission. Input which Keysharp itself sends does not reset it.</p>
     </td>
   </tr>
   <tr id="TimeIdlePhysical">
@@ -871,7 +868,7 @@ MsgBox ElapsedTime " milliseconds have elapsed."</pre>
       <p>The full path and name of the folder containing the current user's application-specific data. For example:</p>
       <pre class="NoIndent no-highlight">C:\Users\&lt;UserName&gt;\AppData\Roaming</pre>
       <p>On Linux this is <code class="no-highlight">$XDG_CONFIG_HOME</code> when that variable holds an absolute path, and <code class="no-highlight">~/.config</code> otherwise. On macOS it is <code class="no-highlight">~/Library/Application Support</code>.</p>
-      <p>The path is returned whether or not the folder exists yet, so the variable is never empty. Create the folder before writing to it, as with any subfolder of it.</p>
+      <p>The path is returned even if the folder does not exist yet.</p>
     </td>
   </tr>
   <tr id="AppDataCommon">
@@ -880,7 +877,7 @@ MsgBox ElapsedTime " milliseconds have elapsed."</pre>
       <p>The full path and name of the folder containing the all-users application-specific data. For example:</p>
       <pre class="NoIndent no-highlight">C:\ProgramData</pre>
       <p>On Linux this is the first absolute entry of <code class="no-highlight">$XDG_CONFIG_DIRS</code>, and <code class="no-highlight">/etc/xdg</code> when that variable is unset or names no absolute path. On macOS it is <code class="no-highlight">/Library/Application Support</code>.</p>
-      <p>On every platform this location is readable by all users but writable only by an administrator, so an ordinary script should read from it rather than write to it.</p>
+      <p>On Linux and macOS, this location is typically writable only by an administrator.</p>
     </td>
   </tr>
   <tr id="Desktop">
@@ -992,9 +989,11 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
         <li><a href="lib/OnMessage.htm">OnMessage</a></li>
         <li><a href="lib/GuiOnMessage.htm">OnMessage (GUI)</a> <span class="ver">[v2.1-alpha.7+]</span></li>
         <li><a href="misc/RegExCallout.htm">Regular Expression Callouts</a></li>
+        <li><a href="lib/SetTimer.htm">SetTimer</a></li>
+        <li>The <code>OnMove</code> and <code>OnCaretMove</code> slots of a <a href="lib/WinEvent.htm#Callback">WinEvent</a></li>
       </ul>
       <p>Note: Unlike variables such as A_ThisHotkey, each <a href="misc/Threads.htm">thread</a> retains its own value for A_EventInfo. Therefore, if a thread is interrupted by another, upon being resumed it will still see its original/correct values in these variables.</p>
-      <p>Mouse-wheel events use a positive value for upward scrolling and a negative value for downward scrolling. Timer callbacks set A_EventInfo to the timer's function object.</p>
+      <p>Mouse-wheel events use a positive value for upward scrolling and a negative value for downward scrolling.</p>
       <p>A_EventInfo can also be set by the script.</p></td>
   </tr>
   <tr id="LastError">
@@ -1048,39 +1047,15 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
   </tr>
 </table>
 
-<h3 id="additional">Compatibility Variables</h3>
-<p>These global variables exist for compatibility with AutoHotkey v1 and are recognized without an import. Variables which Keysharp adds are not global at all: they are exported by the KS module and listed under <a href="#KS">KS Module Variables</a>.</p>
-<table class="info">
-  <tr>
-    <th abbr="Var">Variable</th>
-    <th abbr="Descr">Description</th>
-  </tr>
-  <tr id="A_IsUnicode">
-    <td>A_IsUnicode</td>
-    <td>Always true. This compatibility variable is retained even though scripts run on the Unicode .NET runtime.</td>
-  </tr>
-  <tr id="A_LoopFileLongPath">
-    <td>A_LoopFileLongPath</td>
-    <td>A compatibility alias of <a href="lib/LoopFiles.htm#LoopFileFullPath">A_LoopFileFullPath</a>.</td>
-  </tr>
-  <tr id="A_OSType">
-    <td>A_OSType</td>
-    <td>The current platform symbol: <code>WINDOWS</code>, <code>LINUX</code> or <code>OSX</code>. These values match the corresponding <a href="lib/Preprocessor.htm">conditional-compilation symbols</a>.</td>
-  </tr>
-</table>
-
 <h3 id="KS">KS Module Variables</h3>
-<p>These variables are exported by the <a href="Modules.htm#KS">KS module</a> rather than being global, so a script must import the names it uses. This keeps the global namespace identical to AutoHotkey's.</p>
+<p>These variables are exported by the <a href="Modules.htm#KS">KS module</a>, so a script must import the names it uses.</p>
 <pre>#Import "Ks" { A_DirSeparator, A_NowMs, A_Thread }</pre>
-<p>The application's own identity, metadata, command line and exit state are properties of the <a href="lib/App.htm">App</a> class rather than variables.</p>
+<p>A variable which the script assigns, such as <a href="#A_PeekFrequency">A_PeekFrequency</a>, must be imported by name, not through a <a href="lib/_Import.htm#Wildcard_Import">wildcard import</a>.</p>
+<p>See <a href="lib/App.htm">App</a> for the application's identity, metadata, command line and exit state.</p>
 <table class="info">
   <tr>
     <th abbr="Var">Variable</th>
     <th abbr="Descr">Description</th>
-  </tr>
-  <tr id="A_AllowTimers">
-    <td><span id="KS_A_AllowTimers">A_AllowTimers</span></td>
-    <td>Gets or sets whether timers are allowed, as an alternative to <code>Thread("NoTimers")</code>.</td>
   </tr>
   <tr id="A_ClipboardTimeout">
     <td><span id="KS_A_ClipboardTimeout">A_ClipboardTimeout</span></td>
@@ -1144,7 +1119,7 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
   </tr>
   <tr id="A_GuiTheme">
     <td><span id="KS_A_GuiTheme">A_GuiTheme</span></td>
-    <td>Gets or sets the application-wide GUI theme: <code class="no-highlight">Classic</code>, <code class="no-highlight">System</code> or <code class="no-highlight">Dark</code>. <code class="no-highlight">System</code> selects the operating-system theme; Eto follows later system-theme changes, while WinForms resolves the setting when it is applied. On Linux and macOS, <code class="no-highlight">Classic</code> selects Eto's light theme.</td>
+    <td>Gets or sets the application-wide GUI theme: <code class="no-highlight">Classic</code>, <code class="no-highlight">System</code> or <code class="no-highlight">Dark</code>. <code class="no-highlight">System</code> selects the operating-system theme; on Linux and macOS it also follows later system-theme changes, while on Windows it is resolved when the setting is applied. On Linux and macOS, <code class="no-highlight">Classic</code> selects the light theme.</td>
   </tr>
   <tr id="A_HotIfTimeout">
     <td><span id="KS_A_HotIfTimeout">A_HotIfTimeout</span></td>
@@ -1152,14 +1127,10 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
   </tr>
   <tr id="A_InputLevel">
     <td><span id="KS_A_InputLevel">A_InputLevel</span></td>
-    <td>Gets or sets the default input level, from 0 through 100, for subsequently created hotkeys and hotstrings. <a href="lib/_InputLevel.htm">#InputLevel</a> sets this value.</td>
+    <td>Gets or sets the default input level, from 0 through 100, for subsequently created hotkeys and hotstrings. Assigning another value throws a <a href="lib/Error.htm#ValueError">ValueError</a>. <a href="lib/_InputLevel.htm">#InputLevel</a> sets this value.</td>
   </tr>
-  <tr id="A_IsPersistent">
-    <td><span id="KS_A_IsPersistent">A_IsPersistent</span></td>
-    <td>Gets or sets whether the script is persistent. Prefer <a href="lib/Persistent.htm">Persistent</a> when changing this state so normal lifetime handling occurs.</td>
-  </tr>
-  <tr id="A_KeysharpCorePath">
-    <td><span id="KS_A_KeysharpCorePath">A_KeysharpCorePath</span></td>
+  <tr id="A_KsCorePath">
+    <td><span id="KS_A_KsCorePath">A_KsCorePath</span></td>
     <td>The full path of <code class="no-highlight">Keysharp.Core.dll</code>.</td>
   </tr>
   <tr id="A_KsVersion">
@@ -1206,17 +1177,21 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
     <td><span id="KS_A_OSArch">A_OSArch</span></td>
     <td>The CPU architecture of the operating system, using the same names as <a href="#A_ProcessArch">A_ProcessArch</a>. It differs from that variable only when the process runs emulated, such as an X64 build on ARM64 Windows.</td>
   </tr>
+  <tr id="A_OSType">
+    <td><span id="KS_A_OSType">A_OSType</span></td>
+    <td>The current platform symbol: <code>WINDOWS</code>, <code>LINUX</code> or <code>OSX</code>. These values match the corresponding <a href="lib/KeysharpDirectives.htm#Conditional_Symbols">conditional-compilation symbols</a>.</td>
+  </tr>
   <tr id="A_PeekFrequency">
     <td><span id="KS_A_PeekFrequency">A_PeekFrequency</span></td>
     <td>Gets or sets the current thread's message-check interval in milliseconds.</td>
   </tr>
-  <tr id="A_Priority">
-    <td><span id="KS_A_Priority">A_Priority</span></td>
-    <td>Gets or sets the default priority copied into newly created script threads. See <a href="lib/Thread.htm">Thread</a>.</td>
+  <tr id="A_Persistent">
+    <td><span id="KS_A_Persistent">A_Persistent</span></td>
+    <td>Gets or sets the setting which <a href="lib/Persistent.htm">Persistent</a> changes: 1 or 0. Assigning it is the same as calling Persistent.</td>
   </tr>
   <tr id="A_ProcessArch">
     <td><span id="KS_A_ProcessArch">A_ProcessArch</span></td>
-    <td>The CPU architecture this script runs as: <code class="no-highlight">X64</code>, <code class="no-highlight">ARM64</code>, <code class="no-highlight">X86</code> or <code class="no-highlight">ARM</code>, matching the <a href="lib/Preprocessor.htm">conditional-compilation symbol</a> of the same name. This is the calling convention <a href="lib/DllCall.htm">DllCall</a> and <a href="lib/ComCall.htm">ComCall</a> must obey, so interop code should branch on it rather than on <a href="#PtrSize">A_PtrSize</a>, which is 8 for both X64 and ARM64.</td>
+    <td>The CPU architecture this script runs as: <code class="no-highlight">X64</code>, <code class="no-highlight">ARM64</code>, <code class="no-highlight">X86</code> or <code class="no-highlight">ARM</code>, matching the <a href="lib/KeysharpDirectives.htm#Conditional_Symbols">conditional-compilation symbol</a> of the same name. This is the calling convention <a href="lib/DllCall.htm">DllCall</a> and <a href="lib/ComCall.htm">ComCall</a> must obey, so interop code should branch on it rather than on <a href="#PtrSize">A_PtrSize</a>, which is 8 for both X64 and ARM64.</td>
   </tr>
   <tr id="A_SuspendExempt">
     <td><span id="KS_A_SuspendExempt">A_SuspendExempt</span></td>
@@ -1224,40 +1199,21 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
   </tr>
   <tr id="A_Thread">
     <td><span id="KS_A_Thread">A_Thread</span></td>
-    <td>The current script thread as a <a href="lib/Thread.htm#Object">Thread</a> object. See <a href="#Thread">Thread Identity</a>.</td>
+    <td>The current script thread as a <a href="lib/Thread.htm#Object">Thread</a> object.</td>
   </tr>
   <tr id="A_RealThread">
     <td><span id="KS_A_RealThread">A_RealThread</span></td>
-    <td>The real operating-system thread the current script thread runs on, as a <a href="lib/RealThread.htm">RealThread</a> object. See <a href="#Thread">Thread Identity</a>.</td>
+    <td>The real operating-system thread the current script thread runs on, as a <a href="lib/RealThread.htm">RealThread</a> object.</td>
   </tr>
   <tr id="A_Timers">
     <td><span id="KS_A_Timers">A_Timers</span></td>
-    <td>A Map of timer Func objects to their enabled states.</td>
-  </tr>
-  <tr id="A_UseHook">
-    <td><span id="KS_A_UseHook">A_UseHook</span></td>
-    <td>The value configured by <code>#UseHook</code>.</td>
+    <td>A Map from each timer's callback, the object passed to <a href="lib/SetTimer.htm">SetTimer</a>, to its enabled state.</td>
   </tr>
   <tr id="A_WinActivateForce">
     <td><span id="KS_A_WinActivateForce">A_WinActivateForce</span></td>
     <td>Whether <code>#WinActivateForce</code> enabled forceful activation.</td>
   </tr>
 </table>
-
-<h4 id="Thread">Thread Identity</h4>
-<p><code>A_Thread</code> is the current <a href="misc/Threads.htm">script thread</a> and <code>A_RealThread</code> the real operating-system thread it runs on. Each carries its own facts as properties, so no further <code>A_</code> variable is needed to describe a thread:</p>
-<pre>#Import "Ks" { A_Thread, A_RealThread }
-A_Thread.Id           <em>; identity, valid while the thread is active</em>
-A_Thread.Index        <em>; 1 = the oldest active thread on this real thread</em>
-A_Thread.Elapsed      <em>; ms since it launched</em>
-A_Thread.Underlying        <em>; the thread it interrupted</em>
-A_Thread.Exit()       <em>; terminate it</em>
-A_RealThread.Threads  <em>; every active script thread here, oldest first</em></pre>
-<p><code>A_Thread.Id</code> consists of a 48-bit script-wide creation sequence and a 16-bit zero-based stack index. It is nearly unique for the script's lifetime but only meaningful while the thread is active; a stored <a href="lib/Thread.htm#Object">Thread</a> object reports <code>IsActive</code> false once its thread ends. A thread can be terminated only from the real thread which owns it.</p>
-<p>See the <a href="lib/Thread.htm#Object">Thread object</a>, <a href="lib/RealThread.htm">RealThread</a> and <a href="lib/Exit.htm">Exit</a>.</p>
-
-<h4 id="Dates">Millisecond Date Values</h4>
-<p><code>A_NowMs</code> and <code>A_NowUtcMs</code> can be used with <a href="lib/DateAdd.htm">DateAdd</a> and <a href="lib/DateDiff.htm">DateDiff</a> by specifying <code class="no-highlight">"L"</code> as the time unit.</p>
 
 <h2 id="cap">Variable Capacity and Memory</h2>
 <ul>

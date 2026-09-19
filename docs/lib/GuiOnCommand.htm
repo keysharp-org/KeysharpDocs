@@ -16,7 +16,7 @@
 <p>Registers a function or method to be called when a control notification is received via the <a href="#WM_COMMAND">WM_COMMAND</a> message.</p>
 <pre class="Syntax"><a href="GuiControl.htm">GuiCtrl</a>.<span class="func">OnCommand</span>(NotifyCode, Callback <span class="optional">, AddRemove</span>)</pre>
 
-<p class="note"><strong>Note:</strong> WM_COMMAND is a Win32 concept. On Linux and macOS the registration is accepted, so a cross-platform script still loads, but the callback is never called.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS, the callback is never called.</p>
 
 <h2 id="Parameters">Parameters</h2>
 <dl>

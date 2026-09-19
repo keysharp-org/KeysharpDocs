@@ -16,12 +16,10 @@
 <p>Reads and writes the system clipboard as text, an image, a file list, HTML, RTF, or any format the platform itself advertises.</p>
 <p>This class is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
 
-<p class="note"><strong>Note:</strong> There is one clipboard per session, so this class has no instances and every member is used directly on the class. Calling <code class="no-highlight">Clipboard()</code> throws an <a href="Error.htm">Error</a>.</p>
-<p class="note"><strong>Note:</strong> Reading clipboard content, checking its formats or subscribing to changes can require ClipboardMonitoring. Writing, clearing and restoring clipboard content are ungated.</p>
+<p class="note"><strong>Note:</strong> Every member is used directly on the class. Calling <code class="no-highlight">Clipboard()</code> throws an <a href="Error.htm">Error</a>.</p>
+<p class="note"><strong>Note:</strong> Reading clipboard content, checking its formats or subscribing to changes can require ClipboardMonitoring.</p>
 
-<p class="warning"><strong>Every getter returns an empty string when the clipboard does not hold that content.</strong> An empty string is falsy, so <code class="no-highlight">if (Files := Clipboard.Files)</code> is the intended pattern.</p>
-
-<p><a href="A_Clipboard.htm">A_Clipboard</a>, <a href="ClipboardAll.htm">ClipboardAll</a>, <a href="ClipWait.htm">ClipWait</a> and <a href="OnClipboardChange.htm">OnClipboardChange</a> continue to work unchanged and remain the AutoHotkey-compatible surface. This class is additive.</p>
+<p><a href="A_Clipboard.htm">A_Clipboard</a>, <a href="ClipboardAll.htm">ClipboardAll</a>, <a href="ClipWait.htm">ClipWait</a> and <a href="OnClipboardChange.htm">OnClipboardChange</a> are the AutoHotkey-compatible surface.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
@@ -30,12 +28,12 @@
   <li><a href="#Raw">Native Formats</a></li>
   <li><a href="#SaveRestore">Saving and Restoring</a></li>
   <li><a href="#Events">Waiting and Change Events</a></li>
-  <li><a href="#Platform">Platform Support</a></li>
+  <li><a href="#Linux">Linux</a></li>
   <li><a href="#Examples">Examples</a></li>
 </ul>
 
 <h2 id="Content">Typed Content</h2>
-<p>These properties are the portable surface. Each maps to whichever format names the current platform uses for that kind of content.</p>
+<p>These properties are the portable surface.</p>
 
 <h3 id="Text">Text</h3>
 <pre class="Syntax">Value := Clipboard.<span class="func">Text</span>
@@ -46,19 +44,18 @@ Clipboard.<span class="func">Text</span> := Value</pre>
 <pre class="Syntax">Picture := Clipboard.<span class="func">Image</span>
 Clipboard.<span class="func">Image</span> := Source</pre>
 <p>Gets an <a href="Image.htm">Image</a>, or an empty string if the clipboard holds no image.</p>
-<p><em>Source</em> accepts everything the <a href="Image.htm#Call">Image</a> constructor accepts: an <a href="Image.htm">Image</a>, a file path, a native bitmap handle, or an <code class="no-highlight">"HBITMAP:"</code> specifier. Because the setter takes an Image directly, a captured or generated image no longer has to be written to a file first.</p>
+<p><em>Source</em> accepts everything the <a href="Image.htm#Call">Image</a> constructor accepts: an <a href="Image.htm">Image</a>, a file path, a native bitmap handle, or an <code class="no-highlight">"HBITMAP:"</code> specifier.</p>
 <p><a href="Image.htm#FromClipboard">Image.FromClipboard</a> is an alias of this property's getter.</p>
 
 <h3 id="Files">Files</h3>
 <pre class="Syntax">Paths := Clipboard.<span class="func">Files</span>
 Clipboard.<span class="func">Files</span> := Paths</pre>
 <p>The copied files as an <a href="Array.htm">Array</a> of paths, or an empty string if the clipboard holds no file list. The setter accepts an Array of paths or a single path, and publishes them with copy semantics.</p>
-<p>Cut semantics (so that a file manager moves rather than copies on paste) are desktop-specific and are not implemented.</p>
 
 <h3 id="Html">Html</h3>
 <pre class="Syntax">Markup := Clipboard.<span class="func">Html</span>
 Clipboard.<span class="func">Html</span> := Markup</pre>
-<p>The clipboard's HTML as the <em>fragment</em> — the markup itself. On Windows, clipboard HTML is stored inside a <code class="no-highlight">CF_HTML</code> envelope of byte offsets; this property adds that envelope on write and strips it on read, so markup assigned here pastes correctly into applications such as word processors. To read or write the raw envelope, use <a href="#GetData">GetData</a> or <a href="#Set">Set</a> with the native format name.</p>
+<p>The clipboard's HTML markup, or an empty string if the clipboard holds none. On Windows, this property adds the <code class="no-highlight">CF_HTML</code> envelope on write and removes it on read. To read or write the raw envelope, use <a href="#GetData">GetData</a> or <a href="#Set">Set</a> with the native format name.</p>
 
 <h3 id="Rtf">Rtf</h3>
 <pre class="Syntax">Source := Clipboard.<span class="func">Rtf</span>
@@ -69,18 +66,16 @@ Clipboard.<span class="func">Rtf</span> := Source</pre>
 
 <h3 id="IsEmpty">IsEmpty</h3>
 <pre class="Syntax">Empty := Clipboard.<span class="func">IsEmpty</span></pre>
-<p>Returns 1 (true) if the clipboard holds nothing in any format, or 0 (false) otherwise. This is derived from the platform's own format enumeration, so private and application-registered formats count as content.</p>
+<p>Returns 1 (true) if the clipboard holds nothing in any format, or 0 (false) otherwise. Private and application-registered formats count as content.</p>
 
 <h3 id="Formats">Formats</h3>
 <pre class="Syntax">Names := Clipboard.<span class="func">Formats</span></pre>
 <p>An <a href="Array.htm">Array</a> of every format the clipboard currently advertises, under the names the platform itself uses: <code class="no-highlight">"HTML Format"</code> and <code class="no-highlight">"FileDrop"</code> on Windows, <code class="no-highlight">"text/html"</code> and <code class="no-highlight">"text/uri-list"</code> elsewhere.</p>
-<p class="note"><strong>Note:</strong> These names are deliberately not normalized across platforms. A script that reads or writes them is platform-specific by construction; the typed properties above are the portable equivalent.</p>
 
 <h3 id="Has">Has</h3>
 <pre class="Syntax">Present := Clipboard.<span class="func">Has</span>(Kind)</pre>
 <p>Returns 1 (true) if the clipboard holds the given content, or 0 (false) otherwise.</p>
 <p><em>Kind</em> is one of the portable kind names <code class="no-highlight">"Text"</code>, <code class="no-highlight">"Image"</code>, <code class="no-highlight">"Files"</code>, <code class="no-highlight">"Html"</code> or <code class="no-highlight">"Rtf"</code> (matched without case sensitivity), or any platform-native format name from <a href="#Formats">Formats</a>. A kind name takes precedence when it collides with a native name.</p>
-<p>Use this rather than reading a property when only presence matters, since <a href="#Image">Image</a> would copy the whole bitmap just to answer the question.</p>
 
 <h3 id="Clear">Clear</h3>
 <pre class="Syntax">Clipboard.<span class="func">Clear</span>()</pre>
@@ -96,49 +91,37 @@ Clipboard.<span class="func">Rtf</span> := Source</pre>
 
 <h3 id="Set">Set</h3>
 <pre class="Syntax">Clipboard.<span class="func">Set</span>(Formats)</pre>
-<p>Publishes several formats in a single clipboard transaction, so they coexist instead of overwriting one another and the change is reported once.</p>
+<p>Publishes several formats in a single clipboard transaction, so the change is reported once.</p>
 <p><em>Formats</em> is an object or a <a href="Map.htm">Map</a>. Each key is a kind name (<code class="no-highlight">"Text"</code>, <code class="no-highlight">"Image"</code>, <code class="no-highlight">"Files"</code>, <code class="no-highlight">"Html"</code>, <code class="no-highlight">"Rtf"</code>) or a platform-native format name. Each value is a String, a <a href="Buffer.htm">Buffer</a>, an <a href="Image.htm">Image</a>, or an Array of paths for <code class="no-highlight">Files</code>. A String given for a native format is written as UTF-8.</p>
-<p>A Map is accepted as well as an object because an object literal's keys must be identifiers, so a format name containing a space — such as <code class="no-highlight">"HTML Format"</code> — can only be written as a Map key.</p>
 
 <h2 id="SaveRestore">Saving and Restoring</h2>
 
 <h3 id="All">All</h3>
 <pre class="Syntax">Saved := Clipboard.<span class="func">All</span>
 Clipboard.<span class="func">All</span> := Saved</pre>
-<p>Gets a <a href="ClipboardAll.htm">ClipboardAll</a> holding every format currently on the clipboard, and restores one. This is the same operation as <code class="no-highlight">ClipboardAll()</code> followed later by <code class="no-highlight">A_Clipboard := Saved</code>, written so that the round trip is visible at both ends.</p>
+<p>Gets a <a href="ClipboardAll.htm">ClipboardAll</a> holding every format currently on the clipboard, and restores one. This is the same operation as <code class="no-highlight">ClipboardAll()</code> followed later by <code class="no-highlight">A_Clipboard := Saved</code>.</p>
 <p>Assigning anything other than a <a href="ClipboardAll.htm">ClipboardAll</a> throws a TypeError.</p>
 
 <h2 id="Events">Waiting and Change Events</h2>
 
 <h3 id="Wait">Wait</h3>
 <pre class="Syntax">Arrived := Clipboard.<span class="func">Wait</span>(<span class="optional">Timeout, WaitFor</span>)</pre>
-<p>Waits for clipboard content, returning 1 (true) if it arrived or 0 (false) on timeout. If <em>Timeout</em> is omitted, this waits indefinitely; otherwise it is a number of seconds and may be fractional.</p>
-<p><em>WaitFor</em> behaves exactly as it does for <a href="ClipWait.htm">ClipWait</a>: omitted or 0 waits for text or files, and 1 waits for content of any kind. It additionally accepts a kind name — <code class="no-highlight">"Text"</code>, <code class="no-highlight">"Any"</code>, <code class="no-highlight">"Image"</code>, <code class="no-highlight">"Files"</code>, <code class="no-highlight">"Html"</code> or <code class="no-highlight">"Rtf"</code>. <a href="ClipWait.htm">ClipWait</a> accepts those names too.</p>
+<p>Same as <a href="ClipWait.htm">ClipWait</a>.</p>
 
 <h3 id="OnChange">OnChange</h3>
-<pre class="Syntax">Hook := Clipboard.<span class="func">OnChange</span>(Callback <span class="optional">, Count</span>)</pre>
-<p>Calls <em>Callback</em> whenever the clipboard's content changes, and returns a ClipboardHook object controlling the subscription.</p>
-<p>The callback is called as <code class="no-highlight">Callback(Hook, Type)</code>, where <em>Type</em> is 0 if the clipboard is now empty, 1 if it holds text or files, or 2 for anything else. <em>Count</em> defaults to -1 (unlimited); any other number stops the hook automatically after that many calls.</p>
-<p>Registrations made here and through <a href="OnClipboardChange.htm">OnClipboardChange</a> drive one native clipboard monitor, but are otherwise independent. A hook is not part of the <code class="no-highlight">OnClipboardChange</code> handler chain: its return value is discarded, so it cannot stop handlers registered there, and its callback runs on its own <a href="../misc/Threads.htm">thread</a> rather than inline. Prefer this method when the callback is a closure or bound function: unregistering through <code class="no-highlight">OnClipboardChange</code> requires passing the identical function object back, whereas the hook can stop itself.</p>
+<pre class="Syntax">Hook := Clipboard.<span class="func">OnChange</span>(Callback)
+Hooks := Clipboard.<span class="func">Hooks</span></pre>
+<p>Calls <em>Callback</em> whenever the clipboard's content changes, and returns a running ClipboardHook object controlling the subscription.</p>
+<p><em>Callback</em> is a <a href="../misc/Functor.htm">function object</a>, called as <code class="no-highlight">Callback(Hook, DataType)</code>, where <em>DataType</em> is 0 (empty), 1 (text or files) or 2 (other), matching the global <a href="OnClipboardChange.htm">OnClipboardChange</a> callback. <a href="../Variables.htm#EventInfo">A_EventInfo</a> is not set.</p>
+<p>A running ClipboardHook keeps the script running, as an OnClipboardChange callback does.</p>
+<p>A hook is independent of <a href="OnClipboardChange.htm">OnClipboardChange</a> callbacks: its return value is ignored, and its callback runs in a new <a href="../misc/Threads.htm">thread</a>.</p>
 
 <h3 id="ClipboardHook">ClipboardHook Object</h3>
-<p>Carries the same surface as a <a href="WinEvent.htm">WinEvent</a> hook; both derive from <code>Ks.EventHook</code>.</p>
-<table class="info">
-  <tr><th style="width:12em">Member</th><th abbr="Descr">Description</th></tr>
-  <tr><td>Stop()</td><td>Cancels the subscription so the callback no longer fires. This is permanent.</td></tr>
-  <tr><td>Pause(<span class="optional">NewState</span>)</td><td>Pauses (1), unpauses (0) or toggles (-1) this hook, returning the resulting state. A paused hook stays registered but does not fire.</td></tr>
-  <tr><td>Paused</td><td>Gets or sets this hook's own pause switch. A stopped hook reports false and ignores writes.</td></tr>
-  <tr><td>Status</td><td>The effective state: <code class="no-highlight">"Active"</code>, <code class="no-highlight">"Paused"</code> or <code class="no-highlight">"Stopped"</code>.</td></tr>
-  <tr><td>IsActive</td><td>Whether the hook is firing. A paused hook is <strong>not</strong> active.</td></tr>
-  <tr><td>Count</td><td>Remaining number of times the callback will fire; -1 means unlimited. A stopped hook reports 0.</td></tr>
-  <tr><td>Callback</td><td>The function this hook calls.</td></tr>
-</table>
-<p><code>Status</code> separates the three states a hook can be in, where <code>IsActive</code> only answers whether it is firing and so is false while the hook is paused as well as after it is stopped. See <a href="WinEvent.htm#Hook">WinEvent subscription members</a>.</p>
-<p>The subscription also stops when the hook is collected, but garbage-collection timing is unpredictable; call <code class="no-highlight">Stop()</code> when the exact moment matters.</p>
+<p>A ClipboardHook has only the <a href="EventHook.htm#Members">EventHook members</a>. <code>Clipboard.Hooks</code> lists the running hooks, never <a href="OnClipboardChange.htm">OnClipboardChange</a> callbacks; see <a href="EventHook.htm#Hooks">Listing Running Hooks</a>.</p>
 
-<h2 id="Platform">Platform Support</h2>
-<p>On Linux, writing an <a href="#Image">Image</a> to the clipboard works everywhere; reading one back can return an empty value in some desktop sessions.</p>
-<p>Under a Wayland session served through a desktop shell extension (such as Cinnamon or Muffin), the compositor's selection source can advertise only one type. <a href="#Set">Set</a> and <a href="#All">All</a> therefore restore the single most useful representation rather than every format, which is the same limitation <a href="ClipboardAll.htm">ClipboardAll</a> documents there.</p>
+<h2 id="Linux">Linux</h2>
+<p>Writing an <a href="#Image">Image</a> to the clipboard works in every session; reading one back can return an empty value in some desktop sessions.</p>
+<p><strong>Wayland:</strong> On Cinnamon, <a href="#Set">Set</a> and assigning <a href="#All">All</a> publish only one of the formats, as for <a href="ClipboardAll.htm">ClipboardAll</a>.</p>
 
 <h2 id="Examples">Examples</h2>
 
@@ -186,19 +169,22 @@ Clipboard.Image := Image.FromRect(0, 0, 800, 600)</pre>
 </div>
 
 <div class="ex" id="ExOnChange">
-<p><a class="ex_number" href="#ExOnChange"></a> Watches the clipboard for three changes, then stops.</p>
+<p><a class="ex_number" href="#ExOnChange"></a> Watches the clipboard for three changes, then stops. The running hook keeps the script running, and once it stops the script exits.</p>
 <pre class="NoIndent">#import "Ks" { Clipboard }
 
-Hook := Clipboard.OnChange(Report, 3)
+Clipboard.OnChange(Report)
 
-Report(ThisHook, Type)
+Report(ThisHook, DataType)
 {
-    ToolTip "Clipboard changed, type " Type ", " ThisHook.Count " left"
+    static Seen := 0
+    ToolTip "Clipboard changed, type " DataType
+    if ++Seen = 3
+        ThisHook.Stop()
 }</pre>
 </div>
 
 <h2 id="Related">Related</h2>
-<p><a href="A_Clipboard.htm">A_Clipboard</a>, <a href="ClipboardAll.htm">ClipboardAll</a>, <a href="ClipWait.htm">ClipWait</a>, <a href="OnClipboardChange.htm">OnClipboardChange</a>, <a href="_ClipboardTimeout.htm">#ClipboardTimeout</a>, <a href="Image.htm">Image</a>, <a href="../Platforms.htm">Platform Support</a></p>
+<p><a href="A_Clipboard.htm">A_Clipboard</a>, <a href="ClipboardAll.htm">ClipboardAll</a>, <a href="ClipWait.htm">ClipWait</a>, <a href="OnClipboardChange.htm">OnClipboardChange</a>, <a href="_ClipboardTimeout.htm">#ClipboardTimeout</a>, <a href="Image.htm">Image</a>, <a href="EventHook.htm">EventHook</a>, <a href="../Platforms.htm">Platform Support</a></p>
 
 </body>
 </html>

@@ -27,7 +27,7 @@
   <tr><th>Name</th><th>Purpose</th></tr>
   <tr><td><code>InputMonitoring</code></td><td>Observe keyboard/mouse input or poll arbitrary key/button state. Modifier state, lock-toggle state and cursor position are ungated.</td></tr>
   <tr><td><code>InputControl</code></td><td>Synthesize or suppress keyboard/mouse input, including <a href="BlockInput.htm">BlockInput</a>. A suppressing hook requires this and InputMonitoring.</td></tr>
-  <tr><td><code>WindowMonitoring</code></td><td>Query, enumerate, identify or subscribe to events from foreign windows and controls. On macOS this maps to Accessibility and Screen Recording because foreign window titles require both.</td></tr>
+  <tr><td><code>WindowMonitoring</code></td><td>Query, enumerate, identify or subscribe to events from foreign windows and controls. On macOS it requires Accessibility and Screen Recording permission.</td></tr>
   <tr><td><code>WindowControl</code></td><td>Activate or mutate foreign windows and controls. Resolving a target can also require WindowMonitoring.</td></tr>
   <tr><td><code>ScreenCapture</code></td><td>Capture pixels with PixelGetColor, ImageSearch or Image.</td></tr>
   <tr><td><code>AudioCapture</code></td><td>Reserve permission for audio capture. <a href="Audio.htm#Recorder">Audio.Recorder</a> requires it before it opens a device.</td></tr>
@@ -42,8 +42,7 @@
 
 <h2 id="Remarks">Remarks</h2>
 <h3 id="Linux">Linux</h3>
-<p>On Linux, InputMonitoring belongs to <code class="no-highlight">keysharp-input</code>, while the desktop capabilities belong to <code class="no-highlight">keysharp-desktop</code>. Both components can manage the shared InputControl grant: it is batched with InputMonitoring when both are requested, or with desktop capabilities when requested alongside them. One call can therefore require one polkit authentication per component. Grants are permanent until manually revoked.</p>
-<p>Grants belong to the host executable, so scripts using the same interpreter share them; a later request for additional scopes may prompt again. These rules apply on X11 and Wayland. See <a href="../Platforms.htm#Linux_Permissions">Linux permissions</a>.</p>
+<p>On Linux, <code class="no-highlight">keysharp-input</code> and <code class="no-highlight">keysharp-desktop</code> approve their capabilities separately, so one call can show a polkit prompt for each. Grants persist until revoked and are shared by scripts run by the same executable. See <a href="../Platforms.htm#Linux_Permissions">Linux permissions</a>.</p>
 <p>Use <a href="_Requires.htm#Capability"><code>#Requires capability</code></a> when permissions are needed from startup. Use RequestCapabilities when a script needs to choose when to prompt or inspect individual results.</p>
 
 <h2 id="Examples">Examples</h2>

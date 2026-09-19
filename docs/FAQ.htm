@@ -96,14 +96,13 @@
 <p>UAC may also prevent <a href="lib/SendMode.htm#Play">SendPlay</a> and <a href="lib/BlockInput.htm">BlockInput</a> from working.</p>
 <p>Common workarounds are as follows:</p>
 <ul>
-  <li>Run Keysharp or the script as administrator when interaction with an elevated process is required. Note that programs launched by the script can inherit elevation.</li>
   <li>Prefer running both applications at the same integrity level when elevation is not otherwise required.</li>
   <li>Run the script <a href="Variables.htm#IsAdmin">as administrator</a>. Note that this also causes any programs launched by the script to run as administrator, and may require the user to accept an approval prompt when launching the script.</li>
   <li>Disable the local security policy "Run all administrators in Admin Approval Mode" (not recommended).</li>
   <li>Disable UAC completely. This is not recommended, and is not feasible on Windows 8 or later.</li>
 </ul>
 
-<h3 id="DefaultScript">I can't edit my script through the tray because it exits with an error. What should I do?</h3>
+<h3 id="DefaultScript">I can't edit my script via tray icon because it won't start due to an error. What should I do?</h3>
 <p>Open the original <code class="no-highlight">.ks</code> or <code class="no-highlight">.ahk</code> file directly in Keyview or another <a href="misc/Editors.htm">text editor</a>. Fix the reported error, save the file, and run it again.</p>
 <p>You can check the script without executing it by running <code class="no-highlight">Keysharp.exe --validate "path\to\script.ks"</code>. See <a href="Program.htm#cmd">Keysharp command-line options</a>.</p>
 <h3 id="Debug">How can I find and fix errors in my code?</h3>

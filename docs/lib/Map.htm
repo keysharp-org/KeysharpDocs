@@ -27,6 +27,7 @@ for clr in Array("Blue", "Green")
 </pre>
 <p>"MapObj" is used below as a placeholder for any Map object, as "Map" is the class itself.</p>
 <p>In addition to the methods and properties inherited from <a href="Object.htm">Object</a>, Map objects have the following predefined methods and properties.</p>
+<p><a href="#ToString">ToString</a> is a Keysharp extension.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
@@ -42,9 +43,7 @@ for clr in Array("Blue", "Green")
       <li><a href="#Delete">Delete</a>: Removes a key-value pair from a map.</li>
       <li><a href="#Get">Get</a>: Returns the value associated with a key, or a default value.</li>
       <li><a href="#Has">Has</a>: Returns true if the specified key has an associated value within a map.</li>
-      <li><a href="#MaxIndex">MaxIndex/MinIndex</a>: Returns the highest or lowest numeric key.</li>
       <li><a href="#Set">Set</a>: Sets zero or more items.</li>
-      <li><a href="#ToClr">ToClr</a>: Returns the map as a Clr object.</li>
       <li><a href="#ToString">ToString</a>: Returns a string representation of the map.</li>
       <li><a href="#__Enum">__Enum</a>: Enumerates key-value pairs.</li>
       <li><a href="#__New">__New</a>: Sets items. Equivalent to Set.</li>
@@ -130,22 +129,10 @@ MapObj := Map.<span class="func">Call</span>(Key1, Value1, Key2, Value2, ...)</p
 <p>This method returns the Map.</p>
 </div>
 
-<div class="methodShort" id="ToClr"><h3>ToClr</h3>
-<p>Returns the map as an ordinary <a href="Clr.htm">Clr</a> object, exposing its full CLR surface late-bound.</p>
-<pre class="Syntax">ClrMap := MapObj.<span class="func">ToClr</span>()</pre>
-<p>A map is itself a CLR <code class="no-highlight">IDictionary&lt;object, object&gt;</code>, so a CLR API declaring one accepts it directly; the wrapper is only needed to reach CLR members from script. See <a href="Clr.htm#ToClr">ToClr on built-in objects</a>.</p>
-</div>
-
 <div class="methodShort" id="ToString"><h3>ToString</h3>
 <p>Returns a string representation of the map.</p>
 <pre class="Syntax">Text := MapObj.<span class="func">ToString</span>()</pre>
 <p>The result encloses the key-value pairs in braces, separates pairs with a comma and space, and separates each key from its value with a colon. String keys and values are enclosed in double quotes. <code>String(MapObj)</code> returns the same result.</p>
-</div>
-
-<div class="methodShort" id="MaxIndex"><h3>MaxIndex / MinIndex</h3>
-<p>Returns the highest or lowest numeric key. These v1 compatibility methods are also available on Array.</p>
-<pre class="Syntax">Highest := MapObj.<span class="func">MaxIndex</span>()
-Lowest := MapObj.<span class="func">MinIndex</span>()</pre>
 </div>
 
 <div class="methodShort" id="__Enum"><h3>__Enum</h3>
@@ -164,7 +151,7 @@ Lowest := MapObj.<span class="func">MinIndex</span>()</pre>
     <p>The value.</p>
   </dd>
 </dl>
-<p>The underlying storage is a hash map. To preserve compatible enumeration order, the Map is copied and sorted before enumeration. Modifying it during enumeration therefore does not have the same effect as modifying an AutoHotkey Map during enumeration. Use <a href="HashMap.htm">HashMap</a> when sorted enumeration is unnecessary.</p>
+<p>The Map is copied and sorted before enumeration, so modifying it during enumeration does not have the same effect as in AutoHotkey. Use <a href="HashMap.htm">HashMap</a> when sorted enumeration is unnecessary.</p>
 </div>
 
 <div class="methodShort" id="__New"><h3>__New</h3>

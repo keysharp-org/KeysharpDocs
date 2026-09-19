@@ -31,14 +31,13 @@
 
 <h2 id="Error_Handling">Error Handling</h2>
 <p>A <a href="Error.htm#TargetError">TargetError</a> is thrown if the window could not be found.</p>
-<p>An <a href="Error.htm#OSError">OSError</a> is thrown if the selected platform backend cannot lower the matching window.</p>
+<p>An <a href="Error.htm#OSError">OSError</a> may be thrown on failure.</p>
 
 <h2 id="Remarks">Remarks</h2>
 <p>The effect is similar to pressing <kbd>Alt</kbd>+<kbd>Esc</kbd>.</p>
 
 <h3 id="Linux">Linux</h3>
-<p><strong>X11:</strong> The function uses the X11 lower-window operation.</p>
-<p><strong>Wayland:</strong> Lowering is supported for windows managed through the supplied GNOME or Cinnamon shell extension. KWin and other Wayland backends do not currently provide this operation, so the function throws an <a href="Error.htm#OSError">OSError</a>.</p>
+<p><strong>Wayland:</strong> Lowering is supported for windows managed through the supplied GNOME or Cinnamon shell extension. KWin and other Wayland backends do not provide this operation, so the function throws an <a href="Error.htm#OSError">OSError</a>.</p>
 
 <h3 id="macOS">macOS</h3>
 <p>Only windows owned by the script's process can be lowered. Attempting to lower another application's window throws an <a href="Error.htm#OSError">OSError</a>.</p>

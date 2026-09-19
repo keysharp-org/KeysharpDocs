@@ -23,12 +23,13 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>If omitted, it defaults to 0 (zero is traditionally used to indicate success). Otherwise, specify an integer between -2147483648 and 2147483647 that is returned to its caller when the script exits. This code is accessible to any program that spawned the script, such as another script (via RunWait) or a batch (.bat) file.</p>
+    <p>The thread also keeps the code as its <a href="Thread.htm#ExitCode">ExitCode</a>.</p>
   </dd>
 
 </dl>
 
 <h2 id="Remarks">Remarks</h2>
-<p>To terminate a thread other than the current one, call <a href="Thread.htm#Exit">Exit</a> on its <a href="Thread.htm#Object">Thread</a> object, reached through <a href="../Variables.htm#Thread">A_Thread</a> or <a href="RealThread.htm#Threads">A_RealThread.Threads</a>:</p>
+<p>To terminate a thread other than the current one, call <a href="Thread.htm#Exit">Exit</a> on its <a href="Thread.htm#Object">Thread</a> object, reached through <a href="../Variables.htm#A_Thread">A_Thread</a> or <a href="RealThread.htm#Threads">A_RealThread.Threads</a>:</p>
 <pre>#Import "Ks" { A_Thread, A_RealThread }
 A_Thread.Underlying.Exit()             <em>; the thread this one interrupted</em>
 A_RealThread.Threads[1].Exit()    <em>; the oldest thread on this real thread</em></pre>

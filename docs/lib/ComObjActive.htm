@@ -14,7 +14,7 @@
 <h1>ComObjActive</h1>
 
 <p>Retrieves a registered COM object.</p>
-<p class="note"><strong>Notice:</strong> On macOS this attaches to a running application, and throws if it is not running.</p>
+<p class="note"><strong>Note:</strong> On macOS, this function attaches to a running application and throws if it is not running.</p>
 <pre class="Syntax">ComObj := <span class="func">ComObjActive</span>(CLSID)</pre>
 
 <h2 id="Parameters">Parameters</h2>
@@ -36,11 +36,6 @@
 <h2 id="Error_Handling">Error Handling</h2>
 <p>An exception is thrown on failure.</p>
 <p>On Linux, an error is thrown if no service currently owns the requested bus name.</p>
-
-<h2 id="Remarks">Remarks</h2>
-
-<h3 id="Linux">Linux</h3>
-<p>Connects to a D-Bus service which is already on the bus. Unlike <a href="ComObject.htm">ComObject</a>, this function does not activate a service which is not running, which makes it the way to test whether a service is present.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="ComValue.htm">ComValue</a>, <a href="ComObject.htm">ComObject</a>, <a href="ComObjGet.htm">ComObjGet</a>, <a href="ComObjConnect.htm">ComObjConnect</a>, <a href="ComObjFlags.htm">ComObjFlags</a>, <a href="ObjAddRef.htm">ObjAddRef/ObjRelease</a>, <a href="ComObjQuery.htm">ComObjQuery</a>, <a href="https://learn.microsoft.com/windows/win32/api/oleauto/nf-oleauto-getactiveobject">GetActiveObject (Microsoft Docs)</a></p>

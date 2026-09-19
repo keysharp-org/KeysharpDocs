@@ -18,21 +18,18 @@
 <p>The class is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { Http }</pre>
 
-<p>It works on every platform. A ported script using <code class="no-highlight">ComObject("WinHttp.WinHttpRequest.5.1")</code> runs on Windows only, because <a href="ComObject.htm">ComObject</a> reaches D-Bus on Linux and Apple Events on macOS.</p>
-
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
-  <li><a href="#StaticMethods">Static Methods</a>: Get, Post, Request and their Async twins.</li>
+  <li><a href="#StaticMethods">Static Methods</a>: Get, Post, Request, Download and their Async twins.</li>
   <li><a href="#Call">Http()</a>: Creates a session.</li>
-  <li><a href="#Properties">Session Properties</a>: Headers, Timeout, BaseUrl.</li>
-  <li><a href="#Methods">Session Methods</a>: the same six requests, plus Close and ToClr.</li>
+  <li><a href="#Properties">Session Properties</a>: Headers, Timeout, BaseUrl, OnData.</li>
+  <li><a href="#Methods">Session Methods</a>: the same requests, plus Close and ToClr.</li>
   <li><a href="#RequestOptions">Request Options</a>: Headers, Body, Json, Timeout, OnData.</li>
-  <li><a href="#SessionOptions">Session Options</a>: BaseUrl, Auth, Proxy, IgnoreCertificateErrors, Handler.</li>
+  <li><a href="#SessionOptions">Session Options</a>: Auth, Proxy, IgnoreCertificateErrors, Handler.</li>
   <li><a href="#OnData">OnData</a>: streaming, progress and stopping a transfer.</li>
   <li><a href="#Response">Http.Response</a>: what a server answered.</li>
   <li><a href="#Errors">Errors</a></li>
   <li><a href="#Examples">Examples</a></li>
-  <li><a href="#Scope">What is not included</a></li>
 </ul>
 
 <h2 id="StaticMethods">Static Methods</h2>
@@ -40,15 +37,17 @@
 Res := Http.<span class="func">Post</span>(Url <span class="optional">, Body, Options</span>)
 Res := Http.<span class="func">Request</span>(Method, Url <span class="optional">, Body, Options</span>)
 
+Res := Http.<span class="func">Download</span>(Url, Path <span class="optional">, Options</span>)
+
 Task := Http.<span class="func">GetAsync</span>(Url <span class="optional">, Options</span>)
 Task := Http.<span class="func">PostAsync</span>(Url <span class="optional">, Body, Options</span>)
-Task := Http.<span class="func">RequestAsync</span>(Method, Url <span class="optional">, Body, Options</span>)</pre>
+Task := Http.<span class="func">RequestAsync</span>(Method, Url <span class="optional">, Body, Options</span>)
+Task := Http.<span class="func">DownloadAsync</span>(Url, Path <span class="optional">, Options</span>)</pre>
 
-<p><em>Method</em> is any HTTP method, uppercased before it is sent. <code class="no-highlight">PUT</code>, <code class="no-highlight">PATCH</code>, <code class="no-highlight">DELETE</code> and <code class="no-highlight">HEAD</code> have no shortcut of their own and are spelled through <em>Request</em>.</p>
-<p><em>Body</em> is positional sugar for the <a href="#RequestOptions">Body option</a>, on <em>Request</em> as well as <em>Post</em>.</p>
-<p>The synchronous forms return an <a href="#Response">Http.Response</a>. They block the calling pseudo-thread while pumping everything else, exactly as <a href="Sleep.htm">Sleep</a> and <a href="Await.htm">Await</a> do, so timers, hotkeys and the GUI stay alive; like them, they are an interruption point.</p>
-<p>The <code class="no-highlight">Async</code> forms return a <a href="Task.htm">Task</a> carrying that response, so a request composes with <code class="no-highlight">Await</code>, <code class="no-highlight">Then</code>, <code class="no-highlight">Task.WhenAll</code> and <code class="no-highlight">Task.WhenAny</code>. Completion needs no callback option of its own.</p>
-<p>These share one client which holds no cookies, so two unrelated libraries in one script that call the same host cannot see each other's state. A script that wants shared state asks for a session.</p>
+<p><em>Method</em> is any HTTP method, such as <code class="no-highlight">PUT</code> or <code class="no-highlight">DELETE</code>, and is uppercased before it is sent.</p>
+<p><em>Body</em> is equivalent to the <a href="#RequestOptions">Body option</a>.</p>
+<p>The synchronous forms return an <a href="#Response">Http.Response</a>. Like <a href="Sleep.htm">Sleep</a>, they let timers, hotkeys and the GUI run while they wait.</p>
+<p>The <code class="no-highlight">Async</code> forms return a <a href="Task.htm">Task</a> carrying that response, so a request composes with <code class="no-highlight">Await</code>, <code class="no-highlight">Then</code>, <code class="no-highlight">Task.WhenAll</code> and <code class="no-highlight">Task.WhenAny</code>.</p>
 
 <h2 id="Call">Http()</h2>
 <p>Creates a session: its own connection pool, cookie jar and default options.</p>
@@ -68,7 +67,7 @@ Task := Http.<span class="func">RequestAsync</span>(Method, Url <span class="opt
   <dt id="Headers">Headers</dt>
   <dd>
     <p>Type: <a href="Map.htm">Map</a></p>
-    <p>The headers sent with every request through this session, as a live case-insensitive Map that can be read and modified. A request's own <em>Headers</em> merge over these key by key. The Map is read at the moment a request is sent, so changing it does not affect a request already in flight.</p>
+    <p>The headers sent with every request through this session, as a live case-insensitive Map that can be read and modified. The Map is read at the moment a request is sent, so changing it does not affect a request already in flight.</p>
   </dd>
   <dt id="Timeout">Timeout</dt>
   <dd>
@@ -78,7 +77,12 @@ Task := Http.<span class="func">RequestAsync</span>(Method, Url <span class="opt
   <dt id="BaseUrl">BaseUrl</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>Prefixed to a request URL which is not already absolute, so a session's calls name only their path. An absolute URL ignores it.</p>
+    <p>Resolved against a request URL which is not already absolute, so a session's calls name only their path. An absolute URL ignores it. Resolution follows the rule a browser uses for a link, so a <em>BaseUrl</em> ending in <code class="no-highlight">/</code> keeps its whole path and one that does not loses its last segment.</p>
+  </dd>
+  <dt id="OnDataProperty">OnData</dt>
+  <dd>
+    <p>Type: <a href="../misc/Functor.htm">Function object</a></p>
+    <p>The callback every request through this session streams its body to, unless the request names its own. Reads back as <code class="no-highlight">""</code> when there is none, and assigning <code class="no-highlight">""</code> removes it.</p>
   </dd>
 </dl>
 
@@ -89,59 +93,57 @@ Res := Session.<span class="func">Request</span>(Method, Url <span class="option
 Task := Session.<span class="func">GetAsync</span>(Url <span class="optional">, Options</span>)
 Task := Session.<span class="func">PostAsync</span>(Url <span class="optional">, Body, Options</span>)
 Task := Session.<span class="func">RequestAsync</span>(Method, Url <span class="optional">, Body, Options</span>)
+Res := Session.<span class="func">Download</span>(Url, Path <span class="optional">, Options</span>)
+Task := Session.<span class="func">DownloadAsync</span>(Url, Path <span class="optional">, Options</span>)
 Session.<span class="func">Close</span>()
 Client := Session.<span class="func">ToClr</span>()</pre>
 
-<p>The six request methods behave as the static ones, with the session's headers, cookies, credentials, base URL and timeout applied. <em>ToClr</em> returns the underlying <code class="no-highlight">HttpClient</code> as an ordinary <a href="Clr.htm">Clr</a> object, for settings this class does not surface.</p>
-<p><em>Close</em> releases the session's connections, and a session that has been closed refuses further requests. A session left to the garbage collector releases them anyway, so this is for a script that opens many sessions and wants their sockets back promptly.</p>
+<p><em>Download</em> saves the body to <em>Path</em> and returns a <a href="#Response">Response</a> whose <em>Body</em> is empty. A non-2xx body is saved too, so check <em>IsSuccess</em> before trusting the file. <em>Path</em> is opened only once the response headers have arrived, so a request which gets no reply leaves an existing file unchanged. Giving <em>OnData</em> throws a <a href="Error.htm#ValueError">ValueError</a>, and a session's <em>OnData</em> is not applied. For <code class="no-highlight">ftp</code> URLs, use the global <a href="Download.htm">Download</a>.</p>
+<p>The request methods behave as the static ones, with the session's headers, cookies, credentials, base URL and timeout applied. <em>ToClr</em> returns the underlying <code class="no-highlight">HttpClient</code> as an ordinary <a href="Clr.htm">Clr</a> object, for settings this class does not surface.</p>
+<p><em>Close</em> releases the session's connections, and a session that has been closed refuses further requests. A session which is freed also releases its connections.</p>
 
 <h2 id="RequestOptions">Request Options</h2>
-<p>Options are given as a <a href="Map.htm">Map</a> or an object, with PascalCase keys. An unrecognized key throws a <a href="Error.htm#ValueError">ValueError</a> rather than being ignored, so a typo is reported where it is written instead of silently doing nothing.</p>
-<p>These may be given per request or as session defaults. A request's own value wins; <em>Headers</em> merges key by key, and a request value of <code class="no-highlight">""</code> removes a header for that request only.</p>
+<p>Options are given as a <a href="Map.htm">Map</a> or an object, with PascalCase keys. An unrecognized key throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+<p><em>Headers</em>, <em>Timeout</em>, <em>OnData</em> and <a href="#BaseUrl">BaseUrl</a> may be given per request or as session defaults, and a session reads and writes each of them back as a <a href="#Properties">property</a>. A request's own value wins; <em>Headers</em> merges key by key, and a request value of <code class="no-highlight">""</code> removes a header for that request only.</p>
+<p><em>Body</em> and <em>Json</em> describe <strong>one</strong> request, so giving either to <code class="no-highlight">Http(Options)</code> throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
 <dl>
   <dt>Headers</dt>
   <dd>
     <p>Type: <a href="Map.htm">Map</a></p>
-    <p>Header names to values, compared case-insensitively as HTTP compares them. <code class="no-highlight">Content-Type</code> is applied to the body, and a request with no body ignores every <code class="no-highlight">Content-*</code> name because there is nothing for it to describe. Every other name is sent as given, including one .NET's own header parser would refuse.</p>
-    <p>Unless it is overridden, a request carries <code class="no-highlight">User-Agent: Keysharp/&lt;version&gt;</code>, which several major APIs require: they answer a request with no user agent at all with 403. Setting it to <code class="no-highlight">""</code> removes it, as it removes any other header.</p>
+    <p>Header names to values, compared case-insensitively as HTTP compares them. <code class="no-highlight">Content-Type</code> is applied to the body, and a request with no body ignores every <code class="no-highlight">Content-*</code> name. Every other name is sent as given.</p>
+    <p>Unless it is overridden, a request carries <code class="no-highlight">User-Agent: Keysharp/&lt;version&gt;</code>.</p>
   </dd>
   <dt>Body</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a> or <a href="Buffer.htm">Buffer</a></p>
-    <p>The request body. A string is sent as UTF-8 <code class="no-highlight">text/plain</code>, a Buffer as <code class="no-highlight">application/octet-stream</code>; an explicit <code class="no-highlight">Content-Type</code> header replaces either.</p>
-    <p><em>Body</em> and <em>Json</em> are one slot, so a request naming either one replaces both of the session's defaults rather than colliding with the other.</p>
+    <p>The request body. A string is sent as UTF-8 <code class="no-highlight">text/plain</code>, a Buffer as <code class="no-highlight">application/octet-stream</code>; an explicit <code class="no-highlight">Content-Type</code> header replaces either. Any other object throws a <a href="Error.htm#TypeError">TypeError</a>.</p>
   </dd>
   <dt>Json</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#values">Any</a></p>
-    <p>A value encoded with <a href="Json.htm#Encode">Json.Encode</a> and sent as <code class="no-highlight">application/json</code>. Giving both <em>Body</em> and <em>Json</em> throws a <a href="Error.htm#ValueError">ValueError</a>, since each one <em>is</em> the body.</p>
+    <p>A value encoded with <a href="Json.htm#Encode">Json.Encode</a> and sent as <code class="no-highlight">application/json</code>. Giving both <em>Body</em> and <em>Json</em> throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
   </dd>
   <dt id="TimeoutOption">Timeout</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Number</a></p>
-    <p>A positive number of seconds, default 30, or <code class="no-highlight">-1</code> to wait indefinitely. Anything else throws a <a href="Error.htm#ValueError">ValueError</a> rather than being coerced.</p>
-    <p>It bounds the wait for the response headers and then each further piece of the body. It is an <strong>idle</strong> timeout rather than a total one, so a slow large download is not cut off part-way through while a connection that has stopped answering still is.</p>
+    <p>A positive number of seconds, default 30, or <code class="no-highlight">-1</code> to wait indefinitely. Anything else throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+    <p>It limits the wait for the response headers and then for each further piece of the body, not the transfer as a whole.</p>
   </dd>
   <dt>OnData</dt>
   <dd>
-    <p>Type: <a href="Func.htm">Func</a></p>
+    <p>Type: <a href="../misc/Functor.htm">Function object</a></p>
     <p>See <a href="#OnData">OnData</a>.</p>
   </dd>
 </dl>
 
 <h2 id="SessionOptions">Session Options</h2>
-<p>These configure the connection, which .NET freezes once a request has been sent. They therefore belong to <code class="no-highlight">Http(Options)</code>; giving one per request throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+<p>These configure the session's connection and are accepted only by <code class="no-highlight">Http(Options)</code>; giving one per request throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
 <dl>
-  <dt>BaseUrl</dt>
-  <dd>
-    <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>The initial value of <a href="#BaseUrl">BaseUrl</a>.</p>
-  </dd>
   <dt>Auth</dt>
   <dd>
     <p>Type: <a href="Array.htm">Array</a> or <a href="../Concepts.htm#strings">String</a></p>
     <p><code class="no-highlight">[User, Password]</code>, or the string <code class="no-highlight">"Default"</code> for the logged-in user's credentials.</p>
-    <p>These are credentials, not a scheme: the server's challenge selects Basic, Digest, NTLM, Negotiate or Kerberos, which is also the only way to reach the last two. A server that answers with something other than a 401 challenge is never asked, so preemptive Basic is a header instead: <code class="no-highlight">Map("Authorization", "Basic " Base64.Encode(User ":" Password))</code>. A bearer token or an API key is likewise an ordinary header.</p>
+    <p>The server's 401 challenge selects the scheme: Basic, Digest, NTLM, Negotiate or Kerberos. Credentials are sent only in answer to such a challenge, so preemptive Basic authentication, a bearer token or an API key is given as a header instead, such as <code class="no-highlight">Map("Authorization", "Basic " Base64.Encode(User ":" Password))</code>.</p>
   </dd>
   <dt>Proxy</dt>
   <dd>
@@ -156,7 +158,8 @@ Client := Session.<span class="func">ToClr</span>()</pre>
   <dt>Handler</dt>
   <dd>
     <p>Type: <a href="Clr.htm">Clr</a></p>
-    <p>An <code class="no-highlight">HttpMessageHandler</code> built through <a href="Clr.htm">Clr</a>, used exactly as given; the other session options are then not applied. Client certificates, TLS version pinning, a custom validation callback, cookie policy, connection limits and HTTP/2 settings are all reachable this way rather than through options of their own.</p>
+    <p>An <code class="no-highlight">HttpMessageHandler</code> built through <a href="Clr.htm">Clr</a>, used exactly as given. Client certificates, TLS version pinning, a custom validation callback, cookie policy, redirect policy, connection limits and HTTP/2 settings are all configured this way.</p>
+    <p>Giving <em>Auth</em>, <em>Proxy</em> or <em>IgnoreCertificateErrors</em> alongside it throws a <a href="Error.htm#ValueError">ValueError</a>. <a href="#Methods">Close</a> does not dispose it.</p>
   </dd>
 </dl>
 
@@ -171,17 +174,17 @@ Client := Session.<span class="func">ToClr</span>()</pre>
   <dt>Total</dt>
   <dd><p>Type: <a href="../Concepts.htm#numbers">Integer</a></p><p>The body length the server declared, or <code class="no-highlight">-1</code> when it declared none.</p></dd>
 </dl>
-<p>Bytes accumulate for about 100 ms before each call, which bounds the callback rate on a fast transfer without ever dropping one. Because the body went to the callback, <a href="#Response">Body and Text</a> on the response are then empty.</p>
-<p>The callback runs as a pseudo-thread on the script thread that asked for the request, so <a href="../Variables.htm#BuiltIn">A_ variables</a>, GUI access and error reporting all behave normally. The transfer waits for it to return, which is what keeps memory bounded, but the wait occupies no thread of its own, and <em>Timeout</em> is not charged for the callback's own runtime — a slow callback is never reported as a dead server. Uninterruptibility is skipped, as it is for a message AutoHotkey <em>sends</em> rather than posts, so a <a href="Critical.htm">Critical</a> section cannot cost the transfer a chunk.</p>
-<p>The callback may declare fewer than three parameters, as any callback may. An error raised inside it fails the request.</p>
+<p>Bytes accumulate for about 100 ms, or up to 1 MB, before each call. <a href="#Response">Body and Text</a> on the response are then empty.</p>
+<p>The callback runs in its own <a href="../misc/Threads.htm">script thread</a> on the real thread which made the request, and the transfer waits for it to return. Time spent in the callback does not count toward <em>Timeout</em>. The callback starts even when <a href="Critical.htm">Critical</a>, <a href="_MaxThreads.htm">#MaxThreads</a> or a higher-priority thread would otherwise keep a new thread from starting.</p>
+<p>The callback may declare fewer than three parameters; it is passed only as many as it accepts. An error raised inside it fails the request without calling <a href="OnError.htm">OnError</a> at the throw site.</p>
 
 <h3 id="OnData_Stopping">Stopping a transfer</h3>
-<p><strong>Returning a non-zero <a href="../Concepts.htm#numbers">Integer</a> stops the transfer</strong>, in the same way a non-zero return from an <a href="OnExit.htm">OnExit</a> callback prevents an exit. Anything else continues: <code class="no-highlight">0</code>, an empty string, a string, an object, or no return value at all.</p>
+<p><strong>Returning a non-zero <a href="../Concepts.htm#numbers">Integer</a> stops the transfer</strong>. Any other return value, or none, continues it.</p>
 <p>The task is then canceled. The <code class="no-highlight">Async</code> form leaves a <a href="Task.htm">Task</a> whose <code class="no-highlight">Status</code> is <code class="no-highlight">"Canceled"</code>; the synchronous form throws what <a href="Await.htm">Await</a> throws for canceled work.</p>
 <p>Take care with a fat arrow, whose value is its last expression. This stops after the first chunk, because <a href="File.htm#RawWrite">RawWrite</a> returns the number of bytes written:</p>
 <pre class="NoIndent">Http.Get(Url, {OnData: (Chunk, *) =&gt; File.RawWrite(Chunk)})       <em>; wrong</em>
 Http.Get(Url, {OnData: (Chunk, *) =&gt; (File.RawWrite(Chunk), 0)})  <em>; right</em></pre>
-<p>Stopping from outside the callback — a hotkey, a Cancel button — is a flag the next call reads. A transfer can only stop between chunks in any case, and a connection that has stopped answering is what <em>Timeout</em> is for.</p>
+<p>To stop a transfer from a hotkey or button, set a variable which the callback checks and returns. A transfer stops only between chunks.</p>
 
 <h2 id="Response">Http.Response</h2>
 <pre class="NoIndent">class Http.Response extends Object</pre>
@@ -202,13 +205,13 @@ Http.Get(Url, {OnData: (Chunk, *) =&gt; (File.RawWrite(Chunk), 0)})  <em>; right
   <dt>Url</dt>
   <dd><p>Type: <a href="../Concepts.htm#strings">String</a></p><p>Where the response came from, which differs from the requested URL after a redirect. Redirects are followed automatically.</p></dd>
   <dt>Json()</dt>
-  <dd><p>Type: <a href="../Concepts.htm#values">Any</a></p><p>The body decoded as JSON, the same as <code class="no-highlight">Json.Decode(Res.Text)</code>. Call <a href="Json.htm#Decode">Json.Decode</a> directly to pass its <em>CaseSense</em> or <em>NullValue</em> options. A body which is not well-formed JSON throws a <a href="Error.htm#ValueError">ValueError</a>.</p></dd>
+  <dd><p>Type: <a href="../Concepts.htm#values">Any</a></p><p>The body decoded as JSON, the same as <code class="no-highlight">Json.Decode(Res.Text)</code>. Call <a href="Json.htm#Decode">Json.Decode</a> directly to pass its <em>CaseSense</em> or <em>NullValue</em> options.</p></dd>
   <dt>ToClr()</dt>
   <dd><p>Type: <a href="Clr.htm">Clr</a></p><p>The underlying <code class="no-highlight">HttpResponseMessage</code>, whose body has already been read.</p></dd>
 </dl>
 
 <h2 id="Errors">Errors</h2>
-<p><strong>A non-2xx status is not an error.</strong> The server answered, and the body of a failed request is usually where the reason is; <em>IsSuccess</em> is the test. Treating a 404 as an exception would put that body out of reach without a try block.</p>
+<p>A response is returned whatever its status code; check <em>IsSuccess</em>.</p>
 <p>What does throw:</p>
 <ul>
   <li>A transport failure — the host does not resolve, the connection is refused or drops, TLS fails — as an <a href="Error.htm#OSError">OSError</a>.</li>
@@ -228,7 +231,7 @@ else
     MsgBox "HTTP " Res.Status ": " Res.Text</pre>
 
 <p>A session, whose headers and cookies apply to each of its calls.</p>
-<pre class="NoIndent">#Import "Ks" { Http, Url, Await }
+<pre class="NoIndent">#Import "Ks" { Http, Url, Task, Await }
 
 Api := Http({BaseUrl: "https://example.com/api/", Headers: Map("Authorization", "Bearer " Token)})
 Api.Post("items", , {Json: {Name: "widget", Count: 2}})
@@ -237,7 +240,7 @@ Items := Api.Get("items?q=" Url.Encode(Query)).Json()
 <em>; Two requests at once.</em>
 Both := Await(Task.WhenAll(Api.GetAsync("items"), Api.GetAsync("users")))</pre>
 
-<p>Streaming to a file with a progress bar, which is what <a href="Download.htm">Download</a> does internally.</p>
+<p>Streaming to a file with a progress bar.</p>
 <pre class="NoIndent">#Import "Ks" { Http }
 
 Gui1 := Gui(), Bar := Gui1.Add("Progress", "w300"), Gui1.Show()
@@ -245,9 +248,6 @@ File := FileOpen("big.iso", "w")
 Http.Get(Url, {OnData: (Chunk, Received, Total) =&gt;
     (File.RawWrite(Chunk), Bar.Value := Total &gt; 0 ? 100 * Received / Total : 0, 0)})
 File.Close()</pre>
-
-<h2 id="Scope">What is not included</h2>
-<p>There is no WebSocket, HTTP server, multipart body, cookie inspection, redirect switch or retry policy. <code class="no-highlight">System.Net.WebSockets</code> and <code class="no-highlight">System.Net.Sockets</code> are reachable through <a href="Clr.htm">Clr</a> on every platform, and <em>Handler</em> covers the rest of what the .NET stack can be told to do.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="Download.htm">Download</a>, <a href="Json.htm">Json</a>, <a href="Url.htm">Url</a>, <a href="Base64.htm">Base64</a>, <a href="Task.htm">Task</a>, <a href="Await.htm">Await</a>, <a href="Clr.htm">Clr</a></p>

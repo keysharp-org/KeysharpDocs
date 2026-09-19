@@ -14,8 +14,7 @@
 <h1>Base64</h1>
 <pre class="NoIndent">class Base64 extends Object</pre>
 
-<p>Converts between binary data and Base64 text. Both methods are called on the class itself; a Base64 object is never constructed.</p>
-<p>Base64 is a text encoding, not a form of protection: it hides nothing from anyone who reads it. For hashing, encryption and key derivation, see <a href="Crypto.htm">Crypt</a>.</p>
+<p>Converts between binary data and Base64 text. Both methods are called on the class itself.</p>
 <p>The class is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { Base64 }</pre>
 
@@ -34,13 +33,13 @@
 <dl>
   <dt>Value</dt>
   <dd>
-    <p>Type: <a href="Buffer.htm">Buffer</a>, <a href="Array.htm">Array</a> or <a href="../Concepts.htm#strings">String</a></p>
-    <p>The data to encode. A Buffer or an Array of byte values is encoded exactly as it stands, so <em>Encoding</em> does not apply to it.</p>
+    <p>Type: <a href="Buffer.htm">Buffer</a>, <a href="StringBuffer.htm">StringBuffer</a> or <a href="../Concepts.htm#strings">String</a></p>
+    <p>The data to encode. A Buffer is encoded exactly as it stands, so <em>Encoding</em> does not apply to it. A StringBuffer is encoded as its text, the same as the equivalent string.</p>
   </dd>
   <dt>Encoding</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>The encoding a string <em>Value</em> is converted to bytes with, named as for <a href="FileEncoding.htm">FileEncoding</a>. It defaults to UTF-8, which is what any other tool means by the Base64 of a text. A name which cannot be resolved throws a <a href="Error.htm#ValueError">ValueError</a> rather than being quietly substituted.</p>
+    <p>The encoding a string or StringBuffer <em>Value</em> is converted to bytes with, named as for <a href="FileEncoding.htm">FileEncoding</a>. If omitted, it defaults to UTF-8. A name which cannot be resolved throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
   </dd>
 </dl>
 
@@ -76,11 +75,14 @@ StrGet(Base64.Decode("SGVsbG8="), "UTF-8") <em>; "Hello"</em>
 Base64.Encode("abc", "UTF-16")             <em>; "YQBiAGMA"</em>
 </pre>
 
-<p>Preemptive HTTP Basic authentication, which a server that never sends a challenge requires:</p>
+<p>Sends HTTP Basic authentication credentials:</p>
 <pre class="NoIndent">#Import "Ks" { Http, Base64 }
 
 Http.Get(Url, {Headers: Map("Authorization", "Basic " Base64.Encode(User ":" Password))})
 </pre>
+
+<h2 id="Related">Related</h2>
+<p><a href="Base32.htm">Base32</a>, <a href="Hex.htm">Hex</a>, <a href="Crypto.htm">Crypt</a>, <a href="Buffer.htm">Buffer</a></p>
 
 </body>
 </html>

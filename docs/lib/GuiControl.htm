@@ -143,7 +143,7 @@
 <p>Gets or sets this control's font, as a <a href="Font.htm">Font</a> object.</p>
 <pre class="Syntax">FontObj := GuiCtrl.<span class="func">Font</span></pre>
 <pre class="Syntax">GuiCtrl.<span class="func">Font</span> := FontObj</pre>
-<p>Reading the property returns a detached snapshot, so changing the returned object does not change the control; assign it back to apply it. The font color round-trips through the control's <code>ForeColor</code>.</p>
+<p>Reading the property returns a detached snapshot, so changing the returned object does not change the control; assign it back to apply it. Its <a href="Font.htm#Color">Color</a> is the control's text color.</p>
 </div>
 
 <div class="methodShort" id="GetClientPos">
@@ -164,9 +164,8 @@
   </dd>
 </dl>
 <h4 id="GetClientPos_Remarks">Remarks</h4>
-<p>This method differs from <a href="#GetPos">GetPos</a> in two ways: the coordinates are relative to the screen rather than to the GUI's client area, and the reported area is the control's client area rather than its full bounds. The client area excludes any border, scrollbar or other non-client element supplied by the platform, so for a control drawn without such elements the size matches <a href="#GetPos">GetPos</a>.</p>
-<p>Screen coordinates are what most positioning tasks need: showing a <a href="Menu.htm#Show">menu</a>, tooltip or second GUI aligned with a control, or restricting <a href="ImageSearch.htm">ImageSearch</a> or <a href="PixelSearch.htm">PixelSearch</a> to a control's contents. This method is the control-level counterpart of <a href="WinGetClientPos.htm">WinGetClientPos</a>.</p>
-<p>On Windows, <em>Width</em> and <em>Height</em> are adjusted for <a href="Gui.htm#DPIScale">DPI scaling</a> unless the <code class="no-highlight">-DPIScale</code> option was used; <em>X</em> and <em>Y</em> remain in the platform's screen-coordinate space. On Linux and macOS, the returned sizes use the GUI toolkit's logical coordinates regardless of the <code class="no-highlight">DPIScale</code> option.</p>
+<p>Unlike <a href="#GetPos">GetPos</a>, <em>X</em> and <em>Y</em> are screen coordinates, and the reported area excludes any border or scrollbar of the control.</p>
+<p><em>Width</em> and <em>Height</em> are adjusted for <a href="Gui.htm#DPIScale">DPI scaling</a> unless the <code class="no-highlight">-DPIScale</code> option was used; <em>X</em> and <em>Y</em> remain in the platform's screen-coordinate space.</p>
 </div>
 
 <div class="methodShort" id="GetPos">
@@ -187,7 +186,7 @@
   </dd>
 </dl>
 <h4 id="GetPos_Remarks">Remarks</h4>
-<p>On Windows, unlike <a href="ControlGetPos.htm">ControlGetPos</a>, this method applies <a href="Gui.htm#DPIScale">DPI scaling</a> to the returned coordinates unless the <code class="no-highlight">-DPIScale</code> option was used. On Linux and macOS, it returns the GUI toolkit's logical coordinates regardless of the <code class="no-highlight">DPIScale</code> option.</p>
+<p>Unlike <a href="ControlGetPos.htm">ControlGetPos</a>, this method applies <a href="Gui.htm#DPIScale">DPI scaling</a> to the returned coordinates (unless the <code class="no-highlight">-DPIScale</code> option was used).</p>
 <p>See <a href="#ExMoveResize">example #5</a> or <a href="#ExGetPos">example #10</a> for a demonstration.</p>
 </div>
 
@@ -209,7 +208,7 @@
   </dd>
 </dl>
 <h4 id="Move_Remarks">Remarks</h4>
-<p>On Windows, unlike <a href="ControlMove.htm">ControlMove</a>, this method applies <a href="Gui.htm#DPIScale">DPI scaling</a> to the coordinates unless the <code class="no-highlight">-DPIScale</code> option was used. On Linux and macOS, it accepts the GUI toolkit's logical coordinates regardless of the <code class="no-highlight">DPIScale</code> option.</p>
+<p>Unlike <a href="ControlMove.htm">ControlMove</a>, this method applies <a href="Gui.htm#DPIScale">DPI scaling</a> to the coordinates (unless the <code class="no-highlight">-DPIScale</code> option was used).</p>
 <p>See <a href="#ExMove">example #4</a> or <a href="#ExMoveResize">example #5</a> for a demonstration.</p>
 
 </div>
@@ -294,7 +293,7 @@ EditCtrl.<span class="func">SetCue</span>(NewText <span class="optional">, ShowW
 <p>Changes a control's font typeface, size, color, and/or style.</p>
 <pre class="Syntax">GuiCtrl.<span class="func">SetFont</span>(<span class="optional">Options, FontName</span>)</pre>
 <p>Omit both parameters to set the font to the GUI's current font, as set by <a href="Gui.htm#SetFont">Gui.SetFont</a>. Otherwise, any font attributes which are not specified will be copied from the control's previous font. Text color is changed only if specified in <em>Options</em>.</p>
-<p>For details about both parameters, see <a href="Gui.htm#SetFont">Gui.SetFont</a>.</p>
+<p>Options also accepts a <a href="Font.htm">Font</a> object, applying only its specified attributes. For details about both parameters, see <a href="Gui.htm#SetFont">Gui.SetFont</a>.</p>
 <p>See <a href="#ExFont">example #7</a> for a demonstration.</p>
 </div>
 
@@ -302,14 +301,14 @@ EditCtrl.<span class="func">SetCue</span>(NewText <span class="optional">, ShowW
 <h3>SetTabIcon</h3>
 <p>Changes the icon displayed by a tab control page.</p>
 <pre class="Syntax">TabCtrl.<span class="func">SetTabIcon</span>(TabIndex, ImageIndex)</pre>
-<p><em>TabIndex</em> identifies the tab and <em>ImageIndex</em> identifies an image in the tab control's image list. This provides a direct alternative to sending a native tab-control message.</p>
+<p><em>TabIndex</em> identifies the tab and <em>ImageIndex</em> identifies an image in the tab control's image list.</p>
 </div>
 
 <div class="methodShort" id="ToClr">
 <h3>ToClr</h3>
 <p>Returns the backing toolkit control as an ordinary <a href="Clr.htm">Clr</a> object.</p>
 <pre class="Syntax">ClrCtrl := GuiCtrl.<span class="func">ToClr</span>()</pre>
-<p>Its concrete type is platform-dependent and unspecified. Changes made through it bypass the control object's own state and event wiring. See <a href="Clr.htm#ToClr">ToClr on built-in objects</a>.</p>
+<p>Its concrete type is platform-dependent and unspecified. Changes made through it bypass the control object's own state and event wiring.</p>
 </div>
 
 <h2 id="Properties">Properties</h2>
@@ -332,7 +331,7 @@ EditCtrl.<span class="func">SetCue</span>(NewText <span class="optional">, ShowW
 <h3>NetClassNN</h3>
 <p>Gets a stable managed class name and sequence number for a GUI control.</p>
 <pre class="Syntax">NetClassNN := GuiCtrl.<span class="func">NetClassNN</span></pre>
-<p>Native ClassNN values for .NET controls contain long implementation-specific class names which can vary between machines or after a GUI is changed. NetClassNN instead returns a value such as <code>KeysharpButton6</code>. Its final sequence number matches the corresponding ClassNN. Prefer NetClassNN when identifying controls created by the current process.</p>
+<p>Returns a value such as <code>KeysharpButton6</code>, whose sequence number matches <a href="#ClassNN">ClassNN</a>. Unlike ClassNN, it does not vary between machines, so prefer it when identifying controls created by the current process.</p>
 </div>
 
 <div class="methodShort" id="Enabled">

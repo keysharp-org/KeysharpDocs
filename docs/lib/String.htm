@@ -15,6 +15,7 @@
 <h1>String</h1>
 <p>Converts a value to a string.</p>
 <pre class="Syntax">StrValue := <span class="func">String</span>(Value)</pre>
+<p><a href="#Length">Length</a>, <a href="#StartsWith">StartsWith</a> and <a href="#EndsWith">EndsWith</a> are Keysharp extensions.</p>
 
 <h2 id="Return_Value">Return Value</h2>
 <p>Type: <a href="../Concepts.htm#strings">String</a></p>
@@ -28,7 +29,7 @@
 
 <h2 id="StartsWith">StartsWith</h2>
 <pre class="Syntax">Result := StringValue.<span class="func">StartsWith</span>(Token <span class="optional">, CaseSense</span>)</pre>
-<p>Returns 1 (true) if the string begins with <em>Token</em>, or 0 (false) otherwise. <em>CaseSense</em> selects the comparison mode and follows <a href="InStr.htm">InStr</a>: omitted or <code>Off</code> is case-insensitive, <code>On</code> is case-sensitive, and <code>Locale</code> compares according to the current user's locale. Both <code>On</code> and <code>Off</code> are culture-invariant.</p>
+<p>Returns 1 (true) if the string begins with <em>Token</em>, or 0 (false) otherwise. <em>CaseSense</em> is as for <a href="InStr.htm">InStr</a>.</p>
 
 <h2 id="EndsWith">EndsWith</h2>
 <pre class="Syntax">Result := StringValue.<span class="func">EndsWith</span>(Token <span class="optional">, CaseSense</span>)</pre>

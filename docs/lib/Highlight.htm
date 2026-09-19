@@ -33,18 +33,16 @@
 <p>Returns a new Highlight object. Constructing one does not display anything; call <a href="#Show">Show</a> to put it on screen.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p>The border is drawn just <em>outside</em> the given rectangle, so the rectangle itself remains fully visible. Coordinates are absolute screen pixels, matching the coordinates produced by screen-inspection APIs.</p>
-<p>The overlay is click-through and always on top: it never takes focus and never intercepts mouse input, so the outlined application continues to work normally while it is displayed.</p>
-<p>Each Highlight object owns exactly one overlay, which is created on the first <a href="#Show">Show</a> and then reused. Moving an outline repositions that overlay rather than rebuilding it, so a highlight can be moved continuously without flicker.</p>
-<p>There is no global registry of highlights. The object is released when <a href="#Destroy">Destroy</a> is called or when the last reference to it goes away, at which point the overlay is torn down automatically. Assign it to a variable that stays alive for as long as the outline should remain visible.</p>
+<p>The border is drawn just <em>outside</em> the given rectangle, so the rectangle itself remains fully visible. The outline is always on top, never takes focus, and lets mouse input pass through to the windows beneath it.</p>
+<p>The overlay is also destroyed when the Highlight object is <a href="../Objects.htm#Lifetime">garbage-collected</a>, so keep a reference to it for as long as the outline should remain visible.</p>
 <p>On high-DPI displays the thickness is scaled to the display containing the rectangle, so a 2-pixel border looks the same on every monitor.</p>
 
 <h2 id="Properties">Properties</h2>
 <p>All properties can be changed while the outline is displayed; the change takes effect immediately.</p>
 <p id="X"><strong>HighlightObj.X:</strong> The left edge of the rectangle, in screen pixels.</p>
 <p id="Y"><strong>HighlightObj.Y:</strong> The top edge of the rectangle, in screen pixels.</p>
-<p id="W"><strong>HighlightObj.W:</strong> The width of the rectangle, in pixels.</p>
-<p id="H"><strong>HighlightObj.H:</strong> The height of the rectangle, in pixels.</p>
+<p id="Width"><strong>HighlightObj.Width:</strong> The width of the rectangle, in pixels.</p>
+<p id="Height"><strong>HighlightObj.Height:</strong> The height of the rectangle, in pixels.</p>
 <p id="Color"><strong>HighlightObj.Color:</strong> The border color. It can be set with a color name, a hexadecimal string or a 0xRRGGBB integer, and always reads back as a six-digit hexadecimal string such as <code>"FF0000"</code>.</p>
 <p id="Thickness"><strong>HighlightObj.Thickness:</strong> The border thickness in pixels. Zero hides the border.</p>
 <p id="IsVisible"><strong>HighlightObj.IsVisible:</strong> Returns 1 if the outline is currently on screen and 0 otherwise. This property is read-only; use <a href="#Show">Show</a> and <a href="#Hide">Hide</a> to change it.</p>

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>ValidateScript and CompileScript | Keysharp</title>
+<meta name="description" content="The ValidateScript and CompileScript functions check script source or a script file without running it, and report its errors and warnings." />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="../static/theme.css" rel="stylesheet" type="text/css" />
+<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" type="text/javascript"></script>
+</head>
+<body>
+
+<h1>ValidateScript and CompileScript</h1>
+<p>Check script code without running it, and report its errors and warnings.</p>
+<p>These functions are exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
+<pre class="Syntax">Result := <span class="func">ValidateScript</span>(Code)
+Result := <span class="func" id="CompileScript">CompileScript</span>(Code)</pre>
+
+<h2 id="Parameters">Parameters</h2>
+<dl>
+  <dt>Code</dt>
+  <dd>
+    <p>Type: <a href="../Concepts.htm#strings">String</a></p>
+    <p>Either the path of a script file or the script source itself. If a file of that name exists it is checked, otherwise the value is checked as source.</p>
+  </dd>
+</dl>
+
+<h2 id="Return_Value">Return Value</h2>
+<p>Type: <a href="../Concepts.htm#objects">Object</a></p>
+<p>Both functions return an object with these properties:</p>
+<table class="info">
+  <tr><th>Property</th><th>Description</th></tr>
+  <tr><td><code>IsValid</code></td><td>1 if no errors were found, otherwise 0.</td></tr>
+  <tr><td><code>Errors</code></td><td>An <a href="Array.htm">Array</a> of error messages, empty when <code>IsValid</code> is 1.</td></tr>
+  <tr><td><code>Warnings</code></td><td>An Array of warning messages. Always empty for ValidateScript.</td></tr>
+</table>
+<p>A ValidateScript message is prefixed with its location where that is known: the file when <em>Code</em> names one, then the line and column, as in <code class="no-highlight">C:\Scripts\other.ks:3:7: message</code>.</p>
+<p>CompileScript splits the compiler's own report into lines, one line per element, so its Arrays also contain the report's heading lines, such as <code class="no-highlight">The following errors occurred:</code>. When compilation fails, <code>Errors</code> can also contain the report's warning lines, and when the C# generated from the script is what fails to compile, it also contains that generated code.</p>
+
+<h2 id="Choosing">Which to Use</h2>
+<table class="info">
+  <tr><th></th><th>ValidateScript</th><th>CompileScript</th></tr>
+  <tr><td>What it checks</td><td>Syntax: the script is parsed.</td><td>Everything a build checks: the script is parsed, lowered and compiled in memory, so errors in inline <a href="_CSharp.htm">C#</a> and in the generated code are reported too.</td></tr>
+  <tr><td>Component needed</td><td>The parser</td><td>The compiler</td></tr>
+  <tr><td>Command-line equivalent</td><td><a href="../Program.htm#components"><code class="no-highlight">--validate-syntax</code></a></td><td><a href="../Program.htm#cmd"><code class="no-highlight">--validate</code></a></td></tr>
+</table>
+
+<h2 id="Error_Handling">Error Handling</h2>
+<p>An <a href="Error.htm">Error</a> is thrown if the component the function needs is not installed. Use <a href="IsComponentAvailable.htm">IsComponentAvailable</a> when the component is optional at run time. Errors in the checked code are reported in the returned object.</p>
+
+<h2 id="Remarks">Remarks</h2>
+<p>Neither function runs the code: no hotkeys are registered and the auto-execute section does not run. CompileScript writes nothing to disk and does not restore packages, so a <a href="_Package.htm">#Package</a> the code names must already be available.</p>
+<p>A compiled script with a statically visible call to either function includes the component it needs; see <a href="../Program.htm#components">Optional Scripting Components</a>.</p>
+
+<h2 id="Examples">Examples</h2>
+
+<div class="ex" id="ExValidate">
+<p><a class="ex_number" href="#ExValidate"></a> Compiles generated code before saving it.</p>
+<pre>#Import "Ks" { CompileScript }
+
+Code := "MsgBox 'hello'"
+Result := CompileScript(Code)
+if Result.IsValid
+    FileAppend Code, A_ScriptDir "\generated.ks"
+else
+    MsgBox "Generated code is invalid:`n" Result.Errors.Join("`n")</pre>
+</div>
+
+<div class="ex" id="ExFile">
+<p><a class="ex_number" href="#ExFile"></a> Checks the syntax of an existing file.</p>
+<pre>#Import "Ks" { ValidateScript }
+
+Result := ValidateScript(A_ScriptDir "\other.ks")
+MsgBox Result.IsValid ? "No syntax errors" : Result.Errors.Join("`n")</pre>
+</div>
+
+<h2 id="Related">Related</h2>
+<p><a href="IsComponentAvailable.htm">IsComponentAvailable</a>, <a href="RunScript.htm">RunScript</a>, <a href="../Program.htm#cmd">Command-Line Options</a>, <a href="../Program.htm#execution-model">How a Script Executes</a></p>
+
+</body>
+</html>

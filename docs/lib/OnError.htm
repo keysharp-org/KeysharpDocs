@@ -75,6 +75,7 @@
 <h2 id="Remarks">Remarks</h2>
 <p><em>Callback</em> is called only for errors or exceptions which would normally cause an error message to be displayed. It cannot be called for a load-time error, since OnError cannot be called until after the script has loaded.</p>
 <p><em>Callback</em> is called on the current <a href="../misc/Threads.htm">thread</a>, before it exits (that is, before the call stack unwinds).</p>
+<p id="Unwind">An exception which is not a Keysharp error, such as a .NET exception thrown by <a href="_CSharp.htm">#CSharp</a> code, reaches the callbacks only when it ends the thread, after the call stack has unwound.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="Try.htm">Try</a>, <a href="Catch.htm">Catch</a>, <a href="Throw.htm">Throw</a>, <a href="OnExit.htm">OnExit</a></p>

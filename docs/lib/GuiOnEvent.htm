@@ -80,7 +80,7 @@
   <tr><th>Event</th><th>Raised when...</th></tr>
   <tr><td><a href="#Close">Close</a></td><td>The window is closed.</td></tr>
   <tr><td><a href="#ContextMenu">ContextMenu</a></td><td>The user right-clicks within the window or presses <kbd>Menu</kbd> or <kbd>Shift</kbd>+<kbd>F10</kbd>.</td></tr>
-  <tr><td><a href="#DPIChange">DPIChange</a></td><td>The window moves to a display with a different DPI or backing scale.</td></tr>
+  <tr><td><a href="#DpiChanged">DpiChanged</a></td><td>The window moves to a display with a different DPI or backing scale.</td></tr>
   <tr><td><a href="#DropFiles">DropFiles</a></td><td>Files/folders are dragged and dropped onto the window.</td></tr>
   <tr><td><a href="#Escape">Escape</a></td><td>The user presses <kbd>Esc</kbd> while the GUI window is active.</td></tr>
   <tr><td><a href="#Size">Size</a></td><td>The window is resized, minimized, maximized or restored.</td></tr>
@@ -144,7 +144,10 @@ MyGui.Show()</pre>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>When a ListBox, ListView, or TreeView is the target of the context menu (as determined by <em>GuiCtrlObj</em>), <em>Item</em> specifies which of the control's items is the target.</p>
     <p><a href="GuiControls.htm#ListBox">ListBox</a>: The position number of the currently focused item. Note that a standard ListBox does not focus an item when it is right-clicked, so this might not be the clicked item.</p>
-    <p><a href="ListView.htm">ListView</a> and <a href="TreeView.htm">TreeView</a>: For right-clicks, <em>Item</em> contains the clicked item's row number or ID (or 0 if the user clicked somewhere other than an item). For <kbd>Menu</kbd> and <kbd>Shift</kbd>+<kbd>F10</kbd>, <em>Item</em> contains the selected item's row number or ID.</p></dd>
+    <p><a href="ListView.htm">ListView</a> and <a href="TreeView.htm">TreeView</a>: For right-clicks, <em>Item</em> contains the clicked item's row number or ID (or 0 if the user clicked somewhere other than an item). For <kbd>Menu</kbd> and <kbd>Shift</kbd>+<kbd>F10</kbd>, <em>Item</em> contains the selected item's row number or ID.</p>
+    <p><a href="GuiControls.htm#StatusBar">StatusBar</a>: For right-clicks, <em>Item</em> contains the number of the part which was clicked.</p>
+    <p>For any other control, and when there is no control, <em>Item</em> is 0.</p>
+    </dd>
   <dt>IsRightClick</dt><dd>
     <p>Type: <a href="../Concepts.htm#boolean">Integer (boolean)</a></p>
     <p>One of the following values:</p>
@@ -158,19 +161,19 @@ MyGui.Show()</pre>
 </dl>
 <p>Unlike most other GUI events, the ContextMenu event can have more than one concurrent <a href="../misc/Threads.htm">thread</a>.</p>
 <p>Each control can have its own ContextMenu event callback which is called before any callback registered for the Gui object. Control-specific callbacks omit the <em>GuiObj</em> parameter, but all other parameters are the same.</p>
-<p>Note: Since <a href="GuiControls.htm#Edit">Edit</a> and <a href="GuiControls.htm#MonthCal">MonthCal</a> controls have their own context menu, a right-click in one of them will not launch the ContextMenu event.</p>
+<p>Note: Since <a href="GuiControls.htm#Edit">Edit</a>, <a href="GuiControls.htm#RichEdit">RichEdit</a> and <a href="GuiControls.htm#MonthCal">MonthCal</a> controls have their own context menu, a right-click in one of them will not launch the ContextMenu event.</p>
 
-<h3 id="DPIChange">DPIChange</h3>
+<h3 id="DpiChanged">DpiChanged</h3>
 <p>Launched when the GUI window moves to a display with a different DPI or backing scale.</p>
-<pre class="Syntax">Gui_<span class="func">DPIChange</span>(GuiObj, OldDPI, NewDPI)</pre>
+<pre class="Syntax">Gui_<span class="func">DpiChanged</span>(GuiObj, OldDPI, NewDPI)</pre>
 <dl>
   <dt>OldDPI, NewDPI</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p>The previous and current display DPI, where 96 represents 100% scale. On Linux and macOS these values are derived from the toolkit's logical-pixel scale.</p>
+    <p>The previous and current display DPI, where 96 represents 100% scale.</p>
   </dd>
 </dl>
-<p>On Windows, a script can use <a href="Gui.htm#Gui_DPIResize"><code class="no-highlight">Gui.Opt("-DPIResize")</code></a> to disable automatic resizing by default for controls added afterward, or use <code class="no-highlight">-DPIResize</code> in an individual control's options. The callback can then reposition and resize those controls according to the script's own rules. Changing the GUI option does not affect controls which already exist. On Linux and macOS, native toolkit scaling still applies, but this event can be used to react to the new backing scale.</p>
+<p>To lay out controls by the script's own rules, disable <a href="Gui.htm#DPIResize">DPIResize</a> for them and reposition them in this callback.</p>
 
 <h3 id="DropFiles">DropFiles</h3>
 <p>Launched whenever files/folders are dropped onto the window as part of a drag-and-drop operation (but if this callback is already running, drop events are ignored).</p>
@@ -234,7 +237,7 @@ MyGui.Show()</pre>
   <dt>Info</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p><em>Info</em> is currently 0 for every control, including Slider; the managed GUI backend does not expose how a slider was moved.</p>
+    <p><em>Info</em> is 0 for every control, including Slider.</p>
   </dd>
 </dl>
 <p>To retrieve the control's new value, use <a href="GuiControl.htm#Value">GuiCtrlObj.Value</a>.</p>
@@ -292,7 +295,7 @@ Link_<span class="func">Click</span>(GuiCtrlObj, Info, Href)</pre>
 <p>Raised when the user right-clicks the control or presses <kbd>Menu</kbd> or <kbd>Shift</kbd>+<kbd>F10</kbd> while the control has the keyboard focus.</p>
 <pre class="Syntax">Ctrl_<span class="func">ContextMenu</span>(GuiCtrlObj, Item, IsRightClick, X, Y)</pre>
 <p>For details, see <a href="#ContextMenu">ContextMenu</a>.</p>
-<p>Applies to: All controls except <a href="GuiControls.htm#Edit">Edit</a> and <a href="GuiControls.htm#MonthCal">MonthCal</a> (and the Edit control within a <a href="GuiControls.htm#ComboBox">ComboBox</a>), which have their own standard context menu.</p>
+<p>Applies to: All controls except <a href="GuiControls.htm#Edit">Edit</a>, <a href="GuiControls.htm#RichEdit">RichEdit</a> and <a href="GuiControls.htm#MonthCal">MonthCal</a> (and the Edit control within a <a href="GuiControls.htm#ComboBox">ComboBox</a>), which have their own standard context menu.</p>
 
 <span id="LoseFocus"></span><h3 id="Focus">Focus / LoseFocus</h3>
 <p>Raised when the control gains or loses the keyboard focus.</p>
@@ -335,7 +338,6 @@ TreeView_<span class="func">ItemSelect</span>(GuiCtrlObj, Item)</pre>
 
 
 <h2 id="WebView_Events">WebView Events</h2>
-<p>These events have no AutoHotkey counterpart. They apply only to <a href="GuiControls.htm#WebView">WebView</a> controls, and registering any other event name on one throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
 <p>Every <em>Url</em> parameter below is a string, and is <code>""</code> when the browser does not report one.</p>
 
 <h3 id="Navigated">Navigated</h3>
@@ -346,7 +348,7 @@ TreeView_<span class="func">ItemSelect</span>(GuiCtrlObj, Item)</pre>
 <p>Raised when a page is about to be loaded, before <a href="#Navigated">Navigated</a>.</p>
 <pre class="Syntax">WebView_<span class="func">DocumentLoading</span>(GuiCtrlObj, Url, IsMainFrame)</pre>
 <p><em>IsMainFrame</em> is 1 when the load is for the page itself and 0 when it is for a frame within it.</p>
-<p>Returning a non-empty value cancels the load and prevents any remaining callbacks from being called. Returning nothing, or <code>""</code>, allows it and passes the event to the next callback.</p>
+<p>Returning a non-empty value cancels the load.</p>
 
 <h3 id="DocumentLoaded">DocumentLoaded</h3>
 <p>Raised when a page has finished loading. This is the point at which <a href="GuiControls.htm#WebView_ExecuteScript">ExecuteScript</a> can reach the document.</p>
@@ -359,22 +361,21 @@ TreeView_<span class="func">ItemSelect</span>(GuiCtrlObj, Item)</pre>
 <h3 id="OpenNewWindow">OpenNewWindow</h3>
 <p>Raised when the page asks for a link to be opened in a new window, such as an anchor whose target is <code>_blank</code>.</p>
 <pre class="Syntax">WebView_<span class="func">OpenNewWindow</span>(GuiCtrlObj, Url, TargetName)</pre>
-<p>Returning a non-empty value suppresses the new window and prevents any remaining callbacks from being called. Returning nothing leaves the browser to do whatever it would have done without a handler.</p>
+<p>Returning a non-empty value suppresses the new window.</p>
 <p>On the Internet Explorer engine, <em>Url</em> is read back from the element the user activated and is not always the address that would have been opened. <em>TargetName</em> is <code>""</code> on both Windows engines.</p>
 
 <h3 id="MessageReceived">MessageReceived</h3>
 <p>Raised when script in the page calls <code>window.eto.postMessage(<i>string</i>)</code>, which is how a page hands a value back to the hosting script.</p>
 <pre class="Syntax">WebView_<span class="func">MessageReceived</span>(GuiCtrlObj, Message)</pre>
-<p>On the Internet Explorer engine, <code>window.eto</code> is installed once the document has loaded, so a page cannot post from script which runs while the document is still being parsed; post from an event handler, a timer, or anything else which runs after load. The Edge and WebKit engines install it before the page's own script runs, so a page may post at any time.</p>
+<p>On the Internet Explorer engine, <code>window.eto</code> exists only after the document has loaded, so script which runs while the page is being parsed cannot post.</p>
 
 <h2 id="RichEdit_Events">RichEdit Events</h2>
-<p>These events have no AutoHotkey counterpart. They apply only to <a href="GuiControls.htm#RichEdit">RichEdit</a> controls; registering either on any other control throws a <a href="Error.htm#ValueError">ValueError</a>. A RichEdit also raises <a href="#Change">Change</a> and the other control events, except <a href="#Ctrl-ContextMenu">ContextMenu</a>, which it handles itself as <a href="GuiControls.htm#Edit">Edit</a> does.</p>
 
 <h3 id="SelectionChange">SelectionChange</h3>
 <p>Raised when the caret moves or the selection changes, whether by the user or by the script.</p>
 <pre class="Syntax">RichEdit_<span class="func">SelectionChange</span>(GuiCtrlObj, Start, Length)</pre>
 <p><em>Start</em> is the 1-based position the selection begins at and <em>Length</em> is how many characters are selected, the same values <a href="GuiControls.htm#RichEdit_SelectionStart">SelectionStart</a> and <a href="GuiControls.htm#RichEdit_SelectionLength">SelectionLength</a> report.</p>
-<p>Only a change to what is selected raises this, so the several notifications a single click produces arrive as one event. Formatting applied inside a <a href="GuiControls.htm#RichEdit_BeginUpdate">BeginUpdate</a>/<a href="GuiControls.htm#RichEdit_EndUpdate">EndUpdate</a> pair raises nothing.</p>
+<p>Only a change to what is selected raises this. Formatting applied inside a <a href="GuiControls.htm#RichEdit_BeginUpdate">BeginUpdate</a>/<a href="GuiControls.htm#RichEdit_EndUpdate">EndUpdate</a> pair raises nothing.</p>
 
 <h3 id="LinkClick">LinkClick</h3>
 <p>Raised when the user clicks a link the control found in its text. Links are only detected while <a href="GuiControls.htm#RichEdit_DetectUrls">DetectUrls</a> is on, which makes this a Windows-only event.</p>

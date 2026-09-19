@@ -18,11 +18,11 @@
 
 <p>Transforms a <a href="FileSetTime.htm#YYYYMMDD">YYYYMMDDHH24MISS</a> timestamp into the specified date/time format.</p>
 
-<pre class="Syntax">String := <span class="func">FormatTime</span>(<span class="optional">Timestamp, Format</span>)</pre>
+<pre class="Syntax">String := <span class="func">FormatTime</span>(<span class="optional">YYYYMMDDHH24MISS, Format</span>)</pre>
 <h2 id="Parameters">Parameters</h2>
 <dl>
 
-  <dt>Timestamp</dt>
+  <dt>YYYYMMDDHH24MISS</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>If blank or omitted, it defaults to the current local date and time. Otherwise, specify all or the leading part of a timestamp in the <a href="FileSetTime.htm#YYYYMMDD">YYYYMMDDHH24MISS</a> format.</p>
@@ -40,7 +40,7 @@
 <h2 id="Return_Value">Return Value</h2>
 <p>Type: <a href="../Concepts.htm#strings">String</a></p>
 <p>This function returns the transformed version of the specified timestamp.</p>
-<p>If <em>Timestamp</em> contains a invalid date and/or time portion -- such as February 29th of a non-leap year -- the date and/or time will be omitted from the return value. Although only years between 1601 and 9999 are supported, a formatted time can still be produced for earlier years as long as the time portion is valid.</p>
+<p>If <em>YYYYMMDDHH24MISS</em> contains a invalid date and/or time portion -- such as February 29th of a non-leap year -- the date and/or time will be omitted from the return value. Although only years between 1601 and 9999 are supported, a formatted time can still be produced for earlier years as long as the time portion is valid.</p>
 <p>If <em>Format</em> contains more than 2000 characters, an empty string is returned.</p>
 
 <h2 id="Date_Formats">Date Formats (case-sensitive)</h2>
@@ -190,8 +190,8 @@
   </tr>
 </table>
 <h2 id="Additional_Options">Additional Options</h2>
-<p class="note"><strong>Notice:</strong> The <code>R</code>, <code>D</code><em>n</em> and <code>T</code><em>n</em> timestamp options described below are not supported, except that <code>0x80000000</code> may be used to disallow user overrides. Specify the desired order and formatting in the <em>Format</em> parameter using <a href="https://learn.microsoft.com/dotnet/standard/base-types/custom-date-and-time-format-strings">.NET custom date and time format strings</a>.</p>
-<p>The following options can appear inside the <em>Timestamp</em> parameter immediately after the timestamp (if there is no timestamp, they may be used alone). In the following example, note the lack of commas between the last four items:</p>
+<p class="note"><strong>Note:</strong> The <code>D</code><em>n</em> and <code>T</code><em>n</em> timestamp options described below are not supported, except that <code>0x80000000</code> may be used to disallow user overrides. Specify the desired order and formatting in the <em>Format</em> parameter using <a href="https://learn.microsoft.com/dotnet/standard/base-types/custom-date-and-time-format-strings">.NET custom date and time format strings</a>.</p>
+<p>The following options can appear inside the <em>YYYYMMDDHH24MISS</em> parameter immediately after the timestamp (if there is no timestamp, they may be used alone). In the following example, note the lack of commas between the last four items:</p>
 <pre>OutputVar := FormatTime("20040228 LSys D1 D4")</pre>
 <p><strong>R:</strong> Reverse. Have the date come before the time (meaningful only when <em>Format</em> is blank).</p>
 <p><strong>Ln:</strong> If this option is <em>not</em> present, the current user's locale is used to format the string. To use the system's locale instead, specify LSys. To use a specific locale, specify the letter L followed by a hexadecimal or decimal locale identifier (LCID). For information on how to construct an LCID, search <a href="https://www.microsoft.com">www.microsoft.com</a> for the following phrase: Locale Identifiers</p>

@@ -15,12 +15,12 @@
 <pre class="NoIndent">class Taskbar extends Object</pre>
 
 <p>The badge and progress bar a desktop shell draws on a taskbar button.</p>
-<p>Called on the class, it decorates the application's own button. That is what Linux and macOS do in any case, so it is the form which means the same thing on every platform:</p>
+<p>Called on the class, it decorates the application's own button, with the same result on every platform:</p>
 <pre>Taskbar.SetProgress(40)</pre>
-<p>It behaves as one application-wide setting: every call replaces the last, on the windows already open as well as on those opened afterwards, so no window is left showing an earlier badge. It can therefore be set before any window exists. On Windows, where the shell decorates a button rather than an application, that is done by giving each button the same decoration &mdash; when it is set, and again as each new window is shown. A per-window call overrides it for that window until the next application-wide one.</p>
+<p>This is one application-wide setting: each call replaces the last on every window, including windows opened afterwards, so it can be set before any window exists. A per-window call overrides it for that window until the next application-wide one.</p>
 <p>Constructed with a <a href="../misc/WinTitle.htm#ahk_id">window handle</a>, it decorates that one window's button &mdash; a distinction only Windows makes, see <a href="#IsPerWindow">IsPerWindow</a>:</p>
 <pre>Taskbar(MyGui.Hwnd).SetProgress(40)</pre>
-<p>This is not the taskbar button's own icon, which is the window's icon: set that with <a href="Gui.htm#SetIcon">Gui.SetIcon</a> or <a href="TraySetIcon.htm">TraySetIcon</a>. This is the small badge drawn over it, and the progress bar drawn inside it.</p>
+<p>The button's own icon is the window's icon, set with <a href="Gui.htm#SetIcon">Gui.SetIcon</a> or <a href="TraySetIcon.htm">TraySetIcon</a>.</p>
 <p>The class is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { Taskbar }</pre>
 
@@ -30,13 +30,13 @@
   <li><a href="#SetBadge">SetBadge</a>: Draws a badge over the window's taskbar button.</li>
   <li><a href="#SetProgress">SetProgress</a>: Fills the window's taskbar button with a progress bar.</li>
   <li><a href="#SetProgressState">SetProgressState</a>: Sets the kind of progress the bar shows.</li>
-  <li><a href="#HasBadgeIcon">HasBadgeIcon</a>, <a href="#IsPerWindow">IsPerWindow</a>: What this platform can draw.</li>
+  <li><a href="#IsBadgeIconSupported">IsBadgeIconSupported</a>, <a href="#IsPerWindow">IsPerWindow</a>: What this platform can draw.</li>
   <li><a href="#Platforms">Platform Differences</a></li>
   <li><a href="#Examples">Examples</a></li>
 </ul>
 
 <h2 id="Call">Taskbar()</h2>
-<p>Constructs a Taskbar for the window with the given handle, this script's own or any other's. Omit the constructor entirely &mdash; <code>Taskbar.SetProgress(40)</code> &mdash; to decorate the application's own button instead.</p>
+<p>Constructs a Taskbar for the window with the given handle, this script's own or any other's.</p>
 <pre class="Syntax">TaskbarObj := <span class="func">Taskbar</span>(Hwnd)</pre>
 <dl>
   <dt>Hwnd</dt>
@@ -45,20 +45,18 @@
     <p>The <a href="../misc/WinTitle.htm#ahk_id">window handle</a> whose taskbar button is decorated. A handle of 0 raises a ValueError.</p>
   </dd>
 </dl>
-<p>The shell takes its own copy of whatever it is given, so a Taskbar object holds no resources and what it draws outlives it. It is equally correct to keep one for the life of a window or to build one for a single call. The decoration belongs to the window, not to this object, and goes when the window does.</p>
-<p class="note"><strong>Note:</strong> Off Windows the handle is ignored, because the shell decorates the application rather than one of its windows. A script which wants that behaviour everywhere should call the class form.</p>
+<p>The decoration belongs to the window, not to the Taskbar object, and remains until it is removed or the window is destroyed.</p>
 
 <h2 id="SetBadge">SetBadge</h2>
 <p>Draws a badge over the window's taskbar button.</p>
 <pre class="Syntax">TaskbarObj.<span class="func">SetBadge</span>(<span class="optional">Source, IconNumber, Text</span>)
 Taskbar.<span class="func">SetBadge</span>(<span class="optional">Source, IconNumber, Text</span>)</pre>
-<p>The first form badges <em>TaskbarObj</em>'s window; the second badges the application's own button.</p>
 <h3 id="SetBadge_Parameters">Parameters</h3>
 <dl>
   <dt>Source</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>If omitted or blank, the badge is removed. Otherwise the path to an icon or image file, a module holding icon resources such as <code class="no-highlight">"shell32.dll"</code>, or a handle such as <code class="no-highlight">"HICON:" handle</code>. Platforms which cannot draw an icon badge ignore this and show <em>Text</em> instead; see <a href="#HasBadgeIcon">HasBadgeIcon</a>.</p>
+    <p>If omitted or blank, the badge is removed. Otherwise the path to an icon or image file, a module holding icon resources such as <code class="no-highlight">"shell32.dll"</code>, or a handle such as <code class="no-highlight">"HICON:" handle</code>. Platforms which cannot draw an icon badge ignore this and show <em>Text</em> instead; see <a href="#IsBadgeIconSupported">IsBadgeIconSupported</a>.</p>
   </dd>
   <dt>IconNumber</dt>
   <dd>
@@ -76,13 +74,12 @@ Taskbar.<span class="func">SetBadge</span>(<span class="optional">Source, IconNu
 <p>Fills the window's taskbar button with a progress bar.</p>
 <pre class="Syntax">TaskbarObj.<span class="func">SetProgress</span>(<span class="optional">Value, Maximum</span>)
 Taskbar.<span class="func">SetProgress</span>(<span class="optional">Value, Maximum</span>)</pre>
-<p>The first form fills <em>TaskbarObj</em>'s window's button; the second fills the application's own.</p>
 <h3 id="SetProgress_Parameters">Parameters</h3>
 <dl>
   <dt>Value</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p>If omitted or blank, the bar is removed. Otherwise how far along the work is, out of <em>Maximum</em>.</p>
+    <p>If omitted or blank, the bar is removed. Otherwise how far along the work is, from 0 through <em>Maximum</em>. A value outside that range throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
   </dd>
   <dt>Maximum</dt>
   <dd>
@@ -95,7 +92,6 @@ Taskbar.<span class="func">SetProgress</span>(<span class="optional">Value, Maxi
 <p>Sets the kind of progress the bar shows, which is what makes it amber, red or a marquee.</p>
 <pre class="Syntax">TaskbarObj.<span class="func">SetProgressState</span>(State)
 Taskbar.<span class="func">SetProgressState</span>(State)</pre>
-<p>The first form applies to <em>TaskbarObj</em>'s window; the second to the application's own button.</p>
 <h3 id="SetProgressState_Parameters">Parameters</h3>
 <dl>
   <dt>State</dt>
@@ -113,10 +109,10 @@ Taskbar.<span class="func">SetProgressState</span>(State)</pre>
   </dd>
 </dl>
 
-<h2 id="HasBadgeIcon">HasBadgeIcon</h2>
+<h2 id="IsBadgeIconSupported">IsBadgeIconSupported</h2>
 <p>Whether this platform can draw an icon as the badge.</p>
-<pre class="Syntax">Boolean := Taskbar.<span class="func">HasBadgeIcon</span></pre>
-<p>False on Linux and macOS, which have only a number or a short string, so a badge set there shows its <em>Text</em> instead.</p>
+<pre class="Syntax">Boolean := Taskbar.<span class="func">IsBadgeIconSupported</span></pre>
+<p>False on Linux and macOS.</p>
 
 <h2 id="IsPerWindow">IsPerWindow</h2>
 <p>Whether the badge and progress belong to one window.</p>
@@ -124,16 +120,16 @@ Taskbar.<span class="func">SetProgressState</span>(State)</pre>
 <p>False on Linux and macOS, where they decorate the whole application, so two windows setting them there overwrite one another.</p>
 
 <h2 id="Platforms">Platform Differences</h2>
-<p>Only Windows has all of this. Nothing here reports whether the shell drew anything, because two of the three platforms cannot say; ask <a href="#HasBadgeIcon">HasBadgeIcon</a> and <a href="#IsPerWindow">IsPerWindow</a> once instead of checking a result on every call.</p>
+<p>Only Windows has all of this.</p>
 <table class="info">
   <tr><th>Platform</th><th>Badge</th><th>Progress</th><th>Scope</th></tr>
   <tr><td>Windows</td><td>The icon, drawn over the button</td><td>A bar inside the button, in the colour the state names</td><td>One window</td></tr>
   <tr><td>Linux</td><td><em>Text</em> read as a number</td><td>A fraction on the launcher icon; Error also raises the urgent hint</td><td>The whole application</td></tr>
   <tr><td>macOS</td><td><em>Text</em> as dock tile badge text</td><td>A bar drawn on the dock tile</td><td>The whole application</td></tr>
 </table>
-<p class="note"><strong>Note:</strong> On macOS the underlying toolkit also asks for the user's attention when progress completes or fails, which bounces the dock icon until the application is activated. That is a side effect of how the dock tile is driven, not something this class requests.</p>
-<p>Linux uses the Unity LauncherEntry protocol, which carries a number and a progress fraction rather than an icon, and which reaches only docks that implement it &mdash; Ubuntu's, Dash to Dock, Plank and Latte among them. A dock which does not implement it ignores the request silently.</p>
-<p id="desktop-entry">The launcher icon a Linux dock decorates is the one named by the <code class="no-highlight">DESKTOP_ENTRY</code> environment variable, the same variable libunity consumers use, defaulting to Keysharp's own entry. An application which installs its own <code class="no-highlight">.desktop</code> file should set it in its launcher, or from the script before its first call:</p>
+<p class="note"><strong>Note:</strong> On macOS, the dock icon bounces when progress completes or fails, until the application is activated.</p>
+<p>On Linux, the badge and progress appear only in docks which implement the Unity LauncherEntry protocol, such as Ubuntu's dock, Dash to Dock, Plank and Latte; other docks ignore them.</p>
+<p id="desktop-entry">The launcher icon a Linux dock decorates is the one named by the <code class="no-highlight">DESKTOP_ENTRY</code> environment variable, defaulting to Keysharp's own entry. An application which installs its own <code class="no-highlight">.desktop</code> file should set it in its launcher, or from the script before its first call:</p>
 <pre>EnvSet("DESKTOP_ENTRY", "myapp.desktop")</pre>
 
 <h2 id="Examples">Examples</h2>
@@ -173,7 +169,7 @@ catch
 </div>
 
 <div class="ex" id="ExForeign">
-<p><a class="ex_number" href="#ExForeign"></a> Badges a window belonging to another process. The badge stays until it is cleared or the window closes, whether or not the object is kept.</p>
+<p><a class="ex_number" href="#ExForeign"></a> Badges a window belonging to another process.</p>
 <pre>#Import "Ks" { Taskbar }
 
 Taskbar(WinExist("ahk_exe notepad.exe")).SetBadge("shell32.dll", 174, "Watched")</pre>

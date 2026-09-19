@@ -24,7 +24,7 @@
   <dt>Frequency</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p>If omitted, it defaults to 523. Otherwise, specify the frequency of the sound, a number between 37 and 32767.</p>
+    <p>If omitted, it defaults to 523. Otherwise, specify the frequency of the sound, a number from 37 through 32767. A value outside that range throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
   </dd>
 
   <dt>Duration</dt>
@@ -38,10 +38,6 @@
 <h2 id="Remarks">Remarks</h2>
 <p>The script waits for the sound to finish before continuing. In addition, system responsiveness might be reduced during sound production.</p>
 <p>If the computer lacks a sound card, a standard beep is played through the PC speaker.</p>
-<h3 id="Linux">Linux</h3>
-<p>The tone is synthesized and handed to the same external player <a href="SoundPlay.htm">SoundPlay</a> uses, so <em>Frequency</em> and <em>Duration</em> are honoured. Because the tone is a WAV, any of the listed players can play it.</p>
-<h3 id="macOS">macOS</h3>
-<p>The tone is synthesized and played through <code class="no-highlight">afplay</code>, so <em>Frequency</em> and <em>Duration</em> are honoured.</p>
 <p>To produce the standard system sounds instead of beeping the PC Speaker, see the asterisk mode of <a href="SoundPlay.htm">SoundPlay</a>.</p>
 <h2 id="Related">Related</h2>
 <p><a href="SoundPlay.htm">SoundPlay</a></p>

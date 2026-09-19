@@ -31,6 +31,7 @@
     <p>If omitted, blank criteria will be set (turns off context-sensitivity). Otherwise, the criteria will be set to an existing <a href="_HotIf.htm">#HotIf</a> expression. The expression is usually written as a <a href="../Language.htm#strings">quoted string</a>, but can also be a variable or expression which returns text matching a #HotIf expression.</p>
     <p class="note"><strong>Note:</strong> The HotIf function uses the string that you pass to it, not the original source code.  <a href="../misc/EscapeChar.htm">Escape sequences</a> are resolved when the script loads, so only the resulting characters are considered; for example, <code>HotIf 'x = "`t"'</code> and <code>HotIf 'x = "' A_Tab '"'</code> both correspond to <code>#HotIf x = "`t"</code>.</p>
     <p>For an example, see <a href="_HotIf.htm#ExDynamic">#HotIf example #5</a>.</p>
+    <p>In Keysharp, a non-empty string or a number raises a <a href="Error.htm#ValueError">ValueError</a>; pass a function object as <em>Callback</em> instead.</p>
   </dd>
   
   <dt>Callback</dt>

@@ -34,19 +34,7 @@
   <dt id="CapabilityNames">CapabilityNames</dt>
   <dd>
     <p>One or more case-insensitive capability names, separated by commas or whitespace. The permissions are requested together at startup, before hotkeys are registered. If any requested capability is denied or unsupported, the script exits.</p>
-    <table class="info">
-      <tr><th>Name</th><th>Purpose</th></tr>
-      <tr><td>InputMonitoring</td><td>Observe keyboard/mouse input or poll arbitrary key/button state.</td></tr>
-      <tr><td>InputControl</td><td>Synthesize or suppress keyboard/mouse input.</td></tr>
-      <tr><td>WindowMonitoring</td><td>Query, enumerate or subscribe to foreign windows and controls.</td></tr>
-      <tr><td>WindowControl</td><td>Activate or mutate foreign windows and controls.</td></tr>
-      <tr><td>ScreenCapture</td><td>Capture screen pixels for PixelGetColor, ImageSearch and Image.</td></tr>
-      <tr><td>AudioCapture</td><td>Permission for audio capture, required by <a href="Audio.htm#Recorder">Audio.Recorder</a>.</td></tr>
-      <tr><td>CameraCapture</td><td>Reserve permission for camera capture.</td></tr>
-      <tr><td>ClipboardMonitoring</td><td>Read or listen to the clipboard.</td></tr>
-    </table>
-    <p>Each name must use its canonical spelling. Aliases and punctuation variants are rejected.</p>
-    <p>For a non-fatal runtime request and a complete description of the returned status object, see <a href="RequestCapabilities.htm">RequestCapabilities</a>.</p>
+    <p>For the names, and to request capabilities at run time without exiting, see <a href="RequestCapabilities.htm#Names">RequestCapabilities</a>.</p>
   </dd>
 </dl>
 
@@ -65,7 +53,6 @@ Error: This line does not contain a recognized action.</pre>
 <p>For details of how the mode affects the script's behaviour, see <a href="../v2.1-changes.htm#CompatMode">Compatibility Mode (Changes)</a>.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p>For scripts intended specifically for this runtime, use a requirement such as <code>#Requires Keysharp &gt;=0.30</code>. For portable v2 scripts, use an AutoHotkey language requirement such as <code>#Requires AutoHotkey v2</code>.</p>
 <p>If the script uses syntax or functions which are unavailable in earlier versions, using this directive ensures that the error message shows the unmet requirement, rather than indicating an arbitrary syntax error. This cannot be done with something like <code>if (A_AhkVersion &lt;= "1.1.33")</code> because a syntax error elsewhere in the script would prevent it from executing.</p>
 <p>When sharing a script or posting code online, using this directive allows anyone who finds the code to readily identify which version of AutoHotkey it was intended for.</p>
 <p>Other programs, editors and related tools can inspect this directive to determine how to interpret or highlight a script.</p>
@@ -87,7 +74,7 @@ Error: This line does not contain a recognized action.</pre>
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExKeysharp">
 <p><a class="ex_number" href="#ExKeysharp"></a> Requires a particular runtime version.</p>
-<pre>#Requires Keysharp &gt;=0.30</pre>
+<pre>#Requires Keysharp &gt;=0.0.0.17</pre>
 </div>
 
 <div class="ex" id="ExCapabilities">

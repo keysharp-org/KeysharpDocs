@@ -71,8 +71,9 @@ if (ih.Input = CtrlC)
 <p>Multiple InputHooks can be used in combination with <a href="#MinSendLevel">MinSendLevel</a> to separately collect both sent keystrokes and real ones.</p>
 
 <h2 id="object">InputHook Object</h2>
-<p>Calling the InputHook class creates an InputHook object, which has the following methods and properties. Scripts can extend <code>InputHook.Prototype</code> to add their own.</p>
-<p>"InputHookObj" is used below as a placeholder for any InputHook object.</p>
+<p>The InputHook function returns an InputHook object, which has the following methods and properties.</p>
+<p>InputHook derives from <a href="EventHook.htm">EventHook</a>.</p>
+"InputHookObj" is used below as a placeholder for any InputHook object, as "InputHook" is the class itself.
 <ul class="indent">
   <li><a href="#Methods">Methods</a>:
     <ul>
@@ -160,13 +161,15 @@ InputHookObj.KeyOpt("{vkE7}{sc000}", "-I")  <em>; except Unicode events.</em></p
 <pre class="Syntax">InputHookObj.<span class="func">Start</span>()</pre>
 <p>Has no effect if the Input is already in progress.</p>
 <p>The newly started Input is placed on the top of the <a href="#stack">InputHook stack</a>, which allows it to override any previously started Input.</p>
-<p>This method installs the <a href="InstallKeybdHook.htm">keyboard hook</a> (if it was not already).</p>
+<p>This method installs the <a href="InstallKeybdHook.htm">keyboard hook</a> (if it was not already) unless the Input only observes the mouse, and installs the <a href="InstallMouseHook.htm">mouse hook</a> if a mouse callback, <a href="#VisibleMouseMove">VisibleMouseMove</a> or a key option on a mouse button needs it.</p>
+<p>If the input hook cannot be installed, as on a Linux host with no display, the Input does not start: <a href="#EndReason">EndReason</a> becomes Failed and <a href="#OnEnd">OnEnd</a> is not called.</p>
 </div>
 
 <div class="methodShort" id="Stop"><h3>Stop</h3>
 <p>Terminates the Input and sets <a href="#EndReason">EndReason</a> to the word Stopped.</p>
 <pre class="Syntax">InputHookObj.<span class="func">Stop</span>()</pre>
 <p>Has no effect if the Input is not in progress.</p>
+<p>Notifications for <a href="#OnChar">OnChar</a>, <a href="#OnKeyDown">OnKeyDown</a>, <a href="#OnKeyUp">OnKeyUp</a> or the mouse callbacks which are still waiting when the Input ends are discarded, unless the Input has been started again before they run. <a href="#OnEnd">OnEnd</a> always runs. In AutoHotkey, OnChar, OnKeyDown and OnKeyUp notifications queued before the Input ended are delivered.</p>
 </div>
 
 <div class="methodShort" id="Wait"><h3>Wait</h3>
@@ -177,7 +180,7 @@ InputHookObj.KeyOpt("{vkE7}{sc000}", "-I")  <em>; except Unicode events.</em></p
   <dt>MaxTime</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Float</a></p>
-    <p>If omitted, the wait is indefinitely. Otherwise, specify the maximum number of seconds to wait. If Input is still in progress after <em>MaxTime</em> seconds, the method returns and does not terminate Input.</p>
+    <p>If omitted, the wait is indefinite. Otherwise, specify the maximum number of seconds to wait. If Input is still in progress after <em>MaxTime</em> seconds, the method returns and does not terminate Input.</p>
   </dd>
 </dl>
 <h4 id="Wait_Return_Value">Return Value</h4>
@@ -343,6 +346,7 @@ InputHookObj.KeyOpt("{vkE7}{sc000}", "-I")  <em>; except Unicode events.</em></p
 <pre class="Syntax">CurrentSetting := InputHookObj.<span class="func">BeforeHotkeys</span></pre>
 <pre class="Syntax">InputHookObj.<span class="func">BeforeHotkeys</span> := NewSetting</pre>
 <p><em>CurrentSetting</em> is 0 (false) by default, or 1 (true) if the <a href="#option-h">H option</a> was used. When true, this InputHook can suppress an event before it reaches a hotkey.</p>
+<p>Assigning <em>NewSetting</em> while the Input is in progress raises a <a href="Error.htm#ValueError">ValueError</a>; set it before calling <a href="#Start">Start</a>.</p>
 </div>
 
 <div class="methodShort" id="BufferLengthMax"><h3>BufferLengthMax</h3>
@@ -466,6 +470,10 @@ InputHookObj.KeyOpt("{vkE7}{sc000}", "-I")  <em>; except Unicode events.</em></p
     <td>
       <p>One of the <em>EndKeys</em> was pressed to terminate the Input. The <a href="#EndKey">EndKey</a> property contains the terminating key name or character without braces.</p>
     </td>
+  </tr>
+  <tr>
+    <td>Failed</td>
+    <td>The Input could not be started because the input hook cannot be installed (see <a href="#Start">Start</a>).</td>
   </tr>
   <tr>
     <td></td>

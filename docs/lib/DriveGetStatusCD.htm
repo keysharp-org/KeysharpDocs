@@ -69,7 +69,7 @@
 <p>If the tray was recently closed, there may be a delay before the function completes.</p>
 
 <h3 id="macOS">macOS</h3>
-<p>Not supported. There is no exception: the function returns without a status value, so the result is the empty string (or, under v2.1 compatibility, unset). macOS exposes no media-playback status for an optical drive, so no status can be reported.</p>
+<p>Not supported. The function throws no error and returns <a href="../v2.1-changes.htm#CompatMode"><em>blank-unset</em></a>.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="DriveEject.htm">DriveEject</a>, <a href="Drive.htm">Drive functions</a></p>

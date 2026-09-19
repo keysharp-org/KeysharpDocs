@@ -17,7 +17,7 @@
 
 <pre class="Syntax"><span class="func">SoundPlay</span> Filename <span class="optional">, Wait</span></pre>
 
-<p class="note"><strong>Note:</strong> Which file types can be played depends on the platform and, on Linux, on which audio player is installed. See <a href="#Linux">Linux</a> and <a href="#macOS">macOS</a> below.</p>
+<p class="note"><strong>Note:</strong> On Linux, this function requires an installed audio player; see <a href="#Linux">Linux</a>.</p>
 <h2 id="Parameters">Parameters</h2>
 <dl>
 
@@ -56,11 +56,10 @@
 <p>To stop a file that is currently playing, use SoundPlay on a nonexistent filename as in this example: <code>try SoundPlay "Nonexistent.avi"</code>.</p>
 <p>If the script is exited, any currently-playing file that it started will stop.</p>
 <h3 id="Linux">Linux</h3>
-<p>Playback is delegated to the first installed player that can decode the file: <code class="no-highlight">paplay</code> or <code class="no-highlight">aplay</code> for uncompressed and libsndfile formats (WAV, FLAC, Ogg, AIFF, AU), otherwise <code class="no-highlight">ffplay</code>, <code class="no-highlight">mpv</code>, <code class="no-highlight">gst-play-1.0</code> or <code class="no-highlight">mpg123</code>. A file a player cannot decode is never handed to it, so compressed formats such as .mp3 require one of the latter. If no suitable player is installed, an error naming them is thrown.</p>
+<p>Playback is delegated to the first installed player that can decode the file: <code class="no-highlight">paplay</code> or <code class="no-highlight">aplay</code> for uncompressed and libsndfile formats (WAV, FLAC, Ogg, AIFF, AU), otherwise <code class="no-highlight">ffplay</code>, <code class="no-highlight">mpv</code>, <code class="no-highlight">gst-play-1.0</code> or <code class="no-highlight">mpg123</code>. Compressed formats such as .mp3 require one of the latter. If no suitable player is installed, an error naming them is thrown.</p>
 <p>The standard sounds come from the freedesktop sound theme (usually the <code class="no-highlight">sound-theme-freedesktop</code> package). When it is not installed, a synthesized beep is played instead.</p>
 <h3 id="macOS">macOS</h3>
-<p>Playback uses <code class="no-highlight">afplay</code>, which handles the formats CoreAudio supports, including WAV, AIFF, CAF, MP3 and M4A.</p>
-<p>The standard sounds come from <code class="no-highlight">/System/Library/Sounds</code>, falling back to a synthesized beep if the chosen sound is missing.</p>
+<p>Supported file types include WAV, AIFF, CAF, MP3 and M4A.</p>
 <h2 id="Related">Related</h2>
 <p><a href="SoundBeep.htm">SoundBeep</a>, <a href="Sound.htm">Sound Functions</a>, <a href="MsgBox.htm">MsgBox</a>, <a href="../misc/Threads.htm">Threads</a></p>
 <h2 id="Examples">Examples</h2>

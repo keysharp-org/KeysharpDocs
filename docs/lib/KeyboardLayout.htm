@@ -18,9 +18,8 @@
 
 <h2 id="GetKeyboardLayout">GetKeyboardLayout</h2>
 <pre class="Syntax">Layout := <span class="func">GetKeyboardLayout</span>()</pre>
-<p>Returns Keysharp's identifier for the current keyboard layout, as a readable platform-native string. Returns <code class="no-highlight">"unknown"</code> if the platform reports no layout.</p>
-<p class="note"><strong>Note:</strong> The string is platform-specific. Treat it as an opaque value to compare or to pass to <a href="#GetKeyInfo">GetKeyInfo</a>, not as a value to parse.</p>
-<p>On Linux, the current keymap and layout group are queried through <code class="no-highlight">keysharp-desktop</code> without requesting an interactive grant. X11 uses XKB; Wayland uses the compositor's keyboard protocol when available. Some Wayland sessions expose a keymap without the current layout group or modifiers. If the session data is unavailable, resolution falls back to configured layout information; the result may not reflect a recent compositor layout switch.</p>
+<p>Returns an identifier for the current keyboard layout, or an empty string if the platform reports no layout. The string is platform-specific: treat it as an opaque value to compare or to pass to <a href="#GetKeyInfo">GetKeyInfo</a>.</p>
+<p>On Linux, the layout is queried through <code class="no-highlight">keysharp-desktop</code>. On some Wayland sessions, the result may not reflect a recent layout switch.</p>
 
 <h2 id="GetKeyInfo">GetKeyInfo</h2>
 <pre class="Syntax">Info := <span class="func">GetKeyInfo</span>(KeyName <span class="optional">, Layout</span>)</pre>
@@ -35,7 +34,7 @@
   <dt>Layout</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>If omitted, the current layout is used. Otherwise, specify a layout string obtained from <a href="#GetKeyboardLayout">GetKeyboardLayout</a> to resolve the key as that layout would. On Linux and macOS, this parameter is currently ignored and the current keymap is used; querying does not change the active layout.</p>
+    <p>If omitted, the current layout is used. Otherwise, specify a layout string obtained from <a href="#GetKeyboardLayout">GetKeyboardLayout</a> to resolve the key as that layout would. On Linux and macOS, this parameter is ignored and the current layout is used.</p>
   </dd>
 </dl>
 
@@ -60,14 +59,6 @@
 Info := GetKeyInfo("!")
 if Info
     MsgBox "VK " Info.VK ", SC " Info.SC ", typed as " Info.Prefix Info.Name</pre>
-</div>
-
-<div class="ex" id="ExUnresolved">
-<p><a class="ex_number" href="#ExUnresolved"></a> Tests whether a key name is valid, since an unresolved name returns 0.</p>
-<pre>#Import "Ks" { GetKeyInfo }
-
-for Name in ["Esc", "NotAKey"]
-    MsgBox Name ": " (GetKeyInfo(Name) ? "resolved" : "unknown")</pre>
 </div>
 
 <h2 id="Related">Related</h2>

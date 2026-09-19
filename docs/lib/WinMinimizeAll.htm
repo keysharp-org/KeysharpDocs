@@ -17,9 +17,16 @@
 
 <pre class="Syntax"><span class="func">WinMinimizeAll</span>
 <span class="func">WinMinimizeAllUndo</span></pre>
-<p>On most systems, this is equivalent to Explorer's <kbd>Win</kbd>+<kbd>M</kbd> and <kbd>Win</kbd>+<kbd>D</kbd> hotkeys.</p>
+<p><code>WinMinimizeAllUndo()</code> unminimizes minimized top-level windows, preserving their previous normal or maximized state. Windows which are already normal or maximized are left unchanged. Unlike in AutoHotkey, it includes windows minimized individually and does not require a preceding <code>WinMinimizeAll()</code> call. <a href="DetectHiddenWindows.htm">DetectHiddenWindows</a> controls whether hidden windows are included.</p>
+<h2 id="Remarks">Remarks</h2>
+<h3 id="Windows">Windows</h3>
+<p><code>WinMinimizeAll()</code> invokes Explorer's Minimize All operation, equivalent to <kbd>Win</kbd>+<kbd>M</kbd>, which exempts some windows. <code>WinMinimizeAllUndo()</code> skips hung windows.</p>
+<h3 id="Linux">Linux</h3>
+<p>Restoring other applications' windows has the same requirements as <a href="WinRestore.htm#Linux">WinRestore</a>.</p>
+<h3 id="macOS">macOS</h3>
+<p>Restoring other applications' windows requires Accessibility permission. Unminimizing leaves native full screen unchanged. Native state transitions have not been verified on macOS.</p>
 <h2 id="Related">Related</h2>
-<p><a href="WinMinimize.htm">WinMinimize</a>, <a href="GroupAdd.htm">GroupAdd</a></p>
+<p><a href="WinRestore.htm">WinRestore</a>, <a href="WinMinimize.htm">WinMinimize</a>, <a href="GroupAdd.htm">GroupAdd</a></p>
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExBasic">
 <p><a class="ex_number" href="#ExBasic"></a> Minimizes all windows for 1 second and unminimizes them.</p>

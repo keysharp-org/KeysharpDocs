@@ -18,8 +18,6 @@
 <pre class="Syntax"><span class="func">#ErrorStdOut</span></pre>
 
 <h2 id="Remarks">Remarks</h2>
-<p class="note"><strong>Notice:</strong> Console output is visible only when standard error or standard output is captured by a pipe or redirection. For example, <code>Keysharp.exe test.ahk 2&gt;&amp;1 | more</code> displays it, and appending <code>&gt; out.txt</code> writes it to a file.</p>
-<p>The directive affects load errors encountered after its line is processed, so it is normally placed near the top of the script. The command-line switch applies from the start of loading.</p>
 <p>If this directive is unspecified in the script, load-time and uncaught runtime errors are normally displayed in a dialog.</p>
 <p>Errors are written to stderr instead of stdout. The command prompt and fancy editors usually display both.</p>
 <p>This allows editors such as TextPad, SciTE, Crimson, and EditPlus to jump to the offending line when a syntax error occurs. The <a href="../Scripts.htm#cmd">/ErrorStdOut command-line switch</a> can be configured in an editor to route load-time errors for every script, but it does not route uncaught runtime errors; use the directive when both are needed.</p>

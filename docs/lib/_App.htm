@@ -14,41 +14,28 @@
 
 <h1>#App <span class="ver">[Keysharp]</span></h1>
 
-<p>Declares final application facts: identity and metadata, packaged assets, generated host shape, presentation defaults, and fixed integration identifiers.</p>
-
-<p>See <a href="App.htm">App</a>, the class that reads them back.</p>
+<p>Declares the script's application name and metadata, icon, GUI theme, console mode, hook mutex name and embedded files.</p>
 
 <pre class="Syntax"><span class="func">#App</span> { Key: Value, ... }</pre>
-
-<pre>#App {
-    Name: "MyTool",              <em>; assembly identity (Assembly.GetName().Name)</em>
-    Title: "My Tool",            <em>; assembly metadata, read back by App.Title</em>
-    Company: "Acme Corp",
-    Version: "1.2.0",            <em>; assembly + file version; shown in Explorer properties</em>
-    Icon: "assets/app.ico",      <em>; default window/tray icon AND the compiled executable's icon</em>
-    GuiTheme: "Dark",            <em>; initial A_GuiTheme, applied before runtime windows</em>
-    Files: ["assets/*.wav"],     <em>; embedded for FileInstall</em>
-}</pre>
 
 <h2 id="Keys">Keys</h2>
 <p>Key names are case-insensitive. Every value must be a compile-time constant: a quoted string, a number, <code>true</code>/<code>false</code>, a <code>.</code> concatenation of constants, or an array of them. An unknown key, a malformed value, or a missing <em>Icon</em>/<em>Files</em> path is a compile-time error.</p>
 <table class="info">
   <tr><th>Key</th><th>Value</th><th>Meaning</th></tr>
-  <tr><td>Name</td><td>String</td><td>The compiled assembly's identity &mdash; what <code>Assembly.GetName().Name</code> reports and <a href="App.htm#Name">App.Name</a> reads. Overrides the name otherwise taken from the script's file name.</td></tr>
+  <tr><td>Name</td><td>String</td><td>The assembly name, read by <a href="App.htm#Name">App.Name</a>. Without it, the name is taken from the script's file name.</td></tr>
   <tr><td>Title, Description, Configuration, Company, Product, Copyright, Trademark</td><td>String</td><td>The matching .NET assembly attribute on compiled output, readable at run time through the matching <a href="App.htm#Metadata">App property</a>.</td></tr>
   <tr><td>Version</td><td>String</td><td><code>"major.minor[.build[.revision]]"</code>, with 2 to 4 decimal components each from 0 through 65534. Sets both the assembly and the file version, so it also appears in a compiled executable's Explorer properties.</td></tr>
-  <tr><td id="Icon">Icon</td><td>String</td><td>Relative path to a <code class="no-highlight">.ico</code> file. It becomes the script's default icon &mdash; the main window's and every GUI's icon, and the tray icon unless <a href="_TrayIcon.htm">#TrayIcon</a> selects another &mdash; with no startup flash of the Keysharp icon, and a <a href="../Program.htm#cmd">compiled executable</a> additionally wears it as its win32 icon. At run time, <a href="TraySetIcon.htm">TraySetIcon</a> overrides the tray icon; <code>TraySetIcon("*")</code> restores its embedded tray default, which is this icon unless #TrayIcon selected another.</td></tr>
-  <tr><td id="GuiTheme">GuiTheme</td><td>String</td><td>A presentation default: <code>Classic</code>, <code>System</code> or <code>Dark</code> becomes the initial <code>A_GuiTheme</code>. The runtime applies it before creating its windows or dialogs, including an error dialog raised before or during the auto-execute section. It does not affect compile-time errors raised before the script runtime starts.</td></tr>
-  <tr><td id="ConsoleApp">ConsoleApp</td><td>Boolean</td><td>Generated host shape: builds a <a href="../Program.htm#cmd">compiled executable</a> as a console application, so a shell waits for it and its standard streams are the terminal's. This is the equivalent of AutoHotkey's <a href="../misc/Ahk2ExeDirectives.htm#ConsoleApp">Ahk2Exe ConsoleApp directive</a>. On Windows this is the executable's PE subsystem, fixed before the process starts; it is ignored when the script is interpreted or compiled to a <code class="no-highlight">.cks</code>, and inert on Linux and macOS, where executables have no subsystem.</td></tr>
-  <tr><td id="HookMutexName">HookMutexName</td><td>String</td><td>A fixed integration identifier: the name of the mutex objects used to detect keyboard and mouse hooks in other scripts. The default is <code class="no-highlight">Keysharp</code>.</td></tr>
-  <tr><td id="Files">Files</td><td>Array of Strings</td><td>Relative paths of files embedded into the compiled script for <a href="FileInstall.htm">FileInstall</a> to extract. Paths are stored as <code class="no-highlight">/</code>-separated logical keys; <code>*</code> and <code>?</code> wildcards are allowed in the file-name segment only. This list is the single authority on what gets embedded; unlike Ahk2Exe, FileInstall calls are not scanned.</td></tr>
+  <tr><td id="Icon">Icon</td><td>String</td><td>Relative path to a <code class="no-highlight">.ico</code> file. It is the default icon of the main window, every GUI and the tray (unless <a href="_TrayIcon.htm">#TrayIcon</a> selects another), and the file icon of a <a href="../Program.htm#cmd">compiled executable</a> on Windows.</td></tr>
+  <tr><td id="GuiTheme">GuiTheme</td><td>String</td><td><code>Classic</code>, <code>System</code> or <code>Dark</code>: the initial <code>A_GuiTheme</code>, which also applies to error dialogs shown before or during the auto-execute section, but not to compile-time errors.</td></tr>
+  <tr><td id="ConsoleApp">ConsoleApp</td><td>Boolean</td><td>Builds a <a href="../Program.htm#cmd">compiled executable</a> as a console application, so a shell waits for it and its standard streams are the terminal's, as the <a href="../misc/Ahk2ExeDirectives.htm#ConsoleApp">Ahk2Exe ConsoleApp directive</a> does. It affects only a Windows executable.</td></tr>
+  <tr><td id="HookMutexName">HookMutexName</td><td>String</td><td>The name of the mutex objects used to detect keyboard and mouse hooks in other scripts. The default is <code class="no-highlight">Keysharp</code>.</td></tr>
+  <tr><td id="Files">Files</td><td>Array of Strings</td><td>Relative paths of files embedded into the compiled script for <a href="FileInstall.htm">FileInstall</a> to extract. <code>*</code> and <code>?</code> wildcards are allowed in the file-name segment only. Only listed files are embedded.</td></tr>
 </table>
 
 <h2 id="Remarks">Remarks</h2>
 <p>One or more <code>#App</code> blocks may appear at the top level of the main module. Blocks and their keys are applied in source order, so the last value for a repeated key wins; <code>Files: []</code> clears an earlier file list. A block in an <a href="_Include.htm">#Include</a>d file counts as the main module's; one inside a function, a class, a <a href="_Module.htm">#Module</a> or an <a href="_Import.htm">#Import</a>ed module file is an error. Each block uses ordinary object-literal syntax, so it may span multiple lines and carry comments and trailing commas.</p>
-<p><em>Icon</em> and every <em>Files</em> entry must be relative; a rooted path is a compile-time error. Each path resolves against the main script's directory (the program include root), even when the block comes from an included file. This is also the root used by <a href="FileInstall.htm">FileInstall</a> in source mode.</p>
-<p>The finished manifest is embedded in the compiled assembly as the JSON resource <code class="no-highlight">Keysharp.App.json</code>, with any icon beside it. A <code class="no-highlight">.cks</code> or executable also embeds each listed file; source-mode execution validates the list but does not snapshot its payloads, so <a href="FileInstall.htm">FileInstall</a> copies the live files from disk. The runtime reads the manifest back before the hook thread, tray icon, main window or any runtime dialog exists &mdash; in every execution mode &mdash; which is what makes these settings bind earlier than any statement could, regardless of where in the file the block sits. An assembly with no such resource has no manifest; if the resource is present but unreadable or malformed, loading the script fails with a hard error. External tools can read a valid resource to inspect a compiled script without executing it.</p>
-<p><code>#App</code> keys independently state final application facts, and all blocks merge into one key/value map; no key acts as a source command or observes intermediate state. Standalone directives select compiler or execution policy, such as front-end diagnostics or launch behavior, or express source-ordered state transitions. <a href="_ErrorStdOut.htm">#ErrorStdOut</a> changes diagnostic routing when the parser reaches it; <a href="_SingleInstance.htm">#SingleInstance</a> selects launch behavior; and <a href="_TrayIcon.htm">#TrayIcon</a> and <a href="_NoTrayIcon.htm">#NoTrayIcon</a> transition startup tray state in source order. Startup controls may use the internal manifest resource when the runtime needs their final value before chrome exists, but transport does not determine source syntax and these directives are not <code>#App</code> keys.</p>
+<p><em>Icon</em> and every <em>Files</em> entry must be relative; a rooted path is a compile-time error. Each path resolves against the main script's directory, even when the block comes from an included file.</p>
+<p>These settings take effect before the script creates any window, dialog or tray icon, wherever the block appears. A compiled script carries them as the JSON resource <code class="no-highlight">Keysharp.App.json</code>, which external tools can read without running the script.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="App.htm">App</a>, <a href="FileInstall.htm">FileInstall</a>, <a href="_TrayIcon.htm">#TrayIcon</a>, <a href="TraySetIcon.htm">TraySetIcon</a>, <a href="_SingleInstance.htm">#SingleInstance</a>, <a href="_NoTrayIcon.htm">#NoTrayIcon</a>, <a href="_ErrorStdOut.htm">#ErrorStdOut</a>, <a href="KeysharpDirectives.htm">Keysharp Build Directives</a>, <a href="../Program.htm#compile">Compiling a Script</a></p>

@@ -49,6 +49,7 @@
 <h2 id="User-Defined">User-Defined</h2>
 <!-- TODO: Explain how a user-defined object could be useful -->
 <p>User-defined function objects must define a <em>Call</em> method containing the implementation of the "function".</p>
+<p>In AutoHotkey v2.1, an object which defines only <a href="../Objects.htm#Meta_Functions">__Call</a> cannot be called, and a built-in refuses it as a callback. In Keysharp, such an object is called through its __Call, with "Call" as the method name.</p>
 <pre>class YourClassName {
     Call(a, b) {  <em>; Declare parameters as needed, or an <a href="../Functions.htm#Variadic">array*</a>.</em>
         <em>;...</em>

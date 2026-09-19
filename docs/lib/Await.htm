@@ -14,6 +14,7 @@
 <h1>Await</h1>
 
 <p>Waits for work which finishes later and returns what it produced.</p>
+<p>This function is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
 
 <pre class="Syntax">Value := <span class="func">Await</span>(Value <span class="optional">, Timeout</span>)</pre>
 
@@ -23,14 +24,14 @@
   <dt>Value</dt>
   <dd>
     <p>Type: <a href="Task.htm">Task</a>, <a href="Clr.htm">Clr</a> task or an <a href="../Objects.htm#__Await">awaitable object</a></p>
-    <p>The work to wait for. A script object may expose work through a zero-argument <a href="../Objects.htm#__Await">__Await()</a> method. Anything which does not finish later raises a <a href="Error.htm#TypeError">TypeError</a>; this is deliberately not lenient, so that <code class="no-highlight">Await(MyFunc)</code> &mdash; the missing-parentheses mistake &mdash; is reported rather than quietly returning the function object.</p>
-    <p>A <a href="RealThread.htm">RealThread</a> raises that TypeError too, because a worker has <a href="RealThread.htm#Completions">two completions</a>: await <a href="RealThread.htm#Task">worker.Task</a> for what the entry function produced, or <a href="RealThread.htm#Terminated">worker.Terminated</a> for the thread being gone. <a href="RealThread.htm#Exit">Exit</a> returns that same termination task, so <code>Await(worker.Exit())</code> stops a worker and waits.</p>
+    <p>The work to wait for. A script object may expose work through a zero-argument <a href="../Objects.htm#__Await">__Await()</a> method. Anything which does not finish later raises a <a href="Error.htm#TypeError">TypeError</a>.</p>
+    <p>A <a href="RealThread.htm">RealThread</a> raises that TypeError too, because a worker has <a href="RealThread.htm#Completions">two completions</a>: await <a href="RealThread.htm#Task">worker.Task</a> for what the entry function produced, or <a href="RealThread.htm#Terminated">worker.Terminated</a> for the thread being gone.</p>
   </dd>
 
   <dt>Timeout</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-    <p>If omitted, it waits indefinitely. Otherwise, the number of milliseconds to wait before raising a <a href="Error.htm#TimeoutError">TimeoutError</a>. A timeout stops only this wait and does not cancel the work. <a href="Task.htm#Wait">Task.Wait</a> is the non-throwing form; it returns false only on timeout.</p>
+    <p>If omitted, it waits indefinitely. Otherwise, the number of milliseconds to wait before raising a <a href="Error.htm#TimeoutError">TimeoutError</a>. A timeout stops only this wait and does not cancel the work. <a href="Task.htm#Wait">Task.Wait</a> is the non-throwing form.</p>
   </dd>
 
 </dl>
@@ -40,19 +41,20 @@
 <p>The value the work produced, or an empty string if it produced none.</p>
 
 <h2 id="Errors">Errors</h2>
-<p>A task's failure is rethrown as a catchable Keysharp error, so <code>try</code> around an <code>Await</code> works as it would around an ordinary call. It is the same Error object exposed by <a href="Task.htm#Error">Task.Error</a>. This includes a <a href="RealThread.htm">RealThread</a> body's error, which its <a href="RealThread.htm#Task">Task</a> carries. Canceled work raises a base <a href="Error.htm">Error</a>; cancellation is not failure, so Task.Error remains empty.</p>
+<p>A task's failure is rethrown as a catchable Keysharp error, so <code>try</code> around an <code>Await</code> works as it would around an ordinary call. It is the same Error object exposed by <a href="Task.htm#Error">Task.Error</a>. Canceled work raises a base <a href="Error.htm">Error</a>.</p>
 <p>A <a href="Error.htm#TimeoutError">TimeoutError</a> is raised if <em>Timeout</em> elapses first, and a <a href="Error.htm#TypeError">TypeError</a> if <em>Value</em> is not work which finishes later or its <code>__Await()</code> method returns a non-awaitable value.</p>
-<p>Two waits which could never finish raise <a href="Error.htm#TargetError">TargetError</a> instead of hanging: awaiting <code>A_RealThread.Task</code> from inside the body which settles it, and awaiting a <a href="RealThread.htm#Post">Post</a> aimed at the calling thread's own real thread while the current script thread is <a href="Critical.htm">Critical</a>.</p>
+<p>Two waits which could never finish raise <a href="Error.htm#TargetError">TargetError</a>: awaiting <code>A_RealThread.Task</code> from inside the body which settles it, and awaiting a <a href="RealThread.htm#Post">Post</a> aimed at the calling thread's own real thread while the current script thread is <a href="Critical.htm">Critical</a>.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p>This is the equivalent of C#'s <code class="no-highlight">await</code>, but it does not suspend the way C#'s does. A <a href="../misc/Threads.htm">script thread</a> runs to completion on its own frame, so <code>Await</code> blocks the calling thread and pumps everything else, as <a href="Sleep.htm">Sleep</a> and <a href="WinWait.htm">WinWait</a> do. Timers, hotkeys and the GUI stay alive throughout.</p>
-<p class="warning"><strong>Warning:</strong> Because it pumps, <code>Await</code> is an interruption point: another script thread can start while it waits, just as inside <a href="Sleep.htm">Sleep</a>. Unlike <code>Sleep</code>, it does not look like one &mdash; <code class="no-highlight">Await(f())</code> reads as an ordinary expression. This matters most around <a href="Lock.htm">Lock</a>, whose ownership is per real thread and reentrant: a timer which acquires and releases the same lock during an <code>Await</code> releases the waiting thread's acquisition. Use <a href="Critical.htm">Critical</a> to hold a section closed across a wait.</p>
-<p><code>Await</code> is exported by the <a href="../Modules.htm#KS">KS module</a>, like the <a href="Task.htm">Task</a> class it waits on: <code class="no-highlight">#Import "Ks" { Task, Await }</code>.</p>
+<p>Unlike C#'s <code class="no-highlight">await</code>, <code>Await</code> does not suspend the calling function: it blocks the calling thread and processes events meanwhile, as <a href="Sleep.htm">Sleep</a> does, so timers, hotkeys and the GUI stay responsive.</p>
+<p class="warning"><strong>Warning:</strong> Because it processes events, <code>Await</code> is an interruption point: another script thread can start while it waits, just as inside <a href="Sleep.htm">Sleep</a>. Unlike <code>Sleep</code>, it does not look like one &mdash; <code class="no-highlight">Await(f())</code> reads as an ordinary expression. A thread which starts during the wait can re-enter and release a <a href="Lock.htm#Remarks">Lock</a> the waiting thread holds. Use <a href="Critical.htm">Critical</a> to hold a section closed across a wait.</p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExInline">
 <p><a class="ex_number" href="#ExInline"></a> Calling an asynchronous .NET API through <a href="_CSharp.htm">#CSharp</a>.</p>
-<pre>#CSharp
+<pre>#Import "Ks" { Await }
+
+#CSharp
 using System.IO;
 using System.Threading.Tasks;
 

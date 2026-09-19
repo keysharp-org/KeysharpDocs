@@ -15,7 +15,7 @@
 <h1>ComObjFromPtr</h1>
 
 <p>Wraps a raw <a href="https://learn.microsoft.com/windows/win32/api/oaidl/nn-oaidl-idispatch">IDispatch</a> pointer (COM object) for use by the script.</p>
-<p class="note"><strong>Notice:</strong> This function is supported only on Windows. On Linux and macOS it throws an error: a D-Bus object is addressed by name and path, and an Apple Events object is a query against an application, so neither has an interface pointer.</p>
+<p class="note"><strong>Note:</strong> This function is available only on Windows. On Linux and macOS, it throws an error.</p>
 <pre class="Syntax">ComObj := <span class="func">ComObjFromPtr</span>(DispPtr)</pre>
 
 <h2 id="Parameters">Parameters</h2>

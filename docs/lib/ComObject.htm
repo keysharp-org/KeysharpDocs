@@ -16,8 +16,7 @@
 <p>Creates a COM object on Windows, connects to a D-Bus service on Linux, or addresses a scriptable application on macOS.</p>
 <pre class="Syntax">ComObj := <span class="func">ComObject</span>(CLSID <span class="optional">, IID</span>)</pre>
 <p><code>ComObject</code> itself is a <a href="Class.htm">class</a> derived from <code>ComValue</code>, but is used only to create or identify COM objects.</p>
-<p>On Linux the parameters name a D-Bus service and interface instead of a CLSID and IID; on macOS they name an application and a scripting suite. In both cases the returned object is used with the same object syntax. See <a href="../Platforms.htm#Linux_DBus">Interprocess automation with ComObject</a> for the Linux addressing model and <a href="../Platforms.htm#macOS_AppleEvents">its macOS counterpart</a> for the Apple Events one, and <a href="#Linux">Linux</a> or <a href="#macOS">macOS</a> below for the behavior of this function.</p>
-<p>The three object systems share no targets, so no call to this function is portable between platforms: a script which runs on more than one selects the target for the platform it is running on. Each example below states the platform it is written for.</p>
+<p>See <a href="../Platforms.htm#Linux_DBus">Interprocess automation with ComObject</a> for the Linux and <a href="../Platforms.htm#macOS_AppleEvents">macOS</a> addressing models.</p>
 
 <h2 id="Parameters">Parameters</h2>
 <dl>
@@ -27,7 +26,7 @@
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>CLSID or human-readable Prog ID of the COM object to create.</p>
     <p>On Linux, the D-Bus target to connect to, written <code>[session:|system:]service.name[:/object/path]</code>. The service is activated if it is not already running.</p>
-    <p>On macOS, the application to address: a bundle identifier such as <code>"com.apple.Finder"</code>, an application name such as <code>"Finder"</code>, the path of an application bundle, or <code>"pid:1234"</code>. A process id addresses that process, rather than whichever instance the bundle identifier currently resolves to. The application is launched if it is not already running, without being brought to the front; a process id that is no longer running cannot be launched and throws.</p>
+    <p>On macOS, the application to address: a bundle identifier such as <code>"com.apple.Finder"</code>, an application name such as <code>"Finder"</code>, the path of an application bundle, or <code>"pid:1234"</code>. The application is launched in the background if it is not already running; a <code>pid:</code> target which is not running throws.</p>
   </dd>
 
   <dt>IID</dt>
@@ -61,24 +60,23 @@
 
 <h2 id="Error_Handling">Error Handling</h2>
 <p>An exception is thrown on failure, such as if a parameter is invalid or the object does not support the interface specified by <em>IID</em>.</p>
-<p>If a ComValue whose VarType is <code>VT_DISPATCH</code> and whose pointer is null is later assigned a non-null pointer, its type remains unchanged and its <code>Ptr</code> member remains available.</p>
 <p>On Linux, an error is thrown if the object has no usable interfaces at the requested path, if the object does not implement the requested interface, or if a member name is defined on more than one interface. An error reported by the service is thrown with the D-Bus error name it sent. A call which receives no reply within 25 seconds throws a timeout error.</p>
 <p>On macOS, an error is thrown if no such application can be found, if it publishes no scripting terminology, if it has no suite of the requested name, or if a member name is defined by more than one suite. An error reported by the application is thrown with the message and number it sent. Refused Automation permission throws an <a href="Error.htm#OSError">OSError</a> naming the setting to grant, and a command which receives no reply within 25 seconds throws a timeout error.</p>
 
 <h2 id="Remarks">Remarks</h2>
 
 <h3 id="Linux">Linux</h3>
-<p>Methods and properties are resolved through D-Bus introspection and called with ordinary object syntax. A property is read and written through the standard <code>org.freedesktop.DBus.Properties</code> interface, so a read-only property throws when assigned.</p>
+<p>Methods and properties are resolved through D-Bus introspection. A read-only property throws when assigned.</p>
 <p>A D-Bus method may return several values. A single return value is returned directly; two or more are returned as an <a href="Array.htm">Array</a> in declared order. A method which returns nothing yields an empty string.</p>
 <p>Indexing the object with an object path returns a child object, so <code>nm["Devices/0"]</code> and <code>nm["/org/freedesktop/NetworkManager/Devices/0"]</code> are equivalent. Child objects cannot be assigned.</p>
 <p>Waiting for a reply does not block timers, hotkeys or the GUI.</p>
 
 <h3 id="macOS">macOS</h3>
 <p>Commands, properties and elements are resolved through the application's scripting definition and used with ordinary object syntax. A property whose definition marks it read-only throws when assigned.</p>
-<p>An object is a query which the application resolves when it is used, not a handle it hands out. A plural term yields a collection without sending anything, and indexing one narrows it: <code>app.Windows[1]</code> by position, counting from one and reading a negative index from the end, or <code>app.Windows["Untitled"]</code> by name. <code>ById(value)</code> selects by unique identifier and <code>Count</code> asks the application how many there are. Iterating a collection with a <a href="For.htm">for-loop</a> asks once and walks the answer.</p>
-<p>A command takes its direct parameter as the first unnamed argument; every other value is passed by name, because that is how an Apple event addresses its parameters. When the command is sent to an object rather than to the application, that object is already the direct parameter, so passing another unnamed argument is an error.</p>
+<p>An object is a query which the application resolves each time it is used. Indexing a collection narrows it: <code>app.Windows[1]</code> by position, counting from one and reading a negative index from the end, or <code>app.Windows["Untitled"]</code> by name. <code>ById(value)</code> selects by unique identifier, <code>Count</code> returns the number of elements, and a <a href="For.htm">for-loop</a> iterates the elements present when the loop starts.</p>
+<p>A command takes its direct parameter as the first unnamed argument and every other value by name. When the command is sent to an object, that object is the direct parameter, so passing another unnamed argument is an error.</p>
 <p>Values convert both ways: text, numbers and booleans directly, a record to a <a href="Map.htm">Map</a>, a list to an <a href="Array.htm">Array</a>, a file reference to its POSIX path, a date to <code>YYYYMMDDHH24MISS</code>, and an object specifier back to another <code>ComObject</code>. An enumerator is reported by name, and a name is accepted wherever the definition declares an enumerated type. Use <a href="ComValue.htm">ComValue</a> where a value must carry a type the definition does not pin down.</p>
-<p>Controlling another application requires Automation permission, which is requested before the first command is sent and granted per application in <em>System Settings &rarr; Privacy &amp; Security &rarr; Automation</em>.</p>
+<p>Controlling another application requires <a href="../Platforms.htm#macOS_Permissions">Automation permission</a>, granted per application.</p>
 <p>Waiting for a reply does not block timers, hotkeys or the GUI.</p>
 
 <h2 id="Related">Related</h2>
@@ -119,7 +117,7 @@ for name in bus.ListNames()
 </pre>
 </div>
 <div class="ex" id="ExDBusDiscover">
-<p><a class="ex_number" href="#ExDBusDiscover"></a> <strong>Linux only.</strong> Discovers what an object offers. <code>Introspect</code> is a method of the standard <code>org.freedesktop.DBus.Introspectable</code> interface, which nearly every D-Bus object implements; it returns an XML description of the object's interfaces, methods, properties, signals and child objects. This is the D-Bus counterpart of browsing a COM type library.</p>
+<p><a class="ex_number" href="#ExDBusDiscover"></a> <strong>Linux only.</strong> Discovers what an object offers. <code>Introspect</code> returns an XML description of the object's interfaces, methods, properties, signals and child objects.</p>
 <pre>bus := ComObject("org.freedesktop.DBus")
 xml := bus.Introspect()
 
@@ -174,7 +172,7 @@ MsgBox ComObjType(bus, "Name") " at " ComObjType(bus, "Path")
 </pre>
 </div>
 <div class="ex" id="ExDBusChildren">
-<p><a class="ex_number" href="#ExDBusChildren"></a> <strong>Linux only.</strong> Walks to child objects. A service exposes a tree of objects, and each <code>&lt;node&gt;</code> in the introspection XML names a child of the object being introspected. Start at the service's root object, <code>/</code>: a leaf such as the bus daemon's own <code>/org/freedesktop/DBus</code> has no children. A node name can itself contain slashes where a service publishes nothing at the levels in between.</p>
+<p><a class="ex_number" href="#ExDBusChildren"></a> <strong>Linux only.</strong> Walks to child objects, starting at the service's root object, <code>/</code>. Each <code>&lt;node&gt;</code> in the introspection XML names a child of the introspected object.</p>
 <pre>root := ComObject("org.freedesktop.DBus:/")   <em>; the service's root object</em>
 xml := root.Introspect()
 
@@ -205,7 +203,7 @@ for p in events.ApplicationProcesses
 </pre>
 </div>
 <div class="ex" id="ExAppleEventsNamed">
-<p><a class="ex_number" href="#ExAppleEventsNamed"></a> <strong>macOS only.</strong> Narrows a collection and sends a command. The first unnamed argument of a command is its direct parameter, so a command sent to an object passes everything else by name.</p>
+<p><a class="ex_number" href="#ExAppleEventsNamed"></a> <strong>macOS only.</strong> Narrows a collection and sends a command with a named parameter.</p>
 <pre>finder := ComObject("com.apple.Finder")
 MsgBox finder.Windows.Count
 if finder.Windows.Count

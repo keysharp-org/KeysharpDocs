@@ -23,6 +23,7 @@
 
 <p>"BufferObj" is used below as a placeholder for any Buffer object, as "Buffer" is the class itself.</p>
 <p>In addition to the methods and properties inherited from <a href="Object.htm">Object</a>, Buffer objects have the following predefined properties.</p>
+<p><a href="#__Item">Byte indexing</a> is a Keysharp extension.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul>
@@ -34,9 +35,6 @@
   </li>
   <li><a href="#Methods">Methods</a>:
     <ul>
-      <li><a href="#ToHex">ToHex</a>: Converts the bytes to hexadecimal text.</li>
-      <li><a href="#ToBase64">ToBase64</a>: Converts the bytes to Base64 text.</li>
-      <li><a href="#ToByteArray">ToByteArray</a>: Copies the bytes to an Array.</li>
       <li><a href="#__New">__New</a>: Allocates or reallocates the buffer and optionally fills it.</li>
     </ul>
   </li>
@@ -84,21 +82,6 @@ BufferObj := Buffer.<span class="func">Call</span>(<span class="optional">ByteCo
 </div>
 
 <h2 id="Methods">Methods</h2>
-
-<div class="methodShort" id="ToHex"><h3>ToHex</h3>
-<p>Returns the buffer bytes encoded as a hexadecimal string.</p>
-<pre class="Syntax">Text := BufferObj.<span class="func">ToHex</span>()</pre>
-</div>
-
-<div class="methodShort" id="ToBase64"><h3>ToBase64</h3>
-<p>Returns the buffer bytes encoded as a Base64 string.</p>
-<pre class="Syntax">Text := BufferObj.<span class="func">ToBase64</span>()</pre>
-</div>
-
-<div class="methodShort" id="ToByteArray"><h3>ToByteArray</h3>
-<p>Returns an Array containing the buffer's bytes.</p>
-<pre class="Syntax">Bytes := BufferObj.<span class="func">ToByteArray</span>()</pre>
-</div>
 
 <div class="methodShort" id="__New"><h3>__New</h3>
 <p>Allocates or reallocates the buffer and optionally fills it.</p>

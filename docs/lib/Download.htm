@@ -37,22 +37,17 @@
 
 <h2 id="Error_Handling">Error Handling</h2>
 <p>A transport failure and a refused or unserved FTP request each throw an <a href="Error.htm#OSError">OSError</a>. A URL which is not absolute, a scheme other than <code class="no-highlight">http</code>, <code class="no-highlight">https</code> and <code class="no-highlight">ftp</code>, and a cache flag other than <code class="no-highlight">*0</code> each throw a <a href="Error.htm#ValueError">ValueError</a>.</p>
-<p>An HTTP status outside 2xx is <em>not</em> an error here: whatever the server sent is saved, as it is in AutoHotkey. See the note on error pages under <a href="#Remarks">Remarks</a>, and use <a href="Http.htm">Http</a> when the status matters.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p class="note"><strong>Notice:</strong> Of the inherited numeric download flags, only <code>*0</code> is supported. Other numeric flag values are not supported.</p>
-<p>The resource is streamed to <em>Filename</em> as it arrives rather than held in memory, so the size of a download does not become the size of the script.</p>
-<p>This function waits for the download to finish, pumping while it waits, so timers, hotkeys and the GUI stay alive throughout. Like <a href="Sleep.htm">Sleep</a>, it is therefore an interruption point: another <a href="../misc/Threads.htm">thread</a> can start while it waits.</p>
-<p>The download might appear to succeed even when the remote file doesn't exist, because many web servers answer with an error page and a success status. That page is then what is saved in place of <em>Filename</em>.</p>
+<p>The download might appear to succeed even when the remote file doesn't exist. This is because many web servers send an error page instead of the missing file. This error page is what will be saved in place of <em>Filename</em>.</p>
 <p>Firewalls or the presence of multiple network adapters may cause this function to fail. Also, some websites may block such downloads.</p>
-<p><strong>Caching:</strong> By default the URL is retrieved directly from the remote server, by asking every cache along the way for a fresh copy. To permit caching, precede the URL with <code class="no-highlight">*0</code> followed by a space; for example: <code>"*0 https://someorg.org"</code>.</p>
-<p><strong>Proxies:</strong> For an http or https URL the system proxy configuration is used. To name a proxy, or to send credentials, request headers or anything else this function does not take, use an <a href="Http.htm">Http</a> session and stream the body to a file with <a href="Http.htm#OnData">OnData</a>, which is what this function does internally.</p>
-<p><strong>FTP</strong> URLs are supported. The login is anonymous unless the URL carries credentials in its userinfo, and the transfer is binary and passive.</p>
+<p><strong>Caching:</strong> By default, the URL is retrieved directly from the remote server. To permit caching, precede the URL with <code class="no-highlight">*0</code> followed by a space; for example: <code>"*0 https://someorg.org"</code>.</p>
+<p><strong>Proxies:</strong> For an http or https URL the system proxy configuration is used. To name a proxy, or to send credentials or request headers, use the <a href="Http.htm#Methods">Download</a> method of an <a href="Http.htm">Http</a> session.</p>
+<p><strong>FTP</strong> URLs are also supported, using passive-mode binary transfers. For example:</p>
 <pre>Download "ftp://example.com/home/My File.zip", "C:\My Folder\My File.zip"  <em>; Log in anonymously.</em>
 Download "ftp://user:pass@example.com:21/home/My File.zip", "C:\My Folder\My File.zip"  <em>; Log in as a specific user.</em>
 Download "ftp://user:pass@example.com/My Directory", "C:\Dir Listing.txt"  <em>; Gets a directory listing.</em></pre>
-<p>A path the server refuses as a plain file is listed instead, so a directory URL saves a listing. The listing is the server's own <code class="no-highlight">LIST</code> output, which is plain text; AutoHotkey's WinInet download writes an HTML listing there.</p>
-<p><strong>Schemes:</strong> <code class="no-highlight">http</code>, <code class="no-highlight">https</code> and <code class="no-highlight">ftp</code> are supported. AutoHotkey additionally accepts <code class="no-highlight">gopher</code> URLs through WinInet; those throw a <a href="Error.htm#ValueError">ValueError</a> here.</p>
+<p>A directory URL saves the server's plain-text <code class="no-highlight">LIST</code> output; AutoHotkey saves an HTML listing.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="Http.htm">Http</a>, <a href="FileRead.htm">FileRead</a>, <a href="FileCopy.htm">FileCopy</a></p>

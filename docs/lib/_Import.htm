@@ -47,14 +47,14 @@
 <p>Imports are processed after the main script file has been parsed, in an unspecified order. If <em>ModuleName</em> (excluding quote marks) does not match a module defined by <a href="_Module.htm">#Module</a> or previously imported from file, #Import attempts to locate a module file and load it. For details, see <a href="../Modules.htm#Search_Path">Search Path</a>.</p>
 
 <h2 id="Imported_Names">Imported Names</h2>
-<p>The module object is added to the current module's global namespace if <em>ModuleAlias</em> is specified or <em>ModuleName</em> is unquoted. A quoted module name without an alias loads the module without binding its object. Repeated imports of one module refer to the same module object.</p>
-<p id="Wildcard_Import">If <code>*</code> is used, each unassigned and undeclared name in the current module may implicitly resolve to an exported name from <em>ModuleName</em>. Every global variable, function and class declared directly in a script module is exported automatically. An alias created by an ordinary import is not exported, and names beginning with an underscore are excluded from wildcard import. If a name is exported from multiple imported modules, the last import takes precedence. Explicit imports and other declarations take precedence over implicit imports, regardless of order.</p>
+<p>The module itself is added to the current module's global namespace only if <em>ModuleAlias</em> is specified or <em>ModuleName</em> is unquoted.</p>
+<p id="Wildcard_Import">If <code>*</code> is used, each unassigned and undeclared name in the current module may implicitly resolve to a name exported from <em>ModuleName</em>. If a name is exported from multiple imported modules, the last import takes precedence. Explicit imports and other declarations take precedence over implicit imports, regardless of order.</p>
+<p><span class="ver">[v2.1-alpha.31+]</span>: Each module exports all global names which do not begin with an underscore, except for names imported without the Export keyword.</p>
 <p class="note"><strong>Note:</strong> An implicitly imported variable cannot be the target of an assignment, as the presence of an assignment would cause a new variable to be created in the current module.</p>
-<p>An explicit import may name an underscore-prefixed global or an imported alias which a wildcard would omit. If the source variable is unset, every import level continues to refer to that same unset variable. A load-time error is raised if an explicit import conflicts with another declaration or with a different import target; repeating the same import is permitted.</p>
+<p>A load-time error is raised if any name used in an explicit import is also used in some other declaration within the current module.</p>
 
 <h2 id="Export">Export</h2>
-<p>If <code>Export</code> precedes <em>ModuleName</em>, the module alias and all explicitly imported names are also exported from the current module. A wildcard import is likewise forwarded to wildcard consumers. Without <code>Export</code>, imported aliases remain available to explicit imports and through the module object, but are not forwarded by a wildcard import.</p>
-<p>To preserve a module named <code class="no-highlight">Export</code>, the first <code>Export</code> is treated as <em>ModuleName</em> when it is the only word or is followed directly by <code>as</code> or <code>{</code>. A quoted module name is always treated as <em>ModuleName</em>; for example, <code>#Import Export "Export" { Name }</code> re-exports <em>Name</em> from a module named Export.</p>
+<p>The imported names are only exported (accessible to wildcard import in other modules) if the Export keyword is used.</p>
 
 <h2 id="Remarks">Remarks</h2>
 <p>Line breaks can be used inside the braces, due to <a href="../Scripts.htm#continuation-expr">continuation by enclosure</a>.</p>

@@ -456,8 +456,8 @@
     <td><kbd>LCtrl</kbd>+<kbd>LShift</kbd>+<kbd>LAlt</kbd>+<kbd>LWin</kbd></td>
   </tr>
 </table>
-<p>These labels are not runtime key names. A script can always write the combination the key sends, exactly as it would for any other combination, and a keyboard which sends some other combination is handled the same way. Whether a key labelled <kbd>Copilot</kbd> or <kbd>Office</kbd> sends what the table shows depends on its firmware; use <a href="lib/KeyHistory.htm">KeyHistory</a> to see what a particular keyboard actually emits.</p>
-<p><code>Copilot</code> is also a Keysharp-specific convenience alias in <em>static hotkey and remap declarations only</em>. The compiler replaces a complete <code>Copilot</code> term with <code class="no-highlight">&lt;#&lt;+F23</code> before registering the hotkey. This includes either term of a custom combination and either side of a remap. There is no corresponding <code>Office</code> alias.</p>
+<p>A hotkey on such a key is a hotkey on the combination it sends. What a particular keyboard sends depends on its firmware; use <a href="lib/KeyHistory.htm">KeyHistory</a> to see it.</p>
+<p>In hotkey and remap declarations, including either term of a custom combination and either side of a remap, <code>Copilot</code> is a Keysharp-specific alias for <code class="no-highlight">&lt;#&lt;+F23</code>, and <a href="Variables.htm#ThisHotkey">A_ThisHotkey</a> reports it as <code class="no-highlight">&lt;#&lt;+F23</code>. Other functions, including <a href="lib/Hotkey.htm">Hotkey</a>, <a href="lib/Send.htm">Send</a>, <a href="lib/KeyWait.htm">KeyWait</a>, <a href="lib/GetKeyState.htm">GetKeyState</a> and <a href="lib/InputHook.htm">InputHook</a>, do not recognize it. There is no <code>Office</code> alias.</p>
 
 <h4 id="chord-examples">Examples</h4>
 <pre><em>; A hotkey on the Copilot key.</em>
@@ -469,16 +469,12 @@ Copilot::AppsKey
 <em>; Make another key send what the Copilot key sends.</em>
 CapsLock::Copilot
 
-<em>; Remap it to RCtrl+A. Sided target modifiers are emitted correctly.</em>
+<em>; Remap it to RCtrl+A.</em>
 Copilot::&gt;^a
 
 <em>; There is no Office alias; write its generic combination.</em>
 &lt;^&lt;+&lt;!LWin::MsgBox "Office pressed"</pre>
-<p class="note"><strong>Note:</strong> The alias does not apply to the runtime <a href="lib/Hotkey.htm">Hotkey</a> function, <a href="lib/Send.htm">Send</a>, <a href="lib/KeyWait.htm">KeyWait</a>, <a href="lib/GetKeyState.htm">GetKeyState</a>, <a href="lib/InputHook.htm">InputHook</a>, or the key-name query functions. For example, <code>Send "{Copilot}"</code> is not supported. Use the actual component keys with those APIs. A dynamic hotkey can use <code>Hotkey("&lt;#&lt;+F23", Callback)</code>.</p>
-<p>The <code class="no-highlight">&lt;</code> and <code class="no-highlight">&gt;</code> prefixes belong to hotkey syntax. <a href="lib/Send.htm">Send</a> does not recognize them and types them as ordinary characters, so <code class="no-highlight">Send "&lt;#&lt;+{F23}"</code> does not send this combination. Write it with explicit key events, or use the plain <code class="no-highlight">#+</code> form, whose modifiers Send already resolves to the left-hand key:</p>
-<pre>Send "{LWin down}{LShift down}{F23}{LShift up}{LWin up}"
-Send "#+{F23}"   <em>; Equivalent, since Send's modifiers are left-hand.</em></pre>
-<p>Because the trigger of the Office key is <kbd>LWin</kbd>, a hotkey on it affects a key the operating system also uses. Test such a hotkey before relying on it.</p>
+<p>To send what the Copilot key sends, use <code>Send "#+{F23}"</code>; Send's modifier symbols press the left-hand keys.</p>
 
 <h4 id="chord-prefix">Holding one of these keys and pressing another</h4>
 <p>Which form to use depends on whether the combination consists only of modifiers.</p>
@@ -486,16 +482,13 @@ Send "#+{F23}"   <em>; Equivalent, since Send's modifiers are left-hand.</em></p
 <pre>&lt;^&lt;+&lt;!&lt;#x::MsgBox "Office held, then x"</pre>
 <p>The Copilot key is different: it includes <kbd>F23</kbd>, which is not a modifier and so cannot be written in the modifier position. This needs a <a href="Hotkeys.htm#combo">custom combination</a>, whose prefix may carry modifiers of its own. The alias can be used for the complete prefix:</p>
 <pre>Copilot &amp; x::MsgBox "Copilot held, then x"</pre>
-<p>In the combination form the modifiers are checked when the prefix key goes down, and that verdict is kept until it is released, so a modifier released while the prefix is still held does not cancel the combination. Pressing <kbd>F23</kbd> without them does not make it a prefix at all, which leaves the plain key unaffected.</p>
-<p>Modifiers are equally allowed on the <em>suffix</em> of a combination, where they are checked against the modifier state as the suffix is pressed:</p>
+<p>For how these modifiers are checked, see <a href="Hotkeys.htm#combo_prefix_mods">modifiers on either side</a>.</p>
+<p>The alias can also be the suffix:</p>
 <pre>a &amp; Copilot::MsgBox "a held, then Copilot"</pre>
 
 <h4 id="chord-caveats">Caveats</h4>
 <p>A hotkey matches the combination, not the physical key. <code class="no-highlight">Copilot::</code> fires whenever <kbd>LWin</kbd>+<kbd>LShift</kbd>+<kbd>F23</kbd> occurs, whether that came from the key, from the user pressing those keys, or from another script sending them. Nothing can distinguish these.</p>
-<p>When <code>Copilot</code> is the source of a remap, its generated callbacks release the firmware-generated <kbd>LWin</kbd> and <kbd>LShift</kbd> as needed, but do not restore them after the target is released. Writing the literal <code class="no-highlight">&lt;#&lt;+F23</code> instead requests ordinary generic-chord behavior, including the normal restoration check. This distinction prevents the remap from manufacturing a bare modifier press while the Copilot firmware is completing its own release sequence.</p>
-<p>Because the alias is replaced before registration, runtime values such as <a href="Variables.htm#ThisHotkey">A_ThisHotkey</a> use the canonical <code class="no-highlight">&lt;#&lt;+F23</code> spelling rather than <code>Copilot</code>.</p>
-<p>Which side matters. These keys send left-hand modifiers, so <code class="no-highlight">&lt;#&lt;+</code> is required; the neutral <code class="no-highlight">#+</code> would also match the right-hand keys.</p>
-<p>A custom combination requires the <a href="lib/InstallKeybdHook.htm">keyboard hook</a>.</p>
+<p>When <code>Copilot</code> is the source of a remap, its generated callbacks release the firmware-generated <kbd>LWin</kbd> and <kbd>LShift</kbd> as needed, but do not restore them after the target is released. Writing the literal <code class="no-highlight">&lt;#&lt;+F23</code> instead requests ordinary generic-chord behavior, including the normal restoration check.</p>
 
 <h2 id="Controller">Game Controller (Gamepad, Joystick, etc.)</h2>
 <p class="note"><strong>Note:</strong> For historical reasons, the following button and control names begin with <code class="no-highlight">Joy</code>, which stands for joystick. However, they usually also work for other game controllers such as gamepads or steering wheels.</p>

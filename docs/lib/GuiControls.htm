@@ -80,7 +80,7 @@
 <p>When the control is created, the ActiveX object can be retrieved via <a href="GuiControl.htm#Value">GuiControl.Value</a>.</p>
 <p>To handle the events exposed by the ActiveX object, use <a href="ComObjConnect.htm">ComObjConnect</a>.</p>
 <p>To determine the type of the ActiveX object, use <a href="ComObjType.htm">ComObjType</a>.</p>
-<p><a href="Gui.htm#ExWebBrowser">Gui example #10</a> demonstrates a simple web browser created via the <a href="https://learn.microsoft.com/dotnet/desktop/winforms/controls/webbrowser-control-windows-forms">WebBrowser control</a>. For a cross-platform browser control which needs no COM, use <a href="#WebView">WebView</a> instead.</p>
+<p><a href="Gui.htm#ExWebBrowser">Gui example #10</a> demonstrates a simple web browser created via the <a href="https://learn.microsoft.com/dotnet/desktop/winforms/controls/webbrowser-control-windows-forms">WebBrowser control</a>. For a cross-platform browser control, see <a href="#WebView">WebView</a>.</p>
 
 <h2 id="Button">Button</h2>
 <p>A pushbutton, which can be pressed to trigger an action.</p>
@@ -310,8 +310,7 @@ DTN_DROPDOWN(MyDT, lParam) {
 <p>A list of choices that is displayed in response to pressing a small button.</p>
 <p>Syntax:</p>
 <pre class="Syntax Indent"><a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">Add</span>("DropDownList", Options, Choices)
-<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddDropDownList</span>(Options, Choices)
-<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddDDL</span>(Options, Choices)</pre>
+<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddDropDownList</span>(Options, Choices)</pre>
 <p>Example:</p>
 <pre>MyDDL := MyGui.Add("DropDownList",, ["Black", "White", "Red", "Green", "Blue"])</pre>
 <p>Appearance:</p>
@@ -402,6 +401,8 @@ MyEdit.Value := FileRead("C:\My File.txt")</pre>
 <h2 id="RichEdit">RichEdit</h2>
 <p>An editable area of formatted text, in which every range of characters has a font, a text color, a background color and a paragraph of its own.</p>
 <p>This control type has no AutoHotkey counterpart.</p>
+<p>On Linux and macOS, a member described below as Windows only throws an <a href="Error.htm">Error</a> unless its description says otherwise. On Linux, <a href="#RichEdit_RichText">RichText</a> and the RTF format of <a href="#RichEdit_LoadFile">LoadFile</a> and <a href="#RichEdit_SaveFile">SaveFile</a> also throw an Error.</p>
+<p class="note"><strong>Note:</strong> The macOS behavior of this control is unverified.</p>
 <p>Syntax:</p>
 <pre class="Syntax Indent"><a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">Add</span>("RichEdit", Options, Text)
 <a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddRichEdit</span>(Options, Text)</pre>
@@ -417,7 +418,6 @@ MyGui.Show()</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>The same options an <a href="#Edit">Edit</a> takes, with these differences: multi-line mode is on by default; <code>WantReturn</code> and <code>Password</code> are not supported; and <code>Uppercase</code> and <code>Lowercase</code> affect typed characters but not pasted text. See also <a href="Gui.htm#Add_Options">general options and styles</a>.</p>
-    <p><code>-Wrap</code> turns word wrapping off, so that a line and a displayed row stay the same thing.</p>
   </dd>
   <dt>Text</dt>
   <dd>
@@ -428,17 +428,7 @@ MyGui.Show()</pre>
 
 <h3 id="RichEdit_Positions">Character Positions</h3>
 <p>Every position this control takes or returns is 1-based and indexes exactly the string <a href="GuiControl.htm#Value">Value</a> returns, each line break counting as one character. A position found with <code>InStr(Rich.Value, ...)</code> or <a href="RegExMatch.htm">RegExMatch</a> can therefore be passed straight to <a href="#RichEdit_SetFormat">SetFormat</a>.</p>
-<p>Wherever a range is asked for, a <em>Start</em> of 0 or an omitted one means the current selection instead. Positions and lengths outside the text are clamped rather than rejected.</p>
-
-<h3 id="RichEdit_Platforms">RichEdit Platform Support</h3>
-<p>The control, its text, its selection and its character formatting work on every platform. Only the Win32 control serves the whole surface below.</p>
-<table class="info">
-  <tr><th>Platform</th><th>What is missing</th></tr>
-  <tr><td>Windows</td><td>Nothing.</td></tr>
-  <tr><td>Linux</td><td>GTK's text widget knows nothing of RTF, so <a href="#RichEdit_RichText">RichText</a> and the RTF form of <a href="#RichEdit_LoadFile">LoadFile</a>/<a href="#RichEdit_SaveFile">SaveFile</a> throw an <a href="Error.htm">Error</a>, as do the members listed for macOS.</td></tr>
-  <tr><td>macOS</td><td><a href="#RichEdit_SelectedRichText">SelectedRichText</a>, <a href="#RichEdit_SetParagraph">SetParagraph</a>/<a href="#RichEdit_GetParagraph">GetParagraph</a>, <a href="#RichEdit_PosFromPoint">PosFromPoint</a>/<a href="#RichEdit_PointFromPos">PointFromPos</a> and <a href="#RichEdit_FirstVisibleLine">FirstVisibleLine</a> throw an <a href="Error.htm">Error</a> naming the member. There is no undo history, so <a href="#RichEdit_CanUndo">CanUndo</a> and <a href="#RichEdit_CanRedo">CanRedo</a> are 0 and <a href="#RichEdit_Undo">Undo</a>/<a href="#RichEdit_Redo">Redo</a> do nothing. <a href="#RichEdit_DetectUrls">DetectUrls</a> and <a href="#RichEdit_HideSelection">HideSelection</a> read back as 0. <a href="#RichEdit_Zoom">Zoom</a> scales the control's font instead of magnifying. <a href="#RichEdit_GetFormat">GetFormat</a> reports the formatting where the range starts instead of detecting variation across it.</td></tr>
-</table>
-<p class="note"><strong>Note:</strong> The macOS behavior of this control is unverified.</p>
+<p>Wherever a range is asked for, a <em>Start</em> of 0 or an omitted one means the current selection instead. Positions and lengths outside the text are clamped.</p>
 
 <h3 id="RichEdit_Properties">RichEdit Properties</h3>
 <p>In addition to the standard <a href="GuiControl.htm">GuiControl</a> properties, a RichEdit has the following.</p>
@@ -565,7 +555,7 @@ MyGui.Show()</pre>
   <dt id="RichEdit_Append">Append</dt>
   <dd>
     <p><code>GuiCtrl.Append(Text)</code></p>
-    <p>Adds <em>Text</em> to the end, formatted like the text already there. Cheaper than assigning <a href="GuiControl.htm#Value">Value</a>, which rewrites and reformats everything.</p>
+    <p>Adds <em>Text</em> to the end, formatted like the text already there.</p>
   </dd>
   <dt id="RichEdit_Replace">Replace</dt>
   <dd>
@@ -595,20 +585,20 @@ MyGui.Show()</pre>
   <dt id="RichEdit_ClearUndo">ClearUndo</dt>
   <dd>
     <p><code>GuiCtrl.Undo()</code>, <code>GuiCtrl.Redo()</code>, <code>GuiCtrl.ClearUndo()</code></p>
-    <p>Undoes or redoes the last edit, or forgets the history so that the current contents cannot be undone away. <code>Undo</code> and <code>Redo</code> do nothing when there is nothing to undo or redo. Windows only; elsewhere the widget keeps no history and all three do nothing.</p>
+    <p>Undoes or redoes the last edit, or forgets the history so that the current contents cannot be undone away. <code>Undo</code> and <code>Redo</code> do nothing when there is nothing to undo or redo. Windows only; elsewhere all three do nothing.</p>
   </dd>
   <dt id="RichEdit_CanUndo">CanUndo</dt>
   <dt id="RichEdit_CanRedo">CanRedo</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#boolean">Boolean</a></p>
-    <p>Retrieves 1 when there is an edit to undo or redo. Read-only, and always 0 off Windows. <a href="#RichEdit_Undo">Undo</a> and <a href="#RichEdit_Redo">Redo</a> check for themselves, so these are for enabling and disabling menu items.</p>
+    <p>Retrieves 1 when there is an edit to undo or redo. Read-only, and always 0 off Windows.</p>
   </dd>
   <dt id="RichEdit_SetFormat">SetFormat</dt>
   <dd>
     <p><code>GuiCtrl.SetFormat(Start, Length [, Options, FontName])</code></p>
     <p>Applies character formatting to <em>Length</em> characters at the 1-based <em>Start</em>, or to the current selection when <em>Start</em> is 0.</p>
-    <p><em>Options</em> is a <a href="Gui.htm#SetFont">Gui.SetFont</a> option string — <code>s<i>N</i></code>, <code>w<i>N</i></code>, <code>c<i>Color</i></code>, <code>bold</code>, <code>italic</code>, <code>underline</code>, <code>strike</code>, <code>norm</code> — extended with <code>Background<i>Colour</i></code> and <code>BackgroundDefault</code>. A <a href="Font.htm">Font</a> object is accepted in its place. An unrecognized option throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
-    <p><em>FontName</em> is the font family, which <em>Options</em> has no token for, as in <a href="Gui.htm#SetFont">Gui.SetFont</a>.</p>
+    <p><em>Options</em> is a <a href="Gui.htm#SetFont">Gui.SetFont</a> option string — <code>s<i>N</i></code>, <code>w<i>N</i></code>, <code>c<i>Color</i></code>, <code>bold</code>, <code>italic</code>, <code>underline</code>, <code>strike</code>, <code>norm</code> — extended with <code>Background<i>Color</i></code> and <code>BackgroundDefault</code>. A <a href="Font.htm">Font</a> object is accepted in its place. An unrecognized option throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+    <p><em>FontName</em> is the font name, as for <a href="Gui.htm#SetFont">Gui.SetFont</a>.</p>
     <p>Anything the options do not mention is left as it was, so a token can be colored without also deciding its size or weight:</p>
     <pre>Rich.SetFormat(Pos, Len, "c0000FF bold")
 Rich.SetFormat(Pos, Len, "BackgroundFFFF00")  <em>; leaves the text color alone</em></pre>
@@ -618,12 +608,12 @@ Rich.SetFormat(Pos, Len, "BackgroundFFFF00")  <em>; leaves the text color alone<
   <dd>
     <p><code>FontObj := GuiCtrl.GetFormat([Start, Length])</code></p>
     <p>Retrieves the font of a range as a <a href="Font.htm">Font</a> object, whose <code>Color</code> is the text color. The arguments name the range as for <a href="#RichEdit_SetFormat">SetFormat</a>; omitting them reads the current selection.</p>
-    <p>An attribute which is not the same throughout the range comes back as <code>""</code>, as an unset one does on any other Font, so what is read from one range can be applied to another unchanged. Off Windows the widget cannot report variation, and the formatting where the range starts is returned instead.</p>
+    <p>An attribute which is not the same throughout the range comes back as <code>""</code>, as an unset one does on any other Font, so what is read from one range can be applied to another unchanged. Off Windows, the formatting where the range starts is returned.</p>
   </dd>
   <dt id="RichEdit_GetBackColor">GetBackColor</dt>
   <dd>
-    <p><code>Colour := GuiCtrl.GetBackColor([Start, Length])</code></p>
-    <p>Retrieves the background color of a range as a 6-digit RRGGBB string, or <code>""</code> when the range is not all one color or is drawn on the control's own background. This is separate from <a href="#RichEdit_GetFormat">GetFormat</a> because a <a href="Font.htm">Font</a> carries no background.</p>
+    <p><code>Color := GuiCtrl.GetBackColor([Start, Length])</code></p>
+    <p>Retrieves the background color of a range as a 6-digit RRGGBB string, or <code>""</code> when the range is not all one color or is drawn on the control's own background.</p>
   </dd>
   <dt id="RichEdit_SetParagraph">SetParagraph</dt>
   <dd>
@@ -651,10 +641,10 @@ Rich.SetFormat(Pos, Len, "BackgroundFFFF00")  <em>; leaves the text color alone<
 </dl>
 
 <h3 id="RichEdit_Events">RichEdit Events</h3>
-<p>A RichEdit raises <a href="GuiOnEvent.htm#Change">Change</a> whenever the text changes &mdash; applying formatting is not a change &mdash; plus <a href="GuiOnEvent.htm#SelectionChange">SelectionChange</a> and <a href="GuiOnEvent.htm#LinkClick">LinkClick</a>, which no other control raises. Like <a href="#Edit">Edit</a>, it has its own context menu and so does not raise <a href="GuiOnEvent.htm#ContextMenu">ContextMenu</a>.</p>
+<p>A RichEdit raises <a href="GuiOnEvent.htm#Change">Change</a>, <a href="GuiOnEvent.htm#SelectionChange">SelectionChange</a> and <a href="GuiOnEvent.htm#LinkClick">LinkClick</a>. Like <a href="#Edit">Edit</a>, it has its own context menu and does not raise <a href="GuiOnEvent.htm#ContextMenu">ContextMenu</a>.</p>
 
 <h3 id="RichEdit_Highlighting">Syntax Highlighting</h3>
-<p>A highlighting pass is a loop over the text which calls <a href="#RichEdit_SetFormat">SetFormat</a> for each token, wrapped in one <a href="#RichEdit_BeginUpdate">BeginUpdate</a>/<a href="#RichEdit_EndUpdate">EndUpdate</a> pair. Format the whole text back to the default first, since <code>SetFormat</code> changes only what its options name and a token's leftover color would otherwise survive.</p>
+<p>The following example resets the text to the default format, then colors keywords inside one <a href="#RichEdit_BeginUpdate">BeginUpdate</a>/<a href="#RichEdit_EndUpdate">EndUpdate</a> pair:</p>
 <pre>Recolor(Rich) {
     Text := Rich.Value
     Rich.BeginUpdate()
@@ -807,7 +797,6 @@ MyLink2 := MyGui.Add("Link",, 'Links may be used anywhere in the text like &lt;a
 <p id="LBRedraw">When adding a large number of items to a ListBox, performance may be improved by using <code>MyLB.Opt("-Redraw")</code> prior to the operation, and <code>MyLB.Opt("+Redraw")</code> afterward. See <a href="GuiControl.htm#Redraw">Redraw</a> for more details.</p>
 
 <h2 id="ListView">ListView</h2>
-<p class="note"><strong>Notice:</strong> The <code>Count</code> option is accepted but ignored because the managed ListView does not use a script-configurable preallocated capacity.</p>
 <p>A ListView is one of the most elaborate controls provided by the operating system. In its most recognizable form, it displays a tabular view of rows and columns, the most common example of which is Explorer's list of files and folders (detail view).</p>
 <p>Syntax:</p>
 <pre class="Syntax Indent"><a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">Add</span>("ListView", Options, ColumnTitles)
@@ -878,8 +867,7 @@ MyGui.Show()</pre>
 <p>An area containing an image.</p>
 <p>Syntax:</p>
 <pre class="Syntax Indent"><a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">Add</span>("Picture", Options, ImageFile)
-<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddPicture</span>(Options, ImageFile)
-<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddPic</span>(Options, ImageFile)</pre>
+<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddPicture</span>(Options, ImageFile)</pre>
 <p>Example:</p>
 <pre>MyPic := MyGui.Add("Picture", "w300 h-1", "C:\My Pictures\Company Logo.gif")</pre>
 
@@ -1032,7 +1020,7 @@ MyProgress.Value := 50  <em>; Set the current position to 50.</em></pre>
 
 <h3 id="Slider_Remarks">Slider Remarks</h3>
 <p><a href="GuiControl.htm#Value">GuiControl.Value</a> returns the current numeric position of the slider. <a href="Gui.htm#Submit">Gui.Submit</a> stores the same value.</p>
-<p id="slider-change">Whenever the user has stopped moving the slider (such as by releasing the mouse button after having dragged it), the <a href="GuiOnEvent.htm#Change">Change</a> event is raised. If the control has the <a href="Gui.htm#AltSubmit">AltSubmit</a> option, the Change event is also raised after each visible movement while dragging. The callback's Info parameter is always 0 because the managed backend does not expose how the slider was moved.</p>
+<p id="slider-change">Whenever the user has stopped moving the slider (such as by releasing the mouse button after having dragged it), the <a href="GuiOnEvent.htm#Change">Change</a> event is raised. If the control has the <a href="Gui.htm#AltSubmit">AltSubmit</a> option, the Change event is also raised (very frequently) after each visible movement of the bar while the user is dragging it with the mouse. For details, see the <a href="GuiOnEvent.htm#Change">Change</a> event.</p>
 <p>The user may slide the control by the following means: 1) dragging the bar with the mouse; 2) clicking inside the bar's track area with the mouse; 3) turning the mouse wheel while the control has focus; or 4) pressing the following keys while the control has focus: <kbd>&uarr;</kbd>, <kbd>&rarr;</kbd>, <kbd>&darr;</kbd>, <kbd>&larr;</kbd>, <kbd>PgUp</kbd>, <kbd>PgDn</kbd>, <kbd>Home</kbd>, and <kbd>End</kbd>.</p>
 
 <h2 id="StatusBar">StatusBar</h2>
@@ -1147,13 +1135,11 @@ MySB.SetText("There are " RowCount " rows selected.")</pre>
 <p><a href="TreeView.htm#ExAdvanced">TreeView example #1</a> demonstrates a multipart status bar.</p>
 
 <h2 id="Tab">Tab</h2>
-<p class="note"><strong>Notice:</strong> All tab controls use the modern Tab3-style containment model. The older Tab and Tab2 behaviors are not implemented.</p>
+<p class="note"><strong>Note:</strong> Tab and Tab2 controls behave the same as Tab3.</p>
 <p>A large control containing multiple pages, each of which contains other controls. From this point forward, these pages are referred to as "tabs".</p>
 <p>Syntax:</p>
 <pre class="Syntax Indent"><a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">Add</span>("Tab", Options, TabNames)
-<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddTab</span>(Options, TabNames)
-<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddTab2</span>(Options, TabNames)
-<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddTab3</span>(Options, TabNames)</pre>
+<a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddTab</span>(Options, TabNames)</pre>
 <p>Example:</p>
 <pre>MyTab := MyGui.Add("Tab",, ["General", "View", "Settings"])</pre>
 <p>Appearance:</p>
@@ -1254,18 +1240,18 @@ MyTab.UseTab("Name", true)  <em>; Same as above but requires exact match (not ca
 <p id="Tab2_Issues"><strong>Known issues with Tab2:</strong></p>
 <ul>
   <li><a href="Gui.htm#BackgroundTrans">BackgroundTrans</a> has no effect inside a Tab2 control.</li>
-  <li><a href="#ActiveX">ActiveX</a> browser controls do not redraw correctly.</li>
+  <li><a href="#ActiveX">WebBrowser</a> controls do not redraw correctly.</li>
   <li>AnimateWindow and possibly other Win32 API calls can cause the tab's controls to disappear.</li>
 </ul>
 <p id="Tab1_Issues"><strong>Known issues with Tab1:</strong></p>
 <ul>
   <li>Activating a GUI window by clicking certain parts of its controls, such as scrollbars, might redraw improperly.</li>
   <li><a href="Gui.htm#BackgroundTrans">BackgroundTrans</a> has no effect if the Tab1 control contains a ListView.</li>
-  <li><a href="#ActiveX">ActiveX</a> browser controls are invisible.</li>
+  <li><a href="#ActiveX">WebBrowser</a> controls are invisible.</li>
 </ul>
 
 <h2 id="Text">Text</h2>
-<p class="note"><strong>Notice:</strong> Static text controls do not send <code>WM_CTLCOLORSTATIC (0x0138)</code> to their parent.</p>
+<p class="note"><strong>Note:</strong> Text controls do not send <code>WM_CTLCOLORSTATIC (0x0138)</code> to their parent window.</p>
 <p>A region containing borderless text that the user cannot edit. Often used to label other controls.</p>
 <p>Syntax:</p>
 <pre class="Syntax Indent"><a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">Add</span>("Text", Options, String)
@@ -1307,7 +1293,7 @@ MyTab.UseTab("Name", true)  <em>; Same as above but requires exact match (not ca
 <p>See the separate <a href="TreeView.htm">TreeView</a> page for more information.</p>
 
 <h2 id="UpDown">UpDown</h2>
-<p>A pair of arrow buttons that the user can click to increase or decrease a value. By default, an UpDown control automatically snaps onto the previously added control, which is known as the UpDown's <em>buddy control</em>.</p>
+<p>A pair of arrow buttons that the user can click to increase or decrease a value.</p>
 <p>Syntax:</p>
 <pre class="Syntax Indent"><a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">Add</span>("UpDown", Options, StartPos)
 <a href="GuiControl.htm">GuiCtrl</a> := MyGui.<span class="func">AddUpDown</span>(Options, StartPos)</pre>
@@ -1328,7 +1314,7 @@ MyUD := MyGui.Add("UpDown", "Range1-10", 5)</pre>
     <p><strong>Left:</strong> Puts the UpDown on the left side of its buddy rather than the right.</p>
     <p><strong>Range</strong><em>MinMax</em>: Sets the range to be something other than 0 to 100. Specify the minimum, a dash and maximum. The minimum must not be greater than the maximum.</p>
     <p><strong>Wrap:</strong> Accepted for compatibility but has no effect.</p>
-    <p><strong>16:</strong> Accepted for compatibility but has no effect. UpDown buddy-control behavior is not supported; the control uses the backend's standalone numeric control.</p>
+    <p><strong>16:</strong> Accepted for compatibility but has no effect.</p>
     <p id="UpDownSep"><strong>0x80:</strong> Omits the thousands separator that is normally present between every three decimal digits in the buddy control. However, this style is normally not used because the separators are omitted from the number whenever the script retrieves it from the UpDown control itself (rather than its buddy control).</p>
     <p><strong>W</strong><em>n</em>: Sets the width of an isolated UpDown. For example, specifying <code class="no-highlight">w400</code> would make the control 400 pixels wide. If omitted, vertical UpDowns default to 2 times the current font size, while <a href="#Horz">horizontal</a> UpDowns default to 15 times the current font size.</p>
     <p><strong>R</strong><em>n</em> or <strong>H</strong><em>n</em>: Sets the height of an isolated UpDown. For example, specifying <code class="no-highlight">r7</code> would make the control 7 rows tall, while <code class="no-highlight">h400</code> would set its height to 400 pixels. If both R and H are omitted, vertical UpDowns default to 5 rows, while <a href="#Horz">horizontal</a> UpDowns default to 2 times the current font size.</p>
@@ -1342,10 +1328,9 @@ MyUD := MyGui.Add("UpDown", "Range1-10", 5)</pre>
 </dl>
 
 <h3 id="UpDown_Remarks">UpDown Remarks</h3>
-<p>The control is a standalone managed numeric input; pairing it with a previously added buddy control is not supported.</p>
+<p>An UpDown is a standalone numeric input and has no buddy control.</p>
 <p><a href="GuiControl.htm#Value">GuiControl.Value</a> returns the current numeric position of the UpDown. <a href="Gui.htm#Submit">Gui.Submit</a> stores the same value. If the UpDown is attached to an <a href="#Edit">Edit</a> control, and you do not wish to validate the user's input, it is best to use the UpDown's value rather than the Edit's. This is because the UpDown will always yield an in-range number, even when the user has typed something non-numeric or out-of-range in the Edit control. On a related note, numbers with more than three digits get a <a href="../misc/Styles.htm#UpDownSep">thousands separator</a> (such as a comma) by default. These separators are returned by the Edit control but not by the UpDown control.</p>
 <p>Whenever the user clicks one of the arrow buttons or presses an arrow key on the keyboard, the <a href="GuiOnEvent.htm#Change">Change</a> event is raised.</p>
-<p>Use the <code>Increment</code> and <code>Hex</code> options above instead of native messages.</p>
 
 <h2 id="WebView">WebView</h2>
 <p>Displays a webpage, and lets the script drive it and be driven by it.</p>
@@ -1376,8 +1361,8 @@ MyGui.Show()</pre>
 <p>The page is rendered by a browser engine the control does not ship, so the same page can look and behave differently on each platform. <a href="#WebView_EngineProp">Engine</a> reports which one a control got.</p>
 <table class="info">
   <tr><th>Platform</th><th>Engine</th></tr>
-  <tr><td>Windows</td><td><strong>Edge</strong>, through WebView2, when the script has asked for it as described below. Otherwise <strong>Internet Explorer</strong>, through the WinForms browser control, which runs pages in a legacy document mode: a site built for a current browser may render incorrectly or not at all.</td></tr>
-  <tr><td>Linux</td><td><strong>WebKitGTK</strong>. The control cannot be created unless <code>libwebkit2gtk-4.1</code> or <code>libwebkit2gtk-4.0</code> is installed; without it, <a href="Gui.htm#Add">Gui.Add</a> throws an <a href="Error.htm">Error</a> naming the requirement.</td></tr>
+  <tr><td>Windows</td><td><strong>Edge</strong> (WebView2), when the script has asked for it as described below. Otherwise <strong>Internet Explorer</strong>, which runs pages in a legacy document mode: a site built for a current browser may render incorrectly or not at all.</td></tr>
+  <tr><td>Linux</td><td><strong>WebKitGTK</strong>. The control cannot be created unless <code>libwebkit2gtk-4.1</code> or <code>libwebkit2gtk-4.0</code> is installed; without it, <a href="Gui.htm#Add">Gui.Add</a> throws an <a href="Error.htm">Error</a> naming the requirement. The Keysharp <code>.deb</code> recommends it, so installing that package with apt brings it unless recommendations are declined; <code class="no-highlight">keysharp-linux-setup.sh</code> and the tarball installer do not install it.</td></tr>
   <tr><td>macOS</td><td><strong>WKWebView</strong>, which is part of the operating system.</td></tr>
 </table>
 <p class="note"><strong>Note:</strong> The macOS behavior of this control is unverified.</p>
@@ -1385,8 +1370,7 @@ MyGui.Show()</pre>
 <h4 id="WebView_Edge">Asking for Edge on Windows</h4>
 <p>Keysharp ships none of WebView2, so a script which wants Edge brings it:</p>
 <pre>#Package "Microsoft.Web.WebView2"</pre>
-<p>Edge is then used automatically, with no other change to the script. Both the resolved package and the machine's Edge WebView2 Runtime are required; the runtime ships with Windows 11 and with Microsoft Edge on Windows 10. If either is missing, the control falls back to Internet Explorer rather than failing and writes the reason through <a href="OutputDebug.htm">OutputDebug</a>.</p>
-<p>The control's own surface does not change with the engine. Internet Explorer may not render a modern page correctly, cannot receive a message posted while a document is still parsing, and reports a less exact URL for <a href="GuiOnEvent.htm#OpenNewWindow">OpenNewWindow</a>.</p>
+<p>Edge is then used automatically, with no other change to the script. Both the resolved package and the machine's Edge WebView2 Runtime are required; the runtime ships with Windows 11 and with Microsoft Edge on Windows 10. If either is missing, the control uses Internet Explorer and writes the reason through <a href="OutputDebug.htm">OutputDebug</a>.</p>
 <p>For direct access to a Windows ActiveX browser object and its COM events, use an <a href="#ActiveX">ActiveX</a> control instead.</p>
 
 <h3 id="WebView_Properties">WebView Properties</h3>
@@ -1430,7 +1414,7 @@ MyGui.Show()</pre>
   <dt id="WebView_GoBack">GoBack / GoForward</dt>
   <dd>
     <p><code>GuiCtrl.GoBack()</code>, <code>GuiCtrl.GoForward()</code></p>
-    <p>Moves one page back or forward through the control's history, or does nothing when there is no such page. <a href="#WebView_CanGoBack">CanGoBack</a> and <a href="#WebView_CanGoForward">CanGoForward</a> are therefore only needed to enable or disable a button.</p>
+    <p>Moves one page back or forward through the control's history, or does nothing when there is no such page.</p>
   </dd>
   <dt id="WebView_Stop">Stop</dt>
   <dd>
@@ -1448,7 +1432,7 @@ MyGui.Show()</pre>
     <p>Runs <em>Script</em> as JavaScript in the current page and returns its result as a string, or <code>""</code> if it produced none.</p>
     <p><em>Script</em> runs as the body of a function, so it may use <code>return</code> to produce a value:</p>
     <pre>Title := Browser.ExecuteScript("return document.title;")</pre>
-    <p>There is no page to run script in until a document has loaded, so this returns <code>""</code> before the first <a href="GuiOnEvent.htm#DocumentLoaded">DocumentLoaded</a> event.</p>
+    <p>Before the first <a href="GuiOnEvent.htm#DocumentLoaded">DocumentLoaded</a> event, this returns <code>""</code>.</p>
   </dd>
   <dt id="WebView_ExecuteScriptAsync">ExecuteScriptAsync</dt>
   <dd>
@@ -1469,7 +1453,7 @@ MyGui.Show()</pre>
 </dl>
 
 <h3 id="WebView_Events">WebView Events</h3>
-<p>A WebView raises <a href="GuiOnEvent.htm#Navigated">Navigated</a>, <a href="GuiOnEvent.htm#DocumentLoading">DocumentLoading</a>, <a href="GuiOnEvent.htm#DocumentLoaded">DocumentLoaded</a>, <a href="GuiOnEvent.htm#DocumentTitleChanged">DocumentTitleChanged</a>, <a href="GuiOnEvent.htm#OpenNewWindow">OpenNewWindow</a> and <a href="GuiOnEvent.htm#MessageReceived">MessageReceived</a>. It raises none of the events other controls do, because a click inside it belongs to the page; registering one throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+<p>A WebView raises <a href="GuiOnEvent.htm#Navigated">Navigated</a>, <a href="GuiOnEvent.htm#DocumentLoading">DocumentLoading</a>, <a href="GuiOnEvent.htm#DocumentLoaded">DocumentLoaded</a>, <a href="GuiOnEvent.htm#DocumentTitleChanged">DocumentTitleChanged</a>, <a href="GuiOnEvent.htm#OpenNewWindow">OpenNewWindow</a> and <a href="GuiOnEvent.htm#MessageReceived">MessageReceived</a>. It raises no other events; registering one throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
 <p>Register them before loading a page: an event which has already happened is not replayed.</p>
 
 <h3 id="WebView_Messages">WebView Two-way Communication</h3>

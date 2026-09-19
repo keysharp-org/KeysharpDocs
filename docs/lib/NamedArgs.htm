@@ -13,7 +13,6 @@
 
 <h1>NamedArgs Object</h1>
 <pre class="NoIndent">class NamedArgs extends Map</pre>
-<p class="note"><strong>Keysharp extension.</strong> This class does not exist in AutoHotkey v2.</p>
 <p>Carries the <a href="../Language.htm#named-parameters">named arguments</a> of one call. It is a case-insensitive <a href="Map.htm">Map</a> whose keys are the parameter names, and it behaves like one in every respect but one: passed as the <strong>last</strong> argument of a call, it supplies that call's named arguments instead of being passed as a value.</p>
 <p>Writing <code>f(Alpha: 1)</code> creates one automatically. The class itself is needed only to build a named call whose names are decided at run time, or to inspect the names a <a href="../Functions.htm#Variadic">variadic</a> function collected. It is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { NamedArgs }</pre>
@@ -21,7 +20,6 @@
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
   <li><a href="#Call">NamedArgs()</a>: Creates a container from name/value pairs.</li>
-  <li><a href="#Names">Reading and writing names</a></li>
   <li><a href="#Position">Why the position matters</a></li>
   <li><a href="#Examples">Examples</a></li>
 </ul>
@@ -29,23 +27,14 @@
 <h2 id="Call">NamedArgs()</h2>
 <pre class="Syntax">NamedArgsObj := <span class="func">NamedArgs</span>(<span class="optional">Name1, Value1, Name2, Value2, ...</span>)</pre>
 <p>Takes the same alternating name/value pairs as <a href="Map.htm#Call">Map()</a>. An empty container is legal; it supplies no named arguments.</p>
-<p><a href="Map.htm#CaseSense">CaseSense</a> is fixed at <code>Off</code>, because parameter names are matched case-insensitively and nothing else would agree with the binder. It cannot be changed.</p>
-
-<h2 id="Names">Reading and writing names</h2>
-<p>Names are Map keys, so the ordinary item syntax reads and writes them &mdash; including names computed at run time, and names that would collide with a member of <a href="Object.htm">Object</a> such as <code>Base</code> or <code>Clone</code>, since keys and members share no namespace:</p>
-<pre>na := NamedArgs()
-na["Title"] := "Confirm"
-na[NameFromConfig] := Value
-na["Base"] := 16            <em>; an ordinary name, not the object's base</em>
-</pre>
-<p>The same syntax reads a container a variadic function collected, along with the rest of Map's interface &mdash; <code>na["Title"]</code>, <code>na.Has("Title")</code>, <code>na.Count</code>, <code>for Name, Value in na</code>. Each takes the container as the object being operated <em>on</em>, never as an argument, which is what makes them usable here &mdash; see below.</p>
+<p><a href="Map.htm#CaseSense">CaseSense</a> is always <code>Off</code> and cannot be changed.</p>
 
 <h2 id="Position">Why the position matters</h2>
-<p>The type carries the meaning, as with a <a href="../Concepts.htm#variable-references">VarRef</a>. As the last argument of any call, a NamedArgs supplies that call's named arguments; anywhere else &mdash; including one a <a href="../Functions.htm#VariadicCall">variadic call</a> re-emitted before a later positional argument &mdash; it is an ordinary value.</p>
+<p>Only the last argument of a call supplies named arguments. A NamedArgs anywhere else, including one a <a href="../Functions.htm#VariadicCall">variadic call</a> places before a later positional argument, is an ordinary value.</p>
 <p>The consequence is that a NamedArgs cannot be passed <em>to</em> a function as data: it would name that function's parameters.</p>
 <pre>Type(na)        <em>; error: na's names are not parameters of Type</em>
 Type([na])      <em>; "Array" &mdash; the Array is the argument, so the container is data inside it</em></pre>
-<p>To hand one to a function as a value, pass the <a href="Array.htm">Array</a> or object that holds it &mdash; the container has to stay inside, since taking it back out puts it in the last argument position again.</p>
+<p>To pass one as a value, pass the <a href="Array.htm">Array</a> or object which holds it.</p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExDynamic">
@@ -83,7 +72,7 @@ Peek("Save changes?", Title: "Confirm", Options: "OK")
 </div>
 
 <h2 id="Related">Related</h2>
-<p><a href="../Language.htm#named-parameters">Named parameters</a>, <a href="../Language.htm#named-parameter-forwarding">Forwarding through a wrapper</a>, <a href="Map.htm">Map</a>, <a href="Func.htm#Params">Func.Params</a>, <a href="_Warn.htm">#Warn NamedArg</a>, <a href="../Modules.htm#KS">KS module</a></p>
+<p><a href="../Language.htm#named-parameters">Named parameters</a>, <a href="Map.htm">Map</a>, <a href="Func.htm#Params">Func.Params</a>, <a href="_Warn.htm">#Warn NamedArg</a>, <a href="../Modules.htm#KS">KS module</a></p>
 
 </body>
 </html>

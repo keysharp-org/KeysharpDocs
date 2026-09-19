@@ -17,7 +17,6 @@
 
 <pre class="Syntax"><span class="func">#NoTrayIcon</span></pre>
 <p>Specifying this prevents the script from showing a tray icon when it is launched (even if the script is compiled into an EXE), unless a later <a href="_TrayIcon.htm">#TrayIcon</a> restores or replaces it.</p>
-<p class="note"><strong>Keysharp:</strong> #NoTrayIcon and <a href="_TrayIcon.htm">#TrayIcon</a> are applied in source order. A later #TrayIcon makes the tray visible with the default or selected icon; a later #NoTrayIcon hides an icon selected earlier.</p>
 <p>If you use this for a script that has hotkeys, you might want to bind a hotkey to the <a href="ExitApp.htm">ExitApp</a> function. Otherwise, there will be no easy way to exit the program (without restarting the computer or killing the process). For example: <code>#x::ExitApp</code>.</p>
 <p>The tray icon can be made to disappear or reappear at any time during the execution of the script by assigning a true or false value to <a href="../Variables.htm#IconHidden">A_IconHidden</a>. The only drawback of using <code><a href="../Variables.htm#IconHidden">A_IconHidden</a> := true</code> at the very top of the script is that the tray icon might be briefly visible when the script is first launched. To avoid that, use #NoTrayIcon instead.</p>
 <p>The built-in variable <strong>A_IconHidden</strong> contains 1 if the tray icon is currently hidden or 0 otherwise, and can be assigned a value to show or hide the icon.</p>

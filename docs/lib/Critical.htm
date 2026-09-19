@@ -35,7 +35,7 @@
 
 <h2 id="Behave">Behavior of Critical Threads</h2>
 <p>Critical threads are <em>uninterruptible</em>; for details, see <a href="../misc/Threads.htm#Behave">Threads</a>.</p>
-<p>Uninterruptible means no new thread may <em>start</em>. It does not stop message dispatch: a continuation posted by asynchronous work, and on the main thread a pending <code class="no-highlight">__Delete</code>, are still served whenever the critical thread checks messages, such as inside <a href="Sleep.htm">Sleep</a> or <a href="Await.htm">Await</a>. Timers and hotkeys queued meanwhile wait until the thread stops being critical. Work which is itself a new thread does not get through &mdash; see <a href="RealThread.htm#Send">RealThread.Send</a>.</p>
+<p>A critical thread which checks messages, such as inside <a href="Sleep.htm">Sleep</a> or <a href="Await.htm">Await</a>, still runs continuations posted by asynchronous work and, on the main thread, pending <code class="no-highlight">__Delete</code> calls.</p>
 <p>A critical thread becomes interruptible when a <a href="MsgBox.htm">message box</a> or other dialog is about to be displayed. However, unlike <a href="Thread.htm#Interrupt">Thread Interrupt</a>, the thread becomes critical again after the user dismisses the dialog.</p>
 
 <h2 id="Off">Critical Off</h2>

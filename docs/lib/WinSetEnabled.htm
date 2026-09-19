@@ -47,10 +47,10 @@
 <p>When a window is disabled, the user cannot move it or interact with its controls. In addition, disabled windows are omitted from the alt-tab list.</p>
 
 <h3 id="Linux">Linux</h3>
-<p>Supported only for windows and controls owned by the script's process. Neither X11 nor Wayland has a faithful equivalent of the Win32 <code>EnableWindow</code> for another application's window, so targeting one causes an <a href="Error.htm#OSError">OSError</a>.</p>
+<p>Supported only for windows and controls owned by the script's process. Targeting another application's window causes an <a href="Error.htm#OSError">OSError</a>.</p>
 
 <h3 id="macOS">macOS</h3>
-<p>Supported only for windows and controls owned by the script's process. Cocoa has no equivalent of the Win32 <code>EnableWindow</code> for another application's window, so targeting one causes an <a href="Error.htm#OSError">OSError</a>.</p>
+<p>Supported only for windows and controls owned by the script's process. Targeting another application's window causes an <a href="Error.htm#OSError">OSError</a>.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="WinGetEnabled.htm">WinGetEnabled</a>, <a href="ControlSetEnabled.htm">ControlSetEnabled</a>, <a href="Win.htm">Win functions</a>, <a href="Control.htm">Control functions</a></p>

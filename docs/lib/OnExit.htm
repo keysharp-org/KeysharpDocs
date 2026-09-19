@@ -80,7 +80,10 @@
   </tr>
   <tr>
     <td>Error</td>
-    <td>A runtime error occurred in a script that is not <a href="../Scripts.htm#persistent">persistent</a>. An example of a runtime error is <a href="Run.htm">Run/RunWait</a> being unable to launch the specified program or document.</td>
+    <td>
+      <p>A runtime error occurred in a script that is not <a href="../Scripts.htm#persistent">persistent</a>. An example of a runtime error is <a href="Run.htm">Run/RunWait</a> being unable to launch the specified program or document.</p>
+      <p>In Keysharp, this is the reason when the <a href="../Scripts.htm#auto">auto-execute section</a> fails with an unhandled error, and the exit code is 1. Only <a href="Persistent.htm">Persistent</a> prevents this exit, including when hotkey, hotstring or remapping definitions <a href="Persistent.htm#Remarks">turn it on</a>. In AutoHotkey, anything else which <a href="../Scripts.htm#persistent">keeps a script running</a> also prevents it, such as a timer, a visible GUI or a hotkey created by the <a href="Hotkey.htm">Hotkey</a> function.</p>
+    </td>
   </tr>
   <tr>
     <td>Menu</td>

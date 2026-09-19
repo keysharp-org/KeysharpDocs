@@ -17,18 +17,13 @@
 
 <pre class="Syntax">FoundPos := <span id="RegExMatchCs" class="func">RegExMatchCs</span>(Haystack, NeedleRegEx <span class="optional">, &amp;OutputVar, StartingPos := 1</span>)
 NewStr := <span id="RegExReplaceCs" class="func">RegExReplaceCs</span>(Haystack, NeedleRegEx <span class="optional">, Replacement := "", &amp;OutputVarCount, Limit := -1, StartingPos := 1</span>)</pre>
-<p id="RegExMatchInfoCs">The general parameter and return conventions match <a href="RegExMatch.htm">RegExMatch</a> and <a href="RegExReplace.htm">RegExReplace</a>. RegExMatchCs writes a <code>RegExMatchInfoCs</code> object, which provides the same match-information interface using .NET groups. Invalid patterns throw .NET regular-expression exceptions rather than PCRE exceptions.</p>
-<p>That interface includes <a href="RegExMatch.htm#MatchObject">every member of a PCRE match object</a>, among them <strong>Success</strong>, which is 1 when the pattern matched and 0 otherwise, and <strong>ToString()</strong>, which returns the position of the overall match.</p>
+<p id="MatchInfo">The general parameter and return conventions match <a href="RegExMatch.htm">RegExMatch</a> and <a href="RegExReplace.htm">RegExReplace</a>. RegExMatchCs writes a <a href="RegExMatch.htm#MatchObject">RegExMatchInfo</a> object. An invalid pattern throws an <a href="Error.htm">Error</a> whose <em>Extra</em> is the .NET error message.</p>
 
 <h2 id="Differences">Pattern and Option Differences</h2>
 <ul>
-  <li>Anchored option <code class="no-highlight">A</code> is unavailable; use <code class="no-highlight">^</code> or <code class="no-highlight">\A</code>.</li>
-  <li>Auto-callout option <code class="no-highlight">C</code> is unavailable; iterate matches explicitly.</li>
-  <li>Dollar-end-only option <code class="no-highlight">D</code> is unavailable. <code class="no-highlight">$</code> matches before <code class="no-highlight">\n</code>; use <code class="no-highlight">\r?$</code> for CRLF.</li>
-  <li>Duplicate-name option <code class="no-highlight">J</code> is unavailable.</li>
-  <li>Study option <code class="no-highlight">S</code> is unnecessary; expressions are compiled.</li>
-  <li>Ungreedy option <code class="no-highlight">U</code> is unavailable; append <code class="no-highlight">?</code> to a quantifier.</li>
-  <li>PCRE-extra option <code class="no-highlight">X</code>, PCRE newline escapes and <code class="no-highlight">\K</code> are unavailable. A lookbehind such as <code class="no-highlight">(?&lt;=abc)</code> can replace some uses of <code class="no-highlight">\K</code>.</li>
+  <li>Option <code class="no-highlight">S</code> is the same as <code class="no-highlight">s</code>, and <code class="no-highlight">X</code> is the same as <code class="no-highlight">x</code>.</li>
+  <li>Options <code class="no-highlight">C</code>, <code class="no-highlight">D</code> and <code class="no-highlight">U</code>, the newline options, PCRE newline escapes and <code class="no-highlight">\K</code> are unavailable.</li>
+  <li><code class="no-highlight">$</code> matches before <code class="no-highlight">`n</code> but not before <code class="no-highlight">`r`n</code>; use <code class="no-highlight">\r?$</code> for CRLF text.</li>
 </ul>
 
 <h2 id="Resources">Further Reading</h2>

@@ -76,7 +76,6 @@
   <li>The name of a subpattern.</li>
 </ul>
 <p><strong>Match.N:</strong> Shorthand for <strong>Match["N"]</strong>, where <em>N</em> is any unquoted name or number which does not conflict with a defined property (listed above). For example, <code>match.1</code> or <code>match.Year</code>.</p>
-<p id="Success"><strong>Match.Success:</strong> Returns 1 if the pattern matched and 0 otherwise. Because RegExMatch itself returns the position of a match, or 0 when there is none, this is mainly of use when the match object is passed on and the result of the original call is no longer at hand.</p>
 <p id="MatchToString"><strong>Match.ToString():</strong> Returns the position of the overall match, the same value as <strong>Match.Pos</strong>. This is what a match object yields where a string is expected.</p>
 <p>The object also supports enumeration; that is, the <a href="For.htm">for-loop</a> is supported. Alternatively, use <code><a href="Loop.htm">Loop</a> Match.Count</code>.</p>
 

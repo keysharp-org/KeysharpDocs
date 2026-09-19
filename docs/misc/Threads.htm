@@ -22,14 +22,10 @@
 <p><strong>Related:</strong> The <a href="../lib/Thread.htm">Thread</a> function sets the priority or interruptibility of threads.</p>
 
 <h2 id="Objects">Threads as Objects</h2>
-<p>A thread is also reachable as an object. <a href="../Variables.htm#Thread">A_Thread</a> is the <em>current thread</em> as a <a href="../lib/Thread.htm#Object">Thread</a> object, which carries its identity, stack position, elapsed time, priority, criticality and interruptibility, and can terminate it. The thread it interrupted is <code>A_Thread.Underlying</code>, so the dormant threads described above form a chain from the current one downwards.</p>
-<pre>#Import "Ks" { A_Thread }
-if A_Thread.Elapsed &gt; 5000
-    A_Thread.Underlying.Exit()    <em>; give up on whatever this thread interrupted</em></pre>
+<p><a href="../Variables.htm#A_Thread">A_Thread</a> is the <em>current thread</em> as a <a href="../lib/Thread.htm#Object">Thread</a> object; its <code>Underlying</code> property is the thread it interrupted.</p>
 
 <h2 id="Real">Real Threads</h2>
-<p>The threads described on this page are cooperative: only one of them runs at a time, and one runs until it finishes or is interrupted. A <a href="../lib/RealThread.htm">RealThread</a> is a genuine operating-system thread which runs <em>concurrently</em> with the rest of the script, and each has a thread stack of its own. So the rule that a thread's settings are per thread holds within one real thread; a worker starts from the script's defaults and its <a href="../lib/CoordMode.htm">CoordMode</a> or <a href="../lib/SendMode.htm">SendMode</a> changes never affect the main thread.</p>
-<p><a href="../Variables.htm#Thread">A_RealThread</a> is the real thread the current script thread runs on, and its <code>Threads</code> property is that real thread's stack, oldest first. Because real threads run at the same time, data shared between them needs synchronization &mdash; see <a href="../lib/Lock.htm">Lock</a>.</p>
+<p>The threads described on this page are cooperative: only one of them runs at a time, and one runs until it finishes or is interrupted. A <a href="../lib/RealThread.htm">RealThread</a> is an operating-system thread which runs <em>concurrently</em> with the rest of the script, with its own threads and thread settings.</p>
 
 <h2 id="Priority">Thread Priority</h2>
 <p>Any thread (<a href="../Hotkeys.htm">hotkey</a>, <a href="../lib/SetTimer.htm">timed subroutine</a>, <a href="../lib/Menu.htm">custom menu item</a>, etc.) with a priority lower than that of the <em>current thread</em> cannot interrupt it. During that time, such timers will not run, and any attempt by the user to create a thread (such as by pressing a <a href="../Hotkeys.htm">hotkey</a> or <a href="../lib/GuiControls.htm#Button">GUI button</a>) will have no effect, nor will it be buffered. Because of this, it is usually best to design high priority threads to finish quickly, or use <a href="../lib/Critical.htm">Critical</a> instead of making them high priority.</p>

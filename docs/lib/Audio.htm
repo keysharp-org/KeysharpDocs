@@ -17,20 +17,12 @@
 <p>This class is exported by the <a href="../Modules.htm#KS">KS module</a>:</p>
 <pre>#Import "Ks" { Audio }</pre>
 
-<p class="note"><strong>Note:</strong> There is one audio system per script, so this class has no instances and its own members are used directly on the class. Calling <code class="no-highlight">Audio()</code> throws an <a href="Error.htm">Error</a>.</p>
+<p class="note"><strong>Note:</strong> This class is experimental: it and its nested types may change or be removed without deprecation. See <a href="_Warn.htm#Experimental">#Warn Experimental</a>.</p>
+<p class="note"><strong>Note:</strong> This class has no instances; its members are used directly on the class. Calling <code class="no-highlight">Audio()</code> throws an <a href="Error.htm">Error</a>.</p>
 
-<p><code>Audio</code> is also the container for the eight related types this page documents. They are reached through it &mdash; <a href="#Clip">Audio.Clip</a>, <a href="#Device">Audio.Device</a>, <a href="#Output">Audio.Output</a>, <a href="#Playback">Audio.Playback</a>, <a href="#Session">Audio.Session</a>, <a href="#Meter">Audio.Meter</a>, <a href="#Recorder">Audio.Recorder</a> and <a href="#Recording">Audio.Recording</a> &mdash; and importing <code>Audio</code> introduces no other names.</p>
+<p>The related types below, such as <a href="#Clip">Audio.Clip</a>, are nested in <code>Audio</code>, and importing <code>Audio</code> introduces no other names.</p>
 
-<h2 id="VsSound">Compared with the Sound functions</h2>
-<p>The <a href="Sound.htm">Sound functions</a> are the AutoHotkey-compatible surface and are unchanged by this class. The two solve different problems:</p>
-<table class="info">
-  <tr><th style="width:22em">Sound functions</th><th abbr="Descr">This class</th></tr>
-  <tr><td><a href="SoundPlay.htm">SoundPlay</a> plays one file at a time through the platform's own player.</td><td>Decodes once into a reusable <a href="#Clip">clip</a> and mixes several sounds at once through one stream, so a repeated sound neither re-decodes nor cuts off the previous one.</td></tr>
-  <tr><td><a href="SoundSetVolume.htm">SoundSetVolume</a> and its relatives select a device by a fuzzy name or number, and control that endpoint.</td><td>Every operation names an exact <a href="#Device">device</a> by its opaque <code>Id</code>, or takes the current default explicitly.</td></tr>
-  <tr><td>No handle to a sound that is playing.</td><td><a href="#Play">Audio.Play</a> returns a <a href="#Playback">playback</a> whose volume, pan, position, loop and mute can be changed while it runs.</td></tr>
-  <tr><td>No application-level control, metering or capture.</td><td><a href="#Session">Sessions</a>, <a href="#Meter">meters</a> and <a href="#Recorder">recorders</a>.</td></tr>
-</table>
-<p>The relationship is the one <a href="A_Clipboard.htm">A_Clipboard</a> has with <a href="Clipboard.htm#Text">Clipboard.Text</a>: the compatible function keeps its own selector and semantics, and this class is additive.</p>
+<p>The <a href="Sound.htm">Sound functions</a> are the AutoHotkey-compatible surface. This class adds to them.</p>
 
 <h2 id="toc">Table of Contents</h2>
 <ul class="indent">
@@ -56,7 +48,7 @@
   <tr id="Levels"><td>Levels</td><td>Volume and peak are finite numbers from 0 through 100. Pan is finite, from -100 (full left) through 100 (full right).</td></tr>
   <tr><td>Times</td><td>Durations and positions are milliseconds and may be fractional.</td></tr>
   <tr><td>Absence</td><td>A value which is not yet known, does not apply, or has no default reads as an empty string. Enumerations return an empty <a href="Array.htm">Array</a> and counts return 0 instead.</td></tr>
-  <tr><td>Tokens and names</td><td>Every documented string token, device name and executable name is matched without case sensitivity, and getters return the canonical casing shown here. An opaque <code>Id</code> is compared exactly, because it is backend identity.</td></tr>
+  <tr><td>Tokens and names</td><td>Every documented string token, device name and executable name is matched without case sensitivity, and getters return the canonical casing shown here. An opaque <code>Id</code> is compared exactly.</td></tr>
   <tr><td>Sample formats</td><td><code class="no-highlight">"Unsigned8"</code>, <code class="no-highlight">"Signed16"</code>, <code class="no-highlight">"Signed24"</code>, <code class="no-highlight">"Signed32"</code> or <code class="no-highlight">"Float32"</code>.</td></tr>
   <tr><td>Sample rate and channels</td><td>8000 through 192000 Hz; 1 or 2 channels.</td></tr>
 </table>
@@ -72,15 +64,15 @@
   <tr><td><a href="Error.htm#OSError">OSError</a></td><td>A capability this host does not provide, a denied permission, or a device, decode or write failure. The message names the missing capability and a concrete next step.</td></tr>
   <tr><td>Empty string</td><td>A bounded refusal from <a href="#OutputPlay">Audio.Output.Play</a>, and an absent default, match or result.</td></tr>
 </table>
-<p>Check the capability first where a script must not raise: each <a href="#Probes">probe</a> answers without a native call.</p>
+<p>Where a script must not throw, check the matching <a href="#Probes">probe</a> first.</p>
 
 <h2 id="Static">Audio</h2>
 
 <h3 id="Probes">Capability probes</h3>
-<p>Each of these is a read-only true or false. They read a published snapshot rather than calling into the platform, so they never open a device and never prompt for permission.</p>
+<p>Each of these is a read-only true or false. Reading one never opens a device or prompts for permission.</p>
 <table class="info">
   <tr><th style="width:20em">Property</th><th abbr="Descr">Description</th></tr>
-  <tr id="IsPlaybackSupported"><td>IsPlaybackSupported</td><td>Whether this host has a playback implementation at all. It says nothing about whether a speaker is attached.</td></tr>
+  <tr id="IsPlaybackSupported"><td>IsPlaybackSupported</td><td>Whether this host has a playback implementation at all.</td></tr>
   <tr id="IsOutputAvailable"><td>IsOutputAvailable</td><td>Whether a usable output device is present. A supported host with no speakers answers false here and true to <code>IsPlaybackSupported</code>.</td></tr>
   <tr id="IsInputAvailable"><td>IsInputAvailable</td><td>Whether a usable input device is present.</td></tr>
   <tr id="IsDeviceChangeSupported"><td>IsDeviceChangeSupported</td><td>Whether <a href="#OnDeviceChange">OnDeviceChange</a> can subscribe to device arrivals, removals and default changes.</td></tr>
@@ -93,7 +85,7 @@
 <h3 id="IsFormatSupported">IsFormatSupported</h3>
 <pre class="Syntax">Supported := Audio.<span class="func">IsFormatSupported</span>(Format)</pre>
 <p>Returns 1 (true) if <a href="#Load">Load</a> can decode that container, or 0 (false) otherwise. <em>Format</em> is a token or an extension, with or without the leading dot, such as <code class="no-highlight">"wav"</code> or <code class="no-highlight">".WAV"</code>. This never inspects a file.</p>
-<p class="note"><strong>Note:</strong> WAV is decoded by a managed reader on every platform, so it is always supported. Every other container depends on a codec the host already ships, and this reports what that host's decoder actually initialized with rather than a fixed list. Windows uses Media Foundation and reports mp3, m4a, aac, wma and flac; Linux uses libsndfile when it is installed, and otherwise ffmpeg when it is on PATH; macOS uses ExtAudioFile. Ogg and Opus are not claimed on Windows or macOS, because neither ships a decoder for them. Where a container is unsupported, convert the file to WAV or read its samples yourself and use <a href="#FromPcm">FromPcm</a>.</p>
+<p class="note"><strong>Note:</strong> WAV is supported on every platform. Other containers depend on the host's decoders: Windows reports mp3, m4a, aac, wma and flac; Linux requires libsndfile, or ffmpeg on PATH; Ogg and Opus are not supported on Windows or macOS. Where a container is unsupported, convert the file to WAV or pass its samples to <a href="#FromPcm">FromPcm</a>.</p>
 
 <h3 id="Load">Load</h3>
 <pre class="Syntax">Clip := Audio.<span class="func">Load</span>(Path)</pre>
@@ -103,46 +95,48 @@
 <h3 id="FromPcm">FromPcm</h3>
 <pre class="Syntax">Clip := Audio.<span class="func">FromPcm</span>(Data, SampleRate <span class="optional">, Channels, SampleFormat</span>)</pre>
 <p>Copies headerless PCM out of a <a href="Buffer.htm">Buffer</a> into an immutable clip. The copy is synchronous and complete, so <em>Data</em> may be reused or freed as soon as this returns.</p>
-<p><em>Channels</em> defaults to 1 and <em>SampleFormat</em> to <code class="no-highlight">"Signed16"</code>. The buffer must hold a whole number of frames &mdash; one frame being <em>Channels</em> samples &mdash; and must not be empty; every bound is checked before anything is allocated. A clip may hold at most 512 MiB of decoded samples.</p>
+<p><em>Channels</em> defaults to 1 and <em>SampleFormat</em> to <code class="no-highlight">"Signed16"</code>. The buffer must hold a whole number of frames &mdash; one frame being <em>Channels</em> samples &mdash; and must not be empty. A clip may hold at most 512 MiB of decoded samples.</p>
 
 <h3 id="Play">Play</h3>
 <pre class="Syntax">Playback := Audio.<span class="func">Play</span>(Source <span class="optional">, Volume, Loop, Pan, StartMilliseconds, Device</span>)</pre>
 <p>Plays a clip or a file path and returns an <a href="#Playback">Audio.Playback</a> controlling that sound. <em>Source</em> is an <a href="#Clip">Audio.Clip</a> or a path, which is loaded through <a href="#Load">Load</a>. <em>Volume</em> defaults to 100, <em>Loop</em> to false, <em>Pan</em> to 0, <em>StartMilliseconds</em> to 0 and <em>Device</em> to the current default output.</p>
-<p>This is the one-line convenience form. It uses a private output belonging to the calling script, which it never exposes and never shares. Where <a href="#OutputPlay">Audio.Output.Play</a> reports a bounded refusal by returning an empty string, this raises an OSError instead, because a one-line call has nowhere to report one.</p>
+<p>The sound plays through a private output of the script. Where <a href="#OutputPlay">Audio.Output.Play</a> would return an empty string, this throws an OSError.</p>
 <p>A starting point at or past the clip's duration is a ValueError.</p>
-<p>There is no process-wide stop. Call <a href="#PlaybackStop">Stop</a> on the returned playback, or <a href="#OutputStopAll">StopAll</a> on an output you own.</p>
+<p>To stop the sound, call <a href="#PlaybackStop">Stop</a> on the returned playback. To stop several sounds at once, play them through an <a href="#Output">Audio.Output</a> and call its <a href="#OutputStopAll">StopAll</a>.</p>
 
 <h3 id="Devices">Devices</h3>
 <pre class="Syntax">List := Audio.<span class="func">Devices</span>(<span class="optional">Kind</span>)</pre>
 <p>Returns an <a href="Array.htm">Array</a> of every present, usable <a href="#Device">Audio.Device</a>. <em>Kind</em> is <code class="no-highlight">"Output"</code>, <code class="no-highlight">"Input"</code> or <code class="no-highlight">"All"</code> (the default), and any other token is a ValueError. <code class="no-highlight">"All"</code> lists outputs before inputs.</p>
-<p>A host with no audio at all returns an empty Array rather than raising.</p>
+<p>A host with no audio at all returns an empty Array.</p>
 
 <h3 id="DefaultDevice">DefaultDevice</h3>
 <pre class="Syntax">Device := Audio.<span class="func">DefaultDevice</span>(<span class="optional">Kind</span>)</pre>
-<p>Returns the current default <a href="#Device">Audio.Device</a> of one kind, or an empty string when the host has none. <em>Kind</em> is <code class="no-highlight">"Output"</code> (the default) or <code class="no-highlight">"Input"</code>; a role default is one device, so <code class="no-highlight">"All"</code> is a ValueError here.</p>
+<p>Returns the current default <a href="#Device">Audio.Device</a> of one kind, or an empty string when the host has none. <em>Kind</em> is <code class="no-highlight">"Output"</code> (the default) or <code class="no-highlight">"Input"</code>; <code class="no-highlight">"All"</code> is a ValueError.</p>
 
 <h3 id="Sessions">Sessions</h3>
 <pre class="Syntax">List := Audio.<span class="func">Sessions</span>(<span class="optional">PIDOrName, Device</span>)</pre>
-<p>Returns an Array of every live application audio <a href="#Session">session</a>, optionally narrowed to one process and one device. A process routinely owns several sessions, so every match is returned rather than the first.</p>
+<p>Returns an Array of every live application audio <a href="#Session">session</a>, optionally narrowed to one process and one device.</p>
 <p><em>PIDOrName</em> is a process id, or an executable name with or without its <code class="no-highlight">.exe</code> suffix. It is not a path: a value containing a slash or backslash is a ValueError. Omitted, it matches every session.</p>
 <p>A host with no per-application audio model returns an empty Array.</p>
 
 <h3 id="SetApplicationVolume">SetApplicationVolume</h3>
 <pre class="Syntax">Changed := Audio.<span class="func">SetApplicationVolume</span>(PIDOrName, Volume <span class="optional">, Device</span>)</pre>
 <p>Sets one absolute volume on every session of a process and returns how many sessions were changed, which is 0 when nothing matched. <em>Volume</em> is an absolute level from 0 through 100; relative strings such as <code class="no-highlight">"+5"</code> are not accepted here.</p>
-<p>A session which disappears between enumeration and the write counts as expired rather than failed. If any surviving session refuses the write, this raises an OSError afterwards reporting how many were matched, changed and expired.</p>
+<p>If a session which still exists refuses the change, an OSError is thrown after the other sessions are changed.</p>
 
 <h3 id="SetApplicationMute">SetApplicationMute</h3>
 <pre class="Syntax">Changed := Audio.<span class="func">SetApplicationMute</span>(PIDOrName, Mute <span class="optional">, Device</span>)</pre>
-<p>Sets one absolute mute state on every session of a process and returns how many changed. <em>Mute</em> is a state, not a toggle, because several matched sessions can be in different states.</p>
+<p>Sets one absolute mute state on every session of a process and returns how many changed. <em>Mute</em> is a state, not a toggle.</p>
 
 <h3 id="OnDeviceChange">OnDeviceChange</h3>
-<pre class="Syntax">Hook := Audio.<span class="func">OnDeviceChange</span>(Callback <span class="optional">, Kind, Count</span>)</pre>
-<p>Calls <em>Callback</em> when a device arrives, is removed, is renamed, or becomes the default, and returns the hook controlling the subscription.</p>
-<p>The callback is called as <code class="no-highlight">Callback(Hook, Kind, Device)</code>, where <em>Kind</em> is <code class="no-highlight">"Added"</code>, <code class="no-highlight">"Removed"</code>, <code class="no-highlight">"Changed"</code> or <code class="no-highlight">"DefaultChanged"</code> and <em>Device</em> is the <a href="#Device">Audio.Device</a> the change concerns. The <em>Kind</em> parameter of <code>OnDeviceChange</code> itself is the filter <code class="no-highlight">"Output"</code>, <code class="no-highlight">"Input"</code> or <code class="no-highlight">"All"</code> (the default), and <em>Count</em> defaults to -1 for an unlimited subscription.</p>
-<p>Platforms report duplicate notifications, so a change is classified by comparing the previous device snapshot with a fresh one; a notification whose comparison finds nothing fires nothing.</p>
-<p>The returned hook carries the shared subscription contract &mdash; <code>Stop</code>, <code>Pause</code>, <code>Paused</code>, <code>Status</code>, <code>IsActive</code>, <code>Count</code> and <code>Callback</code> &mdash; documented once under <a href="WinEvent.htm#Hook">Subscription Members</a>. Audio adds nothing to it. The subscription stays registered until <code>Stop()</code>, count exhaustion or script teardown, so dropping the returned hook does not unsubscribe it.</p>
-<p>Passing anything but a function is a TypeError; an unknown <em>Kind</em> or an out-of-range <em>Count</em> is a ValueError; and subscribing where <code>IsDeviceChangeSupported</code> is false raises an OSError.</p>
+<pre class="Syntax">Hook := Audio.<span class="func">OnDeviceChange</span>(Callback <span class="optional">, Kind</span>)
+Hooks := Audio.<span class="func">Hooks</span></pre>
+<p>Calls <em>Callback</em> when a device arrives, is removed, is renamed, or becomes the default, and returns a running hook controlling the subscription.</p>
+<p><em>Callback</em> is a <a href="../misc/Functor.htm">function object</a>, called as <code class="no-highlight">Callback(Hook, Change, Device)</code>, where <em>Change</em> is <code class="no-highlight">"Added"</code>, <code class="no-highlight">"Removed"</code>, <code class="no-highlight">"Changed"</code> or <code class="no-highlight">"DefaultChanged"</code> and <em>Device</em> is the <a href="#Device">Audio.Device</a> the change concerns; for <code class="no-highlight">"Removed"</code> its <a href="#DeviceStatus">Status</a> is <code class="no-highlight">"Missing"</code>. <a href="../Variables.htm#EventInfo">A_EventInfo</a> is not set. <em>Kind</em> filters the devices reported: <code class="no-highlight">"Output"</code>, <code class="no-highlight">"Input"</code> or <code class="no-highlight">"All"</code> (the default).</p>
+<p>A notification which changes nothing observable does not call back.</p>
+<p id="DeviceHook">The returned hook is an <code>Audio.DeviceHook</code>, an <a href="EventHook.htm">EventHook</a> with no additional members. <code>Audio.Hooks</code> is an Array of the running hooks.</p>
+<p>The hook does not keep the script running; a script which only waits for device changes calls <a href="Persistent.htm">Persistent</a>.</p>
+<p>An unknown <em>Kind</em> is a ValueError, and subscribing where <code>IsDeviceChangeSupported</code> is false raises an OSError.</p>
 
 <h2 id="Clip">Audio.Clip</h2>
 <pre class="NoIndent">class Audio.Clip extends Object</pre>
@@ -160,28 +154,29 @@
 <h2 id="Device">Audio.Device</h2>
 <pre class="NoIndent">class Audio.Device extends Object</pre>
 <p>A snapshot of one audio endpoint, plus the controls that endpoint owns. A device is produced by <a href="#Devices">Audio.Devices</a> and <a href="#DefaultDevice">Audio.DefaultDevice</a>, and returned by several other members; calling <code class="no-highlight">Audio.Device()</code> throws an Error.</p>
-<p><code>Id</code> is the durable identity. Names repeat and enumeration order changes, so every operation resolves by id and a refresh never adopts a same-named replacement.</p>
+<p><code>Id</code> is the durable identity: <code>Refresh()</code> never adopts a same-named replacement.</p>
 <table class="info">
   <tr><th style="width:16em">Member</th><th abbr="Descr">Description</th></tr>
   <tr><td>Id</td><td>The opaque, platform-assigned identity, compared exactly. Read-only.</td></tr>
   <tr><td>Name</td><td>The endpoint's display name. Read-only.</td></tr>
   <tr><td>Kind</td><td><code class="no-highlight">"Output"</code> or <code class="no-highlight">"Input"</code>. A device carries audio in exactly one direction. Read-only.</td></tr>
   <tr><td>IsDefault</td><td>Whether this device was the default for its kind when the snapshot was taken. Read-only.</td></tr>
-  <tr><td>IsRunning</td><td>Whether any application currently holds a live stream on this device, or an empty string when the backend cannot tell. Running is not the same as audible: an open but silent stream still reports true. Read-only.</td></tr>
+  <tr id="DeviceStatus"><td>Status</td><td><code class="no-highlight">"Running"</code> while any application holds a live stream, <code class="no-highlight">"Idle"</code> when none does, <code class="no-highlight">"Unknown"</code> when the backend cannot determine it, or <code class="no-highlight">"Missing"</code> after removal is observed. Running includes an open but silent stream. Read-only.</td></tr>
+  <tr><td>IsRunning</td><td>True when <code>Status</code> is <code class="no-highlight">"Running"</code>, otherwise false. Read <code>Status</code> to distinguish idle, unknown and missing devices. Read-only.</td></tr>
   <tr><td>Volume</td><td>This endpoint's own volume, 0 through 100. Writable.</td></tr>
   <tr><td>Mute</td><td>This endpoint's own mute state. Writable.</td></tr>
-  <tr><td>Refresh()</td><td>Re-reads this exact device. Returns the device itself when it is still present, or an empty string after marking it <code class="no-highlight">"Missing"</code>.</td></tr>
-  <tr><td>ToClr()</td><td>Returns the platform's own device object, for controls this class does not model. Work done through it bypasses this class's caching.</td></tr>
+  <tr><td>Refresh()</td><td>Re-reads this exact device. Returns the device itself when it is still present, or an empty string otherwise. An available backend reporting the device absent marks it <code class="no-highlight">"Missing"</code>; an unavailable backend does not establish removal and leaves its activity unknown.</td></tr>
+  <tr><td>ToClr()</td><td>Returns the platform's own device object, for the controls this class does not model. Work done through it bypasses this class's caching.</td></tr>
 </table>
 <p>Operating a device whose <code>Status</code> is <code class="no-highlight">"Missing"</code> raises an OSError telling the caller to <code>Refresh()</code> first. Reading or writing <code>Volume</code> or <code>Mute</code> on a host without endpoint volume control raises an OSError.</p>
-<p class="note"><strong>Note:</strong> The type of the object <code>ToClr</code> returns is platform-dependent and deliberately unspecified &mdash; a Core Audio interface on Windows, something else elsewhere &mdash; so a script which uses it is platform-specific by construction. <a href="SoundGetInterface.htm">SoundGetInterface</a> is the compatible equivalent, differing in that it resolves an endpoint from a fuzzy name.</p>
+<p class="note"><strong>Note:</strong> What <code>ToClr</code> returns depends on the platform; on Windows it is a Core Audio interface. On Linux, <code>ToClr</code> throws an OSError. See also <a href="SoundGetInterface.htm">SoundGetInterface</a>.</p>
 
 <h2 id="Output">Audio.Output</h2>
 <pre class="NoIndent">class Audio.Output extends Object</pre>
 <pre class="Syntax">Output := <span class="func">Audio.Output</span>(<span class="optional">Device, VoiceLimit, VoicePolicy, LatencyMilliseconds</span>)</pre>
-<p>An explicit mixer and the one native stream behind it. This is the object a game or any latency-sensitive script owns: it opens once, prepares its clips once, and every later play is a bounded, non-blocking submission which neither decodes nor resamples.</p>
-<p>Construction only configures. Nothing native is touched until <a href="#OutputOpen">Open</a> or <code>TryOpen</code>, so an output can be built on a machine with no sound card. <em>Device</em> defaults to the current default output and is followed as that default changes; naming a device pins the output to it. <em>VoiceLimit</em> is 1 through 256 and defaults to 16. <em>VoicePolicy</em> defaults to <code class="no-highlight">"Oldest"</code>. <em>LatencyMilliseconds</em> is 5 through 500 and defaults to 20; it is a scheduling target, not a promised floor.</p>
-<p>A script may hold at most 16 open outputs at once, counting the private one <a href="#Play">Audio.Play</a> uses. It may likewise hold 8 running <a href="#Recorder">recorders</a> and 16 running <a href="#Meter">meters</a>. Each cap exists because dropping a wrapper without closing it leaves its native stream running; going beyond one raises an OSError naming it.</p>
+<p>An explicit mixer and the one native stream behind it.</p>
+<p>Construction opens nothing; call <a href="#OutputOpen">Open</a> or <code>TryOpen</code> to open the stream. <em>Device</em> defaults to the current default output and is followed as that default changes; naming a device pins the output to it. <em>VoiceLimit</em> is 1 through 256 and defaults to 16. <em>VoicePolicy</em> defaults to <code class="no-highlight">"Oldest"</code>. <em>LatencyMilliseconds</em> is 5 through 500 and defaults to 20; it is a scheduling target, not a promised floor.</p>
+<p>A script may hold at most 16 open outputs at once, counting the private one <a href="#Play">Audio.Play</a> uses. It may likewise hold 8 running <a href="#Recorder">recorders</a> and 16 running <a href="#Meter">meters</a>. Exceeding a cap throws an OSError.</p>
 
 <h3 id="VoicePolicy">Voice policy</h3>
 <p>A voice is one sound in flight. When every voice is taken, <em>VoicePolicy</em> decides what a new play does:</p>
@@ -212,13 +207,13 @@
   <tr><td>Mute</td><td>Silences the output without stopping its voices. Writable.</td></tr>
   <tr><td>VoicePolicy</td><td>The <a href="#VoicePolicy">policy token</a>. Writable; a change affects only later admissions.</td></tr>
   <tr id="OutputOpen"><td>Open()</td><td>Opens the native stream and returns the output, so it chains. Raises an OSError when the device cannot be opened, playback is unsupported, or the open-output cap is reached.</td></tr>
-  <tr><td>TryOpen()</td><td>Opens, returning true or false. A missing device or a transient failure is false; an unsupported backend or an exhausted output budget still raises, because those are program errors rather than environment ones.</td></tr>
+  <tr><td>TryOpen()</td><td>Opens, returning true or false. A missing device or a transient failure is false; an unsupported backend or an exhausted output cap throws an OSError.</td></tr>
   <tr><td>Prepare(Clip)</td><td>Converts a clip into the open stream's format ahead of time, so playing it never resamples, and returns the output. Preparing while the output is closed registers the clip, which the next successful open converts along with the others. One output's converted clips may total 512 MiB.</td></tr>
   <tr><td>IsPrepared(Clip)</td><td>Whether that clip is converted for the current stream format. It is false while the output is closed, even for a clip which was prepared.</td></tr>
-  <tr id="OutputPlay"><td>Play(Clip <span class="optional">, Volume, Loop, Pan, StartMilliseconds</span>)</td><td>Submits one play and returns an <a href="#Playback">Audio.Playback</a>, or an empty string for a bounded refusal: the output is not open, the command queue is full, or a <code class="no-highlight">"Reject"</code> policy found no free voice. Callers which do not need control ignore the result. <em>Clip</em> must be a clip; unlike <a href="#Play">Audio.Play</a> this takes no paths.</td></tr>
+  <tr id="OutputPlay"><td>Play(Clip <span class="optional">, Volume, Loop, Pan, StartMilliseconds</span>)</td><td>Submits one play and returns an <a href="#Playback">Audio.Playback</a>, or an empty string for a bounded refusal: the output is not open, the command queue is full, or a <code class="no-highlight">"Reject"</code> policy found no free voice. <em>Clip</em> must be a clip, not a path.</td></tr>
   <tr id="OutputStopAll"><td>StopAll()</td><td>Silences every voice on this output immediately. Idempotent, and valid while closed.</td></tr>
   <tr><td>Close()</td><td>Reversible: retires the native stream but keeps the prepared clips for a later open.</td></tr>
-  <tr><td>Dispose()</td><td>Terminal: releases the caches and native state. Later operations raise a ValueError. Dropping the last reference to an open output does the same, so a forgotten output does not hold its stream or its share of the open-output cap until the script exits.</td></tr>
+  <tr><td>Dispose()</td><td>Terminal: releases the caches and native state. Later operations raise a ValueError. Dropping the last reference to an open output does the same.</td></tr>
 </table>
 <p>While an output is <code class="no-highlight">"Transitioning"</code> after a default change, <code>IsAvailable</code> is false, nothing is prepared, and <code>Play</code> returns an empty string; nothing is played through the stale stream. An output pinned to a specific device which goes away becomes <code class="no-highlight">"Unavailable"</code> and waits for that same id to return.</p>
 <p><code>Volume</code> and <code>Mute</code> belong to the open stream: a closed output reports 100 and false, and a value assigned to either while it is closed is discarded. <code>VoicePolicy</code> is held on the output itself, so it survives a <code>Close</code> and applies to the next <code>Open</code>.</p>
@@ -226,12 +221,12 @@
 <h2 id="Playback">Audio.Playback</h2>
 <pre class="NoIndent">class Audio.Playback extends Object</pre>
 <p>One sound in flight. A playback is produced by <a href="#Play">Audio.Play</a> and <a href="#OutputPlay">Audio.Output.Play</a>; calling <code class="no-highlight">Audio.Playback()</code> throws an Error.</p>
-<p>Its identity is stable. It never rebinds to a later sound, so a reference kept after the voice was stolen controls nothing rather than controlling a stranger.</p>
+<p>A playback controls only its own sound; after its voice is stolen, it controls nothing.</p>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
   <tr><td>Device</td><td>The <a href="#Device">Audio.Device</a> this sound was admitted on. It does not track a later default change. Read-only.</td></tr>
   <tr><td>Status</td><td><code class="no-highlight">"Queued"</code>, <code class="no-highlight">"Playing"</code>, <code class="no-highlight">"Paused"</code>, <code class="no-highlight">"Ended"</code>, <code class="no-highlight">"Stopped"</code>, <code class="no-highlight">"Stolen"</code>, <code class="no-highlight">"DeviceLost"</code> or <code class="no-highlight">"Error"</code>. The first terminal reason wins, so a sound which reached its own end reports <code class="no-highlight">"Ended"</code> even after a later <code>Stop()</code>. Read-only.</td></tr>
-  <tr><td>IsPlaying</td><td>True while the sound still holds a voice, which includes <code class="no-highlight">"Queued"</code>. Read-only.</td></tr>
+  <tr><td>IsPlaying</td><td>True when <code>Status</code> is <code class="no-highlight">"Playing"</code> or <code class="no-highlight">"Queued"</code>; false while paused or ended. Read-only.</td></tr>
   <tr><td>DurationMilliseconds</td><td>The source clip's length. Read-only.</td></tr>
   <tr><td>Peak</td><td>This voice's own peak after its gain and pan, 0 through 100, or an empty string before a frame was rendered. Read-only.</td></tr>
   <tr><td>PositionMilliseconds</td><td>The play position, or an empty string once the output that carried the sound is gone. Writable while the sound is live: assigning to a playback which has ended, or a position at or past the duration, is a ValueError.</td></tr>
@@ -247,7 +242,7 @@
 <h2 id="Session">Audio.Session</h2>
 <pre class="NoIndent">class Audio.Session extends Object</pre>
 <p>One application's audio on one device. Sessions are produced by <a href="#Sessions">Audio.Sessions</a>; calling <code class="no-highlight">Audio.Session()</code> throws an Error.</p>
-<p>The snapshot is bound to that exact session. It never rebinds, so a handle kept across an application restart expires instead of quietly controlling the newcomer.</p>
+<p>A session object is bound to that exact session; a later session of the same application needs a new object from <a href="#Sessions">Audio.Sessions</a>.</p>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
   <tr><td>Id</td><td>The session's opaque identity. Read-only.</td></tr>
@@ -268,14 +263,14 @@
 <h2 id="Meter">Audio.Meter</h2>
 <pre class="NoIndent">class Audio.Meter extends Object</pre>
 <pre class="Syntax">Meter := <span class="func">Audio.Meter</span>(<span class="optional">Target, IntervalMilliseconds</span>)</pre>
-<p>An explicit observation of a device's or a session's level. Metering a target whose frames do not pass through the script's own output costs a live native stream on some backends, so a meter is a resource with a lifetime rather than a property which quietly opens one.</p>
-<p><em>Target</em> is an <a href="#Device">Audio.Device</a>, an <a href="#Session">Audio.Session</a>, a device selector, or an empty string for the current default output &mdash; which makes <code class="no-highlight">Audio.Meter()</code> the useful minimal form. <em>IntervalMilliseconds</em> is 20 through 1000 and defaults to 50. Construction snapshots the target and opens nothing.</p>
-<p>A meter has no callback: read <code>Peak</code> whenever a value is wanted, for instance from a <a href="SetTimer.htm">timer</a>.</p>
+<p>An explicit observation of a device's or a session's level.</p>
+<p><em>Target</em> is an <a href="#Device">Audio.Device</a>, an <a href="#Session">Audio.Session</a>, a device selector, or an empty string for the current default output. <em>IntervalMilliseconds</em> is 20 through 1000 and defaults to 50. Construction snapshots the target and opens nothing.</p>
+<p>Read <code>Peak</code> whenever a value is wanted, for instance from a <a href="SetTimer.htm">timer</a>.</p>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
   <tr><td>Target</td><td>The device or session being observed, or an empty string when none resolved. Read-only.</td></tr>
   <tr><td>Status</td><td><code class="no-highlight">"Stopped"</code>, <code class="no-highlight">"Active"</code>, <code class="no-highlight">"Error"</code> or <code class="no-highlight">"Disposed"</code>. Read-only.</td></tr>
-  <tr><td>IntervalMilliseconds</td><td>The publication cadence asked for at construction. It is a request, not a guarantee: a backend whose meter is read on demand rather than published has nothing to apply it to. Read-only.</td></tr>
+  <tr><td>IntervalMilliseconds</td><td>The publication cadence asked for at construction. Some backends ignore it. Read-only.</td></tr>
   <tr><td>IsSupported</td><td>Whether this target can be metered at all. False while no target resolved. Read-only.</td></tr>
   <tr><td>Peak</td><td>The most recent peak, 0 through 100, or an empty string before any observation completed and while the meter is not active. Read-only.</td></tr>
   <tr><td>Error</td><td>An <a href="Error.htm">Error</a> describing why the meter could not open, or an empty string. Read-only.</td></tr>
@@ -287,7 +282,7 @@
 <h2 id="Recorder">Audio.Recorder</h2>
 <pre class="NoIndent">class Audio.Recorder extends Object</pre>
 <pre class="Syntax">Recorder := <span class="func">Audio.Recorder</span>(<span class="optional">Source, Path, Device, SampleRate, Channels, SampleFormat, ChunkMilliseconds, MaximumDurationMilliseconds</span>)</pre>
-<p>One capture, from a microphone or from what an output device is playing. A recorder is configured first and started second, so an immediate permission or device failure is observable and every option is checked before anything is opened.</p>
+<p>One capture, from a microphone or from what an output device is playing. Construction checks every option and opens nothing.</p>
 <p><em>Source</em> is <code class="no-highlight">"Microphone"</code> (the default) or <code class="no-highlight">"SystemOutput"</code>. <em>Path</em> is a <code class="no-highlight">.wav</code> file to write; left empty, the recording is kept in memory instead. <em>Device</em> is a device selector of the kind that source implies, defaulting to the current default. <em>SampleRate</em> defaults to 48000, <em>Channels</em> to 1, <em>SampleFormat</em> to <code class="no-highlight">"Signed16"</code>, and <em>ChunkMilliseconds</em> to 100 within 10 through 1000 &mdash; the buffer size the capture device is asked for, which a backend may deliver more often than. <em>MaximumDurationMilliseconds</em> is 0 for unbounded, or 1 through 86400000.</p>
 <p>A recorder is single-use: construct another for a second recording.</p>
 <p class="warning"><strong>Recording captures whatever the device carries, which can include other people and other applications.</strong> Microphone capture requires the script's <a href="_Requires.htm#CapabilityNames">AudioCapture</a> capability, granted at build time or through <a href="RequestCapabilities.htm">RequestCapabilities</a>, and on platforms which ask, the operating system's own microphone permission. A denial raises an OSError naming the privacy setting to change, and no frames are captured.</p>
@@ -304,7 +299,7 @@
   <tr><td>OverrunCount</td><td>How many captured chunks were dropped because the destination could not keep up. Nonzero means the recording has gaps, which is otherwise invisible. Read-only.</td></tr>
   <tr><td>Error</td><td>An <a href="Error.htm">Error</a> describing a terminal fault, or an empty string. Read-only.</td></tr>
   <tr><td>Result</td><td>The finished <a href="#Recording">Audio.Recording</a>, or an empty string until one exists. Reading it does not stop the recorder. Read-only.</td></tr>
-  <tr><td>Start()</td><td>Opens the device and begins capture, returning the recorder. Raises an OSError for an unsupported source, a denied permission or an absent device, leaving the recorder retryable. Starting twice is a ValueError.</td></tr>
+  <tr id="RecorderStart"><td>Start()</td><td>Opens the device and begins capture, returning the recorder. Raises an OSError for an unsupported source, a denied permission or an absent device, leaving the recorder retryable. Starting twice is a ValueError.</td></tr>
   <tr><td>Pause()</td><td>Holds media time without ending the recording. Returns the resulting paused state.</td></tr>
   <tr><td>Resume()</td><td>Resumes and returns the recorder.</td></tr>
   <tr><td>Stop()</td><td>Ends the recording and returns its <a href="#Recording">Audio.Recording</a>, or an empty string when no honest result could be produced. Repeating it returns the same outcome. Stopping a recorder which was never started is a ValueError.</td></tr>
@@ -314,7 +309,7 @@
 
 <h2 id="Recording">Audio.Recording</h2>
 <pre class="NoIndent">class Audio.Recording extends Object</pre>
-<p>What a finished capture produced: exactly one of an in-memory clip or a file path, never both and never neither. A recording is produced by <a href="#Recorder">Audio.Recorder.Stop</a>; calling <code class="no-highlight">Audio.Recording()</code> throws an Error.</p>
+<p>What a finished capture produced: an in-memory clip or a file path. A recording is produced by <a href="#Recorder">Audio.Recorder.Stop</a>; calling <code class="no-highlight">Audio.Recording()</code> throws an Error.</p>
 <p>Every property is read-only.</p>
 <table class="info">
   <tr><th style="width:16em">Member</th><th abbr="Descr">Description</th></tr>
@@ -334,30 +329,19 @@
   <tr><td>Linux</td><td>Supported</td><td>Supported</td><td>Supported</td><td>Supported where the audio server exposes a monitor for the sink</td></tr>
   <tr><td>macOS</td><td>Unsupported</td><td>Unsupported</td><td>Supported</td><td>Not implemented</td></tr>
 </table>
-<p>Each row states what the backend implements. Verification is a separate question, stated per platform below.</p>
-<p class="note"><strong>Note:</strong> WAV decodes everywhere through a managed reader. Compressed containers depend on a codec the host already ships, so what is available varies by machine as well as by platform: Media Foundation on Windows, libsndfile or ffmpeg on Linux, ExtAudioFile on macOS. Ask <a href="#IsFormatSupported">IsFormatSupported</a> rather than assuming, and <a href="#Load">Load</a> raises an OSError naming the file when the host cannot decode it. Media Foundation decoding is verified on Windows; the other two are implemented but unverified.</p>
-
-<h3 id="PlatformWindows">Windows</h3>
-<p>Implemented over WASAPI and the Core Audio device, session and metering families, and verified on hardware. Output uses a shared-mode event-driven stream; discovery and default-change notifications use MMDevice; <code>Audio.Device.Volume</code> and <code>Mute</code> use the endpoint volume interface; <code>IsRunning</code> reads the device's session states; and <a href="#Device">ToClr</a> hands out the resolved Core Audio object.</p>
-<p>System-output capture uses shared-mode loopback, which delivers frames dependably only on Windows 10 version 1703 and later. On an older build <code>IsSystemAudioCaptureSupported</code> is false rather than opening a stream which would produce audio only while something else happens to be playing.</p>
+<p class="note"><strong>Note:</strong> The Windows backend is verified on hardware, apart from recording. On Linux, device enumeration, playback and system-output recording are verified, and the rest is unverified. The macOS backend is unverified.</p>
 
 <h3 id="PlatformLinux">Linux</h3>
-<p>Implemented over libpulse, which serves X11 and Wayland sessions alike, and requires a reachable PulseAudio or pipewire-pulse server. Sessions are the server's sink inputs and source outputs, so an application's process name and display name are present only when it published them. Metering opens a peak-detect monitor stream. System-output capture uses the sink's monitor source, which the server exposes for most but not all sinks.</p>
-<p class="note"><strong>Note:</strong> The Linux backend is partly verified. It compiles, and device enumeration, opening an output, polyphonic playback and playback control have been run against a real PulseAudio server. Endpoint volume and mute, sessions, metering and recording have not been exercised there; read those statements as a description of the implementation rather than a tested result.</p>
-<p class="note"><strong>Note:</strong> A PulseAudio capture hands over roughly a tenth of a second of already-buffered audio when it opens, so a recording can be slightly longer than the wall-clock window it was started and stopped in; and a capture opened immediately after another closes on the same source loses a comparable amount while the server re-opens it. <a href="#Recorder">Audio.Recorder</a> reports the frames it actually received, so measure from <code>DurationMilliseconds</code> rather than from your own timer, and leave a short gap between back-to-back captures.</p>
+<p>Works on X11 and Wayland alike, and requires a reachable PulseAudio or pipewire-pulse server. An application's process name and display name are available only when it publishes them.</p>
+<p class="note"><strong>Note:</strong> A recording can include about 100 ms of audio buffered before it started, and a capture opened immediately after another on the same source can lose a similar amount. Use <code>DurationMilliseconds</code> for a recording's length, and leave a short gap between back-to-back captures.</p>
 
 <h3 id="PlatformMacOS">macOS</h3>
-<p>Implemented over Core Audio and AudioQueue for playback, discovery, default-change notification, endpoint volume and mute, and microphone capture.</p>
-<p>Session control is unsupported, because macOS exposes no public per-application audio API: Core Audio models devices and streams, not application sessions. <a href="#Sessions">Audio.Sessions</a> returns an empty Array, <code>IsSessionControlSupported</code> is false, and <a href="#SetApplicationVolume">SetApplicationVolume</a> and <a href="#SetApplicationMute">SetApplicationMute</a> raise an OSError. Use <a href="#Device">Audio.Device.Volume</a> and <code>Mute</code>, or the application's own control.</p>
-<p>Metering is unsupported at the endpoint level for a related reason: the Core Audio HAL publishes no peak property for a device, and the one public alternative measures only frames carried by a queue the script itself opened. <code>IsMeteringSupported</code> is false and <a href="#Meter">Audio.Meter.Start</a> raises an OSError. <a href="#Output">Audio.Output.Peak</a>, <a href="#Playback">Audio.Playback.Peak</a> and <a href="#Recorder">Audio.Recorder.Peak</a> measure frames the script already owns and work here.</p>
-<p>Capturing what an output device is playing is not implemented on macOS. <code>IsSystemAudioCaptureSupported</code> is false; record from a microphone, or install a loopback device such as BlackHole and select it as the input device.</p>
-<p class="note"><strong>Note:</strong> The macOS backend is unverified. It compiles against the audio contracts, but it has never been run, so no macOS behavior on this page has been observed apart from the two capabilities the platform itself does not offer.</p>
-
-<h3 id="PlatformRecording">Recording</h3>
-<p class="note"><strong>Note:</strong> Recording has been exercised end to end on Linux against a real PulseAudio server, capturing system output to both an in-memory clip and a WAV file, with the written file read back by this class's own decoder. It has not been run against a real microphone on any platform, nor at all on Windows or macOS; on those two, its argument checking, status vocabulary and result contract are covered by tests which run without a sound card, but the captured audio itself is unverified.</p>
+<p><a href="#Sessions">Audio.Sessions</a> returns an empty Array, and <a href="#SetApplicationVolume">SetApplicationVolume</a> and <a href="#SetApplicationMute">SetApplicationMute</a> throw an OSError. Use <a href="#Device">Audio.Device.Volume</a> and <code>Mute</code> instead.</p>
+<p><a href="#Meter">Audio.Meter.Start</a> throws an OSError. <a href="#Output">Audio.Output.Peak</a>, <a href="#Playback">Audio.Playback.Peak</a> and <a href="#Recorder">Audio.Recorder.Peak</a> are supported.</p>
+<p>To record system output, install a loopback device such as BlackHole and record it as an input device.</p>
 
 <h2 id="Examples">Examples</h2>
-<p>These examples were run on Windows. The macOS backend has never been run and the Linux backend is only partly verified, so none of them is claimed to be cross-platform.</p>
+<p>These examples were verified on Windows, except the recording example.</p>
 
 <div class="ex" id="ExPlay">
 <p><a class="ex_number" href="#ExPlay"></a> Plays a sound file and waits for it to finish.</p>
@@ -426,20 +410,21 @@ if (Result := Rec.Stop())
 </div>
 
 <div class="ex" id="ExOnDeviceChange">
-<p><a class="ex_number" href="#ExOnDeviceChange"></a> Reports when headphones are plugged in or the default output changes.</p>
+<p><a class="ex_number" href="#ExOnDeviceChange"></a> Reports when headphones are plugged in or the default output changes. The hook does not keep the script running, so <a href="Persistent.htm">Persistent</a> does.</p>
 <pre class="NoIndent">#Import "Ks" { Audio }
 
 Hook := Audio.OnDeviceChange(DeviceChanged, "Output")
+Persistent
 
-DeviceChanged(ThisHook, Kind, Device)
+DeviceChanged(ThisHook, Change, Device)
 {
-    ToolTip Kind ": " Device.Name
+    ToolTip Change ": " Device.Name
     SetTimer () =&gt; ToolTip(), -2000
 }</pre>
 </div>
 
 <h2 id="Related">Related</h2>
-<p><a href="Sound.htm">Sound functions</a>, <a href="SoundPlay.htm">SoundPlay</a>, <a href="SoundBeep.htm">SoundBeep</a>, <a href="SoundSetVolume.htm">SoundSetVolume</a>, <a href="SoundGetInterface.htm">SoundGetInterface</a>, <a href="WinEvent.htm#Hook">Subscription Members</a>, <a href="Buffer.htm">Buffer</a>, <a href="../Modules.htm#KS">KS module</a>, <a href="../Platforms.htm">Platform Support</a></p>
+<p><a href="Sound.htm">Sound functions</a>, <a href="SoundPlay.htm">SoundPlay</a>, <a href="SoundBeep.htm">SoundBeep</a>, <a href="SoundSetVolume.htm">SoundSetVolume</a>, <a href="SoundGetInterface.htm">SoundGetInterface</a>, <a href="EventHook.htm">EventHook</a>, <a href="Buffer.htm">Buffer</a>, <a href="../Modules.htm#KS">KS module</a>, <a href="../Platforms.htm">Platform Support</a></p>
 
 </body>
 </html>

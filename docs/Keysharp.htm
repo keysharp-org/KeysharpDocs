@@ -13,44 +13,25 @@
 
 <h1>About Keysharp</h1>
 
-<p class="ks-lead">Keysharp is a cross-platform C# implementation of the AutoHotkey v2 language. It parses scripts, lowers them to C#, compiles them with Roslyn, and runs the resulting .NET assembly.</p>
+<p class="ks-lead">Keysharp is a cross-platform C# implementation of the AutoHotkey v2 language. It compiles scripts to .NET assemblies; see <a href="Program.htm#execution-model">How a Script Executes</a>.</p>
 
 <div class="note">
 <strong>Compatibility target:</strong> AutoHotkey v2.1-alpha.32.
-Keysharp is under active development, so the target does not imply that every
-inherited page has already been verified against every Keysharp platform.
 </div>
 
 <h2 id="Status">Project Status</h2>
 
-<p>The project began as a fork and continuation of the abandoned IronAHK project, itself a C# reimplementation of AutoHotkey. It remains in alpha testing and is not yet recommended for production systems.</p>
-
-<ul>
-  <li>Windows currently has the broadest compatibility.</li>
-  <li>Linux supports X11 and a growing set of Wayland functionality.</li>
-  <li>macOS support is active and requires system permissions for input, accessibility, and screen-capture features.</li>
-  <li>COM and Windows Registry APIs are Windows-only.</li>
-  <li>Foreign-window automation, input hooks, screen capture, GUI behavior, and native interop can differ by platform.</li>
-</ul>
+<p>The project began as a fork and continuation of the abandoned IronAHK project, itself a C# reimplementation of AutoHotkey. It is in alpha testing and is not recommended for production systems.</p>
 
 <p>See <a href="Platforms.htm">Platform Support</a> for shared backend and permission requirements, <a href="howto/Install.htm">How to Install Keysharp</a> for setup, and <a href="KeysharpDifferences.htm">Changes from AutoHotkey to Keysharp</a> for behavior which differs from AutoHotkey.</p>
 
 <h2 id="Files">Script Files</h2>
 
-<p>Keysharp runs <code>.ahk</code> and <code>.ks</code> source scripts. It also runs <code>.cks</code> compiled assemblies produced by Keysharp. AutoHotkey-compatible names such as <code>A_AhkVersion</code> and <code>#Requires AutoHotkey</code> are intentionally retained so compatible scripts do not need cosmetic rewrites.</p>
+<p>Keysharp runs <code>.ahk</code> and <code>.ks</code> source scripts. It also runs <code>.cks</code> compiled assemblies produced by Keysharp. AutoHotkey-compatible names such as <code>A_AhkVersion</code> and <code>#Requires AutoHotkey</code> are retained.</p>
 
 <h2 id="Docs">How to Read These Docs</h2>
 
-<p>The language reference began as the AutoHotkey v2 documentation and is being adapted to Keysharp. Platform qualifications are added to the parameter, return value, error, remark, or example they affect. General platform remarks use headings named Windows, Linux, or macOS so they are easy to scan, and an availability note appears near the syntax when the entire API is unavailable on a supported platform. While the audit is in progress, the absence of a platform qualification does not prove support on every platform; current runtime behavior, source, tests and the migrated platform reference are authoritative.</p>
-
-<p>References to AutoHotkey are retained when they identify:</p>
-
-<ul>
-  <li>language compatibility syntax or built-in compatibility names;</li>
-  <li>historical behavior and version changes;</li>
-  <li>the source of an upstream specification, issue, pull request, or example; or</li>
-  <li>original authorship and acknowledgements.</li>
-</ul>
+<p>This reference is derived from the AutoHotkey v2 documentation. Platform qualifications are stated at the parameter, return value, error, remark or example they affect; general platform remarks are under Windows, Linux or macOS headings, and a note near the syntax marks an API which is unavailable on a supported platform. The absence of a platform qualification does not prove support on every platform.</p>
 
 <h2 id="Links">Project Links</h2>
 

@@ -29,7 +29,7 @@
 
 <h2 id="Encode">Encode</h2>
 <p>Returns the JSON text for a script value.</p>
-<pre class="Syntax">JsonText := Json.<span class="func">Encode</span>(Value <span class="optional">, Indent</span>)</pre>
+<pre class="Syntax">JsonText := Json.<span class="func">Encode</span>(Value <span class="optional">, Indent, NullValue</span>)</pre>
 
 <h3 id="Encode_Parameters">Parameters</h3>
 <dl>
@@ -48,7 +48,12 @@
       <li>A string made of spaces, or a string made of tabs, is the indent unit itself — <code class="no-highlight">Json.Encode(Value, "`t")</code> indents with one tab.</li>
     </ul>
     <p>The widest indent is 127 units. A string that mixes spaces and tabs, or that is neither whitespace nor a number, throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
-    <p>Indented output separates lines with a single line feed on every platform, never a carriage return and line feed. This is deliberate: the same value always produces the same bytes, so a hash taken over encoded JSON — a lock file, a cache key — does not depend on the host.</p>
+    <p>Indented output separates lines with a linefeed (<code>`n</code>) on every platform.</p>
+  </dd>
+  <dt>NullValue</dt>
+  <dd>
+    <p>Type: <a href="../Concepts.htm#values">Any</a></p>
+    <p>If omitted, only an unset value is written as JSON <code class="no-highlight">null</code>. Otherwise, specify a value to write as <code class="no-highlight">null</code> wherever it occurs. See <a href="#Null">Nulls</a>.</p>
   </dd>
 </dl>
 
@@ -56,10 +61,10 @@
 <p>Type: <a href="../Concepts.htm#strings">String</a></p>
 <p>Returns the JSON text.</p>
 <p>Quotation marks are escaped, but non-ASCII characters are not: <code class="no-highlight">Json.Encode("&#228;&#246;&#252;")</code> returns <code class="no-highlight">"&#228;&#246;&#252;"</code> rather than a run of <code class="no-highlight">\uXXXX</code> escapes.</p>
-<p>A <a href="Map.htm">Map</a> enumerates its keys in sorted order, so encoding one sorts its keys. Two maps holding the same entries therefore encode to the same text, whatever order the entries were added in.</p>
+<p>The keys of a <a href="Map.htm">Map</a> are written in sorted order.</p>
 
 <h3 id="Encode_Errors">Errors</h3>
-<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>Value</em> contains itself, directly or through another container, or if it nests more than 128 levels deep. Two distinct containers that happen to hold equal contents are not a cycle.</p>
+<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>Value</em> contains itself, directly or through another container, or if it nests more than 128 levels deep.</p>
 
 <h2 id="Decode">Decode</h2>
 <p>Returns the script value for JSON text.</p>
@@ -70,20 +75,17 @@
   <dt>JsonText</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>The JSON text to decode. Any JSON value is accepted, not only an object or array. Trailing commas and <code class="no-highlight">//</code> and <code class="no-highlight">/* */</code> comments are tolerated, because hand-written configuration files commonly carry them.</p>
+    <p>The JSON text to decode. Any JSON value is accepted, not only an object or array. Trailing commas and <code class="no-highlight">//</code> and <code class="no-highlight">/* */</code> comments are tolerated.</p>
   </dd>
   <dt>CaseSense</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#boolean">Boolean</a> or <a href="../Concepts.htm#strings">String</a></p>
-    <p>The case sensitivity given to <strong>every</strong> <a href="Map.htm">Map</a> in the result, not only the outermost one. Spelled exactly as <a href="Map.htm#CaseSense">Map.CaseSense</a> is: true (the default, matching a map made by <a href="Map.htm">Map</a>), false, or <code class="no-highlight">"Locale"</code>.</p>
-    <p>It has to be chosen here rather than afterwards, because <a href="Map.htm#CaseSense">Map.CaseSense</a> cannot be assigned once a map holds entries. With false, two keys differing only in case collapse into a single entry, as they do in any case-insensitive Map.</p>
-    <p>Any other value throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+    <p>The case sensitivity of every <a href="Map.htm">Map</a> in the result: true (the default), false or <code class="no-highlight">"Locale"</code>, as for <a href="Map.htm#CaseSense">Map.CaseSense</a>. With false, keys which differ only in case are merged into a single entry. Any other value throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
   </dd>
   <dt>NullValue</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#values">Any</a></p>
-    <p>The value a JSON <code class="no-highlight">null</code> becomes. If omitted, it becomes an <strong>unset</strong> value — a <a href="Map.htm">Map</a> key is simply absent, and an <a href="Array.htm">Array</a> element is a hole that keeps the array's Length.</p>
-    <p>Pass your own marker — an object, so it cannot collide with data — when a null has to be told apart from an empty string, and hand the same marker to <a href="#Encode">Encode</a> to write it back out. See <a href="#Null">Nulls</a>.</p>
+    <p>The value a JSON <code class="no-highlight">null</code> becomes. If omitted, it becomes an <strong>unset</strong> value. See <a href="#Null">Nulls</a>.</p>
   </dd>
 </dl>
 
@@ -92,14 +94,13 @@
 <p>Returns the decoded value. See <a href="#Mapping">Type Mapping</a>.</p>
 
 <h3 id="Decode_Errors">Errors</h3>
-<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>JsonText</em> is not well-formed JSON, or if it nests more than 128 levels deep — the same limit <a href="#Encode">Encode</a> applies, so whatever this class can write, it can read back. The message describes the position of the problem.</p>
+<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>JsonText</em> is not well-formed JSON, or if it nests more than 128 levels deep. The message describes the position of the problem.</p>
 
 <h2 id="Null">Nulls</h2>
-<p>JSON has a <code class="no-highlight">null</code>; the script language has no equivalent that a container can hold. Assigning an unset value to a <a href="Map.htm">Map</a> item <em>removes</em> it, so a decoded null cannot be stored as one.</p>
 <p>With no marker a JSON <code class="no-highlight">null</code> decodes to an <strong>unset</strong> value, which means what unset means everywhere else: a Map key is simply absent, and an Array element is a hole.</p>
 <pre>MsgBox Json.Decode('{"a": null}').Has("a")   <em>; 0 — the key is not there</em>
 MsgBox Json.Decode('[1, null, 3]').Length     <em>; 3 — element 2 is a hole</em></pre>
-<p>That distinguishes a null from an empty string without any marker. To distinguish it from an <em>absent</em> key — the one thing unset cannot carry — supply your own marker and hand the same one back to <a href="#Encode">Encode</a>:</p>
+<p>That distinguishes a null from an empty string without any marker. To distinguish it from an <em>absent</em> key, supply your own marker and hand the same one back to <a href="#Encode">Encode</a>:</p>
 <pre>#Import "Ks" { Json }
 
 NULL := Object()   <em>; an object, so it cannot collide with data</em>
@@ -110,9 +111,8 @@ MsgBox Config["a"] == NULL   <em>; 1</em>
 MsgBox Config["b"] == ""     <em>; 1</em>
 
 MsgBox Json.Encode(Config, , NULL)   <em>; {"a":null,"b":""}</em></pre>
-<p>Without the marker on the <em>Encode</em> side the same object is just an object, so nothing can turn into a null by accident:</p>
+<p>Without the marker, <em>Encode</em> writes the marker object as an ordinary object:</p>
 <pre>MsgBox Json.Encode(Map("a", NULL))   <em>; {"a":{}}</em></pre>
-<p class="note"><strong>Note:</strong> <em>Encode</em> has no default marker, because defaulting it to any value would silently turn every occurrence of that value in the document into a null.</p>
 <h2 id="Mapping">Type Mapping</h2>
 <table class="info">
   <tr><th>JSON</th><th>Script value</th><th>Direction</th></tr>
@@ -120,11 +120,10 @@ MsgBox Json.Encode(Config, , NULL)   <em>; {"a":null,"b":""}</em></pre>
   <tr><td>array</td><td><a href="Array.htm">Array</a></td><td>Both</td></tr>
   <tr><td>string</td><td><a href="../Concepts.htm#strings">String</a></td><td>Both</td></tr>
   <tr><td>number</td><td><a href="../Concepts.htm#numbers">Integer</a> or <a href="../Concepts.htm#numbers">Float</a></td><td>Both. Decoding produces an Integer when the value is integral and fits in 64 bits, otherwise a Float.</td></tr>
-  <tr><td>true / false</td><td><a href="Boolean.htm">Boolean</a></td><td>Both. A Boolean reads as the integer 1 or 0 everywhere else in the language, so <code class="no-highlight">x is Boolean</code> is what distinguishes one from those integers.</td></tr>
-  <tr><td>null</td><td>unset, or your own <em>NullValue</em> marker</td><td>Both. Decoding drops the key (or leaves an array hole) unless <em>NullValue</em> names a stand-in. Encoding writes null for an unset value, and for the <em>NullValue</em> marker when one is given. See <a href="#Null">Nulls</a>.</td></tr>
+  <tr><td>true / false</td><td><a href="Boolean.htm">Boolean</a></td><td>Both</td></tr>
+  <tr><td>null</td><td>unset, or your own <em>NullValue</em> marker</td><td>Both. See <a href="#Null">Nulls</a>.</td></tr>
 </table>
-<p>Only an object's <em>own value properties</em> are encoded. A dynamic property would have to be called to produce a value, which encoding does not do, so such properties and methods are skipped.</p>
-<p class="note"><strong>Note:</strong> A decode followed by an encode produces equivalent JSON, and reproduces true and false exactly. It does not necessarily reproduce the original <em>text</em>: object keys come back in sorted order, insignificant whitespace and comments are gone, and a null becomes unset unless a <em>NullValue</em> marker was used.</p>
+<p>Dynamic properties and methods are not encoded.</p>
 
 <h2 id="Examples">Examples</h2>
 
@@ -140,7 +139,7 @@ MsgBox Data["stars"] + 1   <em>; 43, because it decoded as an Integer</em></pre>
 </div>
 
 <div class="ex" id="ExEncode">
-<p><a class="ex_number" href="#ExEncode"></a> Builds JSON text from a Map. A Map enumerates in sorted key order, so the keys come out sorted.</p>
+<p><a class="ex_number" href="#ExEncode"></a> Builds JSON text from a Map.</p>
 <pre>#Import "Ks" { Json }
 
 Settings := Map("theme", "dark", "size", 14, "recent", ["a.ks", "b.ks"])
@@ -162,7 +161,9 @@ FileOpen(A_ScriptDir "\settings.json", "w").Write(Json.Encode(Settings, 2))
 
 <div class="ex" id="ExCaseSense">
 <p><a class="ex_number" href="#ExCaseSense"></a> Reads a configuration file whose key spellings cannot be relied on, and tells a missing setting apart from one that was explicitly set to null.</p>
-<pre>#Import "Ks" { Json, Null }
+<pre>#Import "Ks" { Json }
+
+NULL := Object()
 
 Config := Json.Decode(FileRead("config.json"), CaseSense: false, NullValue: NULL)
 
@@ -170,21 +171,10 @@ MsgBox Config["timeout"]   <em>; found whether the file spelled it Timeout, TIME
 
 if !Config.Has("proxy")
     MsgBox "no proxy setting"
-else if (Config["proxy"] == Null)
+else if (Config["proxy"] == NULL)
     MsgBox "proxy explicitly disabled"
 else
     MsgBox "proxy: " Config["proxy"]</pre>
-</div>
-
-<div class="ex" id="ExFile">
-<p><a class="ex_number" href="#ExFile"></a> Round-trips a settings file.</p>
-<pre>#Import "Ks" { Json }
-
-Path := A_ScriptDir "\settings.json"
-Settings := FileExist(Path) ? Json.Decode(FileRead(Path)) : Map()
-Settings["runs"] := (Settings.Has("runs") ? Settings["runs"] : 0) + 1
-
-FileOpen(Path, "w").Write(Json.Encode(Settings, 2))</pre>
 </div>
 
 <h2 id="Related">Related</h2>

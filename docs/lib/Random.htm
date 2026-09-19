@@ -42,7 +42,7 @@
 <p>Reinitializes the current thread's pseudo-random number generator with a chosen seed.</p>
 <p>This function is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
 <pre class="Syntax"><span class="func">RandomSeed</span>(Integer)</pre>
-<p>Repeatedly seeding with the same value produces a reproducible sequence for testing. Do not use Random or RandomSeed for security-sensitive values; use <a href="Crypto.htm#SecureRandom">Crypt.SecureRandom</a>.</p>
+<p>Seeding with the same value reproduces the same sequence. For security-sensitive values, use <a href="Crypto.htm#SecureRandom">Crypt.SecureRandom</a>.</p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExBasic">

@@ -17,20 +17,18 @@
 <ul>
   <li><em>Global namespace</em> for variables, functions and classes.</li>
   <li><em>Body</em>, sometimes referred to as an auto-execute section.</li>
-  <li><em>Exports</em>, which can be <a href="lib/_Import.htm">imported</a> by another module without explicitly listing each one.</li>
-  <li><em>Unique name</em>, used to import the module or whatever it exports.</li>
 </ul>
 <p>Splitting the components of a script into modules can make the components easier to reuse and maintain.</p>
 <p>By default, all lines of code and global variables (including functions and classes) are added to an implicitly-defined module named "__Main". The script can start a new module with <a href="lib/_Module.htm">#Module</a> or load one from file with <a href="lib/_Import.htm">#Import</a>.</p>
-<p>An <a href="lib/_Import.htm">#Import</a> directive can add a module object or some of its functions, classes and variables to the current module's global namespace. Every global declared directly in a script module is exported automatically and can be selected by a <a href="lib/_Import.htm#Wildcard_Import">wildcard import</a>, except for names beginning with an underscore. An imported alias can be imported explicitly from the receiving module or accessed through its module object, but is forwarded to wildcard consumers only when introduced with <a href="lib/_Import.htm#Export">#Import Export</a>.</p>
-<p>All modules implicitly import from the built-in "AHK" module, which contains all built-in classes, variables and functions. A declaration or assignment within a module can reuse the name of a built-in class or function, in which case that class or function is not accessible except through the AHK module (e.g. <code>#Import AHK</code>, <code>AHK.MsgBox()</code>). However, built-in (A_) variables do not require a declaration or explicit import to allow assignment, and their names cannot be reused. <code>A_Args</code> is the exception (it is a normal variable defined in __Main).</p>
-<p>A module object is added to a module's global namespace only when imported, and conflicts can be resolved by giving it an alias within the destination module. Modules do not have default exports; an unquoted module name or an explicit alias always binds the module object itself.</p>
+<p>An <a href="lib/_Import.htm">#Import</a> directive can be used to make a module or some of its functions, classes and variables accessible within the current module.</p>
+<p id="AHK">All modules implicitly import from the built-in "AHK" module, which contains all built-in classes, variables and functions outside the <a href="#KS">KS module</a>. A declaration or assignment within a module can reuse the name of a built-in class or function, in which case that class or function is not accessible except through the AHK module (e.g. <code>#Import AHK</code>, <code>AHK.MsgBox()</code>). However, built-in (A_) variables do not require a declaration or explicit import to allow assignment, and their names cannot be reused. In AutoHotkey v2.1, <code>A_Args</code> is the exception (it is a normal variable defined in __Main). In Keysharp, <code>A_Args</code> is a built-in variable which every module and function shares.</p>
+<p>A module name is added to a module's global namespace only when imported, and conflicts can be resolved by giving the imported module an alias within the destination module.</p>
 <p><a href="lib/_Include.htm">#Include</a> is able to include a file once per module.</p>
 <p><a href="lib/_Warn.htm">#Warn</a> can enable or disable warnings within the current module without affecting other modules. For details, see the <a href="lib/_Warn.htm#Remarks">#Warn remarks</a>.</p>
 <p><a href="lib/_HotIf.htm">#HotIf</a> affects only the current module. #HotIf and <a href="lib/HotIf.htm">HotIf</a> expressions are module-scoped, as they may contain references to module-level variables. For instance, the effect of <code>#HotIf myToggle</code> depends on what value <em>myToggle</em> has in the current module.</p>
 
 <h2 id="KS">KS Module</h2>
-<p>The built-in <code class="no-highlight">KS</code> module exports Keysharp-specific classes, functions and variables. These are not available to a script until they are imported, which keeps the global namespace the same as AutoHotkey's.</p>
+<p>The built-in <code class="no-highlight">KS</code> module exports Keysharp-specific classes, functions and variables. A script must import a name to use it, and the names are not members of the <a href="#AHK">AHK module</a>.</p>
 <pre>#Import "Ks" { Image, A_DirSeparator }
 
 Capture := Image.FromDesktop()
@@ -46,19 +44,20 @@ MsgBox A_DirSeparator</pre>
   <tr id="KS_Base64"><td><a href="lib/Base64.htm">Base64</a></td><td>Converts between binary data and Base64 text.</td></tr>
   <tr id="KS_Boolean"><td><a href="lib/Boolean.htm">Boolean</a></td><td>The type of a truth value, so that a boolean can be told apart from the Integer 1 or 0.</td></tr>
   <tr id="KS_Clipboard"><td><a href="lib/Clipboard.htm">Clipboard</a></td><td>Reads and writes the system clipboard as text, images, files, HTML, RTF or a native format.</td></tr>
-  <tr id="KS_ClipboardHook"><td><a href="lib/Clipboard.htm#ClipboardHook">ClipboardHook</a></td><td>The subscription returned by <a href="lib/Clipboard.htm#OnChange">Clipboard.OnChange</a>.</td></tr>
+  <tr id="KS_ClipboardHook"><td><a href="lib/Clipboard.htm#ClipboardHook">ClipboardHook</a></td><td>The <a href="lib/EventHook.htm">EventHook</a> returned by <a href="lib/Clipboard.htm#OnChange">Clipboard.OnChange</a>.</td></tr>
   <tr id="KS_Clr"><td><a href="lib/Clr.htm">Clr</a></td><td>Loads .NET assemblies and calls into them from a script.</td></tr>
   <tr id="KS_Crypt"><td><a href="lib/Crypto.htm">Crypt</a></td><td>Hashes values and files, encrypts and decrypts with AES, derives keys from passwords, and returns cryptographically secure random values.</td></tr>
+  <tr id="KS_EventHook"><td><a href="lib/EventHook.htm">EventHook</a></td><td>The base class of every event subscription, <a href="lib/InputHook.htm">InputHook</a> included: <code>Start</code>, <code>Stop</code>, <code>InProgress</code> and <code>EndReason</code>.</td></tr>
   <tr id="KS_Font"><td><a href="lib/Font.htm">Font</a></td><td>A font as a value object, plus the platform's standard interface, emoji and monospace families.</td></tr>
   <tr id="KS_HashMap"><td><a href="lib/HashMap.htm">HashMap</a></td><td>An unordered hash table, faster than <a href="lib/Map.htm">Map</a> where ordering is not needed.</td></tr>
   <tr id="KS_Highlight"><td><a href="lib/Highlight.htm">Highlight</a></td><td>Outlines a region of the screen with a colored, click-through border.</td></tr>
   <tr id="KS_Http"><td><a href="lib/Http.htm">Http</a></td><td>Sends HTTP requests, as static shortcuts or as a session carrying headers, credentials and cookies.</td></tr>
   <tr id="KS_HttpResponse"><td><a href="lib/Http.htm#Response">Http.Response</a></td><td>What a server answered: status, headers and body.</td></tr>
-  <tr id="KS_Image"><td><a href="lib/Image.htm">Image</a></td><td>Captures, loads, manipulates and saves images.</td></tr>
+  <tr id="KS_Image"><td><a href="lib/Image.htm">Image</a></td><td>Captures, loads, draws, manipulates and saves images.</td></tr>
   <tr id="KS_Json"><td><a href="lib/Json.htm">Json</a></td><td>Converts between JSON text and Keysharp objects.</td></tr>
   <tr id="KS_Lock"><td><a href="lib/Lock.htm">Lock</a></td><td>A mutual-exclusion lock guarding code shared between <a href="lib/RealThread.htm">real threads</a>.</td></tr>
   <tr id="KS_Monitor"><td><a href="lib/Monitor.htm#KS">Monitor</a></td><td>One display: identity, metadata, brightness and DDC/CI control, and display-change notifications.</td></tr>
-  <tr id="KS_MonitorHook"><td><a href="lib/Monitor.htm#OnChange">MonitorHook</a></td><td>The subscription returned by <a href="lib/Monitor.htm#OnChange">Monitor.OnChange</a>.</td></tr>
+  <tr id="KS_MonitorHook"><td><a href="lib/Monitor.htm#OnChange">MonitorHook</a></td><td>The <a href="lib/EventHook.htm">EventHook</a> returned by <a href="lib/Monitor.htm#OnChange">Monitor.OnChange</a>.</td></tr>
   <tr id="KS_NamedArgs"><td><a href="lib/NamedArgs.htm">NamedArgs</a></td><td>Carries the <a href="Language.htm#named-parameters">named arguments</a> of one call, for building or inspecting them at run time.</td></tr>
   <tr id="KS_Overlay"><td><a href="lib/Overlay.htm">Overlay</a></td><td>Draws a click-through, always-on-top surface over the screen.</td></tr>
   <tr id="KS_RealThread"><td><a href="lib/RealThread.htm">RealThread</a></td><td>Runs a callback on a real operating-system thread, and marshals work to and from it.</td></tr>
@@ -76,40 +75,31 @@ MsgBox A_DirSeparator</pre>
   <tr id="KS_Await"><td><a href="lib/Await.htm">Await</a></td><td>Waits for work which finishes later and returns its value.</td></tr>
   <tr id="KS_ClipCursor"><td><a href="lib/ClipCursor.htm">ClipCursor</a></td><td>Confines the mouse cursor to a region of the screen, or releases it.</td></tr>
   <tr id="KS_Collect"><td><a href="lib/Collect.htm">Collect</a></td><td>Runs a garbage collection.</td></tr>
-  <tr id="KS_ComponentAvailable"><td><a href="lib/ComponentAvailable.htm">ComponentAvailable</a></td><td>Reports whether the parser or compiler component is installed, compatible and loadable.</td></tr>
+  <tr id="KS_CompileScript"><td><a href="lib/ValidateScript.htm#CompileScript">CompileScript</a></td><td>Compiles source in memory without running it and reports its errors and warnings.</td></tr>
   <tr id="KS_Cosh"><td><a href="lib/Math.htm#Cosh">Cosh</a></td><td>Returns the hyperbolic cosine.</td></tr>
   <tr id="KS_FileCreateTemp"><td><a href="lib/FilePath.htm#FileCreateTemp">FileCreateTemp</a></td><td>Creates a uniquely named temporary file.</td></tr>
-  <tr id="KS_FileDirName"><td><a href="lib/FilePath.htm#FileDirName">FileDirName</a></td><td>Returns the directory portion of a path.</td></tr>
   <tr id="KS_FileFullPath"><td><a href="lib/FilePath.htm#FileFullPath">FileFullPath</a></td><td>Expands a path to its absolute form.</td></tr>
   <tr id="KS_FormatCs"><td><a href="lib/FormatCs.htm">FormatCs</a></td><td>Formats a string using .NET composite formatting.</td></tr>
   <tr id="KS_GetKeyboardLayout"><td><a href="lib/KeyboardLayout.htm#GetKeyboardLayout">GetKeyboardLayout</a></td><td>Returns the keyboard layout of a window or thread.</td></tr>
   <tr id="KS_GetKeyInfo"><td><a href="lib/KeyboardLayout.htm#GetKeyInfo">GetKeyInfo</a></td><td>Returns the characters a key produces under a keyboard layout.</td></tr>
-  <tr id="KS_Join"><td><a href="Scripts.htm#Join">Join</a></td><td>Concatenates values with a separator.</td></tr>
+  <tr id="KS_IsComponentAvailable"><td><a href="lib/IsComponentAvailable.htm">IsComponentAvailable</a></td><td>Reports whether the parser or compiler component is installed, compatible and loadable.</td></tr>
   <tr id="KS_Mail"><td><a href="lib/Mail.htm">Mail</a></td><td>Sends an email message over SMTP.</td></tr>
-  <tr id="KS_NormalizeEol"><td><a href="lib/StringFunctions.htm#NormalizeEol">NormalizeEol</a></td><td>Converts line endings in a string to a single form.</td></tr>
   <tr id="KS_OutputDebugLine"><td><a href="lib/OutputDebug.htm#OutputDebugLine">OutputDebugLine</a></td><td>Writes a line to the system debug output.</td></tr>
-  <tr id="KS_ParseScript"><td><a href="lib/ParseScript.htm">ParseScript</a></td><td>Compiles source without running it and returns any compiler errors.</td></tr>
   <tr id="KS_RandomSeed"><td><a href="lib/Random.htm#RandomSeed">RandomSeed</a></td><td>Seeds the pseudo-random number generator.</td></tr>
   <tr id="KS_RegExMatchCs"><td><a href="lib/RegExCs.htm#RegExMatchCs">RegExMatchCs</a></td><td>Matches a .NET regular expression.</td></tr>
   <tr id="KS_RegExReplaceCs"><td><a href="lib/RegExCs.htm#RegExReplaceCs">RegExReplaceCs</a></td><td>Replaces text using a .NET regular expression.</td></tr>
+  <tr id="KS_ReplaceLineEndings"><td><a href="lib/StringFunctions.htm#ReplaceLineEndings">ReplaceLineEndings</a></td><td>Converts line endings in a string to a single form.</td></tr>
   <tr id="KS_RequestCapabilities"><td><a href="lib/RequestCapabilities.htm">RequestCapabilities</a></td><td>Requests optional platform capabilities the script needs.</td></tr>
   <tr id="KS_RunScript"><td><a href="lib/RunScript.htm">RunScript</a></td><td>Compiles and runs source code, returning a process object.</td></tr>
   <tr id="KS_ShowDebug"><td><a href="lib/OutputDebug.htm#ShowDebug">ShowDebug</a></td><td>Shows or hides the debug output window.</td></tr>
   <tr id="KS_Sinh"><td><a href="lib/Math.htm#Sinh">Sinh</a></td><td>Returns the hyperbolic sine.</td></tr>
   <tr id="KS_Tanh"><td><a href="lib/Math.htm#Tanh">Tanh</a></td><td>Returns the hyperbolic tangent.</td></tr>
+  <tr id="KS_ValidateScript"><td><a href="lib/ValidateScript.htm">ValidateScript</a></td><td>Checks the syntax of source without compiling or running it.</td></tr>
   <tr id="KS_WinFromPoint"><td><a href="lib/WinFromPoint.htm">WinFromPoint</a></td><td>Returns the window at a screen point.</td></tr>
-  <tr id="KS_WinMaximizeAll"><td><a href="lib/WinMaximizeAll.htm">WinMaximizeAll</a></td><td>Maximizes all windows.</td></tr>
 </table>
 
 <h3 id="KS_Variables">Variables</h3>
-<p>The KS module's built-in variables cover thread identity, millisecond timestamps, screen metrics, hotstring defaults and directive state. They are listed with descriptions under <a href="Variables.htm#KS">KS Module Variables</a>.</p>
-
-<h2 id="AHK">AHK Module</h2>
-<p>The built-in <code class="no-highlight">AHK</code> module contains every built-in class, function and variable. Each module implicitly imports it, so these names are available without any declaration and the module rarely has to be named.</p>
-<p>Importing it explicitly is useful when a script defines its own function or class using the name of a built-in one. The built-in remains reachable through the module, which lets a script wrap a built-in rather than replace it, as in the <a href="#ExAHK">example below</a>.</p>
-<pre>#Import AHK
-AHK.MsgBox("Shown by the built-in MsgBox.")</pre>
-<p>Because the AHK module forwards the built-in API rather than declaring its own, its exports are documented throughout this reference and not listed here. Built-in (A_) variables are the exception to shadowing: their names cannot be reused, so they never need to be reached through the module.</p>
+<p>The KS module's variables are listed under <a href="Variables.htm#KS">KS Module Variables</a>.</p>
 
 <h2 id="Execution">Execution</h2>
 <p>The body of each module is executed eagerly at program startup, by the <a href="Scripts.htm#auto">auto-execute thread</a>. A module normally executes after the modules it imports. Declaration order resolves modules which are otherwise unrelated or form a cycle.</p>
@@ -153,8 +143,8 @@ ShowVar() =&gt; MsgBox("Other MyVar = " MyVar)
 
 <div class="ex" id="ExAlias"><p><a class="ex_number" href="#ExAlias"></a> Use an alias to resolve a conflict. Each module has its own <code>Calculate</code>, which takes precedence over any wildcard import.</p>
 <pre>
-#Import "X" { Calculate as CalculateX }
-#Import "Y" { * }
+#Import "X" {Calculate as CalculateX}
+#Import "Y" {*}
 
 MyVar := 1
 MsgBox Calculate()

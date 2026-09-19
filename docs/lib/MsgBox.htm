@@ -26,7 +26,7 @@
 <pre class="Syntax"><span class="func">MsgBox</span> <span class="optional">Text, Title, Options</span>
 Result := <span class="func">MsgBox</span>(<span class="optional">Text, Title, Options</span>)</pre>
 
-<p class="note"><strong>Note:</strong> On Linux and macOS the toolkit provides only the OK, OK/Cancel, Yes/No and Yes/No/Cancel button sets, so the Abort/Retry/Ignore (2), Retry/Cancel (5) and Cancel/Try Again/Continue (6) options are unavailable there and fall back to a single OK button.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS, the Abort/Retry/Ignore (2), Retry/Cancel (5) and Cancel/Try Again/Continue (6) options show only an OK button.</p>
 <h2 id="Parameters">Parameters</h2>
 <dl>
 
@@ -255,7 +255,7 @@ Result := <span class="func">MsgBox</span>(<span class="optional">Text, Title, O
 <p>An <a href="Error.htm">Error</a> is thrown on failure, such as if the options are invalid, the <a href="#max">MsgBox limit</a> has been reached, or the message box could not be displayed for some other reason.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p class="note"><strong>Notice:</strong> Modality option values are ignored. The message box blocks the window which launched it; while <a href="Gui.htm#OwnDialogs">OwnDialogs</a> is active, it blocks all GUI windows in the script. System-modal message boxes are not supported on Windows, and the Help option (16384) is ignored.</p>
+<p class="note"><strong>Note:</strong> The modality options and the Help option (16384) are ignored. The message box blocks the window which launched it or, while <a href="Gui.htm#OwnDialogs">OwnDialogs</a> is active, all of the script's GUI windows.</p>
 <p>A message box usually looks like this:</p>
 <img src="../static/dlg_message.png" alt="MsgBox" />
 <p>To determine which button the user pressed, use the function's <a href="#Result">return value</a>. For example:</p>
@@ -269,9 +269,7 @@ if MsgBox("Retry or cancel?",, "R/C") = "Retry"
     MsgBox("You pressed Retry.")</pre>
 <p>To customize the names of the buttons, see <a href="../scripts/index.htm#MsgBoxButtonNames">Changing MsgBox's Button Names</a>.</p>
 <p class="note"><strong>Note:</strong> Pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> while a message box is active will copy its text to the clipboard. This applies to all message boxes, not just those produced by AutoHotkey.</p>
-<p id="Owner"><strong>Using MsgBox with GUI windows:</strong> A GUI window may display a <em>modal</em> message box by means of the <a href="Gui.htm#OwnDialogs">OwnDialogs option</a>. A <em>modal</em> message box prevents the user from interacting with the GUI window until the message box is dismissed. In such a case, it is not necessary to specify the System Modal or Task Modal options from the table above.</p>
-<p>When the <a href="Gui.htm#OwnDialogs">OwnDialogs option</a> is <em>not</em> in effect, the Task Modal option (8192) can be used to disable all the script's windows until the user dismisses the message box.</p>
-<p>If the <code class="no-highlight">Owner<i>HWND</i></code> option is specified, it takes precedence over any other setting. <i>HWND</i> can be the <a href="../misc/WinTitle.htm#ahk_id">HWND</a> of any window, even one not owned by the script.</p>
+<p id="Owner"><strong>Using MsgBox with GUI windows:</strong> A GUI window may display a <em>modal</em> message box by means of the <a href="Gui.htm#OwnDialogs">OwnDialogs option</a>. A <em>modal</em> message box prevents the user from interacting with the GUI window until the message box is dismissed. In such a case, it is not necessary to specify the System Modal or Task Modal options from the table above.</p><p>If the <code class="no-highlight">Owner<i>HWND</i></code> option is specified, it takes precedence over any other setting. <i>HWND</i> can be the <a href="../misc/WinTitle.htm#ahk_id">HWND</a> of any window, even one not owned by the script.</p>
 <p><strong>The Help button:</strong> When the Help button option (16384) is present in <em>Options</em>, pressing the Help button will have no effect unless both of the following are true:</p>
 <ol>
   <li>The message box is owned by a GUI window by means of the <a href="Gui.htm#OwnDialogs">OwnDialogs option</a>.</li>

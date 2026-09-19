@@ -19,13 +19,20 @@
 </ul>
 <p>For full technical details of changes, refer to <a href="https://github.com/AutoHotkey/AutoHotkey">GitHub</a>.</p>
 
+<h2 id="v2.1-alpha.32">2.1-alpha.32 - September 12, 2026</h2>
+<p>Added the <a href="lib/Gui.htm#FontHandle">FontHandle property (Gui)</a>.</p>
+<p>Fixed Gui.Move to not DPI-scale X or Y.</p>
+<p><strong>Changes applicable only to alpha users:</strong></p>
+<p>Fixed crash when Until is used at the end of a module.</p>
+<p>Fixed simple <code>a := b</code> assignments where b is a virtual reference.</p>
+
 <h2 id="v2.1-alpha.31">2.1-alpha.31 - August 28, 2026</h2>
 <p><strong>Changes applicable only to alpha users:</strong></p>
 <p>Removed standalone Export declarations and default exports. Globals declared directly in a module are now implicitly exported, while imported aliases are re-exported only by <code>#Import Export</code>. A bare import now binds the module object.</p>
 <p>Fixed #Import within #Module AHK and fixed multi-level imports changing an unset value to <code>""</code>.</p>
 <p>Fixed <code>Send "{Click X Y Count}"</code> moving to the coordinates once per sequence instead of once per click.</p>
 <p>Fixed successful CaretGetPos, FileGetShortcut, MouseGetPos, PixelSearch and Run calls leaving absent output values unset instead of making them blank.</p>
-<p>Fixed a property setter not being permitted after a separate getter, Props(v) aliasing <em>v</em>, and simple assignment from a virtual reference.</p>
+<p>Fixed a property setter not being permitted after a separate getter, and Props(v) aliasing <em>v</em>.</p>
 <p>Fixed a ListView header's ContextMenu event reporting an incorrect Item, GuiCtrl.OnMessage threads exceeding #MaxThreads or bypassing a positive thread priority, and a class being permitted to subclass itself.</p>
 <p>Fixed an IServiceProvider interface-pointer leak in ComObjQuery, a crash while destructing a boxed pointer with a nested struct, and a trailing character in an unset-return error message.</p>
 <p>Fixed RegExMatch OutputVar to be unset instead of <code>""</code> in v2.1 mode.</p>
@@ -419,7 +426,7 @@
 <p>Fixed built-in/wildcard imports in assume-global functions.</p>
 
 <h2 id="v2.1-alpha.11">2.1-alpha.11 - May 24, 2024</h2>
-<p>Added <a href="Modules.htm">Modules</a>, <a href="lib/_Module.htm">#Module</a>, <a href="lib/_Import.htm">#Import</a> and <a href="lib/Export.htm">Export</a>.</p>
+<p>Added <a href="Modules.htm">Modules</a>, <a href="lib/_Module.htm">#Module</a>, <a href="lib/_Import.htm">#Import</a> and <a href="lib/_Import.htm#Export">Export</a>.</p>
 
 <p><strong>Changes applicable only to alpha users:</strong></p>
 <p>Fixed leak from virtual references which return objects.</p>

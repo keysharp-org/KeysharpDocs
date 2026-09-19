@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>WinEvent Object | Keysharp</title>
-<meta name="description" content="Subscribes to cross-platform window events." />
+<meta name="description" content="Reports cross-platform window events for the windows matching one set of criteria." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" type="text/css" />
@@ -12,79 +12,137 @@
 <body>
 
 <h1>WinEvent Object</h1>
-<pre class="NoIndent">class WinEvent extends Object</pre>
-<p>Subscribes to active-window, appearance, disappearance, movement, minimize, restore, title-change and caret-movement events.</p>
-<p>This class is exported by the <a href="../Modules.htm#KS">KS module</a> and is modeled on the AutoHotkey WinEvent library.</p>
-<pre>#Import "Ks" { WinEvent }</pre>
+<pre class="NoIndent">class WinEvent extends EventHook</pre>
+<p>Reports activation, appearance, disappearance, movement, minimize, restore, title-change and caret-movement events for the windows which match one set of criteria. Construct one with the criteria, assign a callback to each event slot it should report, then call <a href="EventHook.htm#Start">Start</a>.</p>
+<p>This class is exported by the <a href="../Modules.htm#KS">KS module</a> and is modeled on the AutoHotkey WinEvent library; see <a href="#Library">Comparison with the WinEvent Library</a>.</p>
 
-<h2 id="Subscribe">Subscriptions</h2>
-<pre class="Syntax">Hook := WinEvent.<span class="func">Active</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)
-Hook := WinEvent.<span class="func">Exist</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)
-Hook := WinEvent.<span class="func">NotExist</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)
-Hook := WinEvent.<span class="func">Move</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)
-Hook := WinEvent.<span class="func">Minimize</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)
-Hook := WinEvent.<span class="func">Restore</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)
-Hook := WinEvent.<span class="func">TitleChange</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)
-Hook := WinEvent.<span class="func">CaretMove</span>(Callback <span class="optional">, WinTitle, Count := -1, WinText, ExcludeTitle, ExcludeText</span>)</pre>
-<p><em>Callback</em> receives <code class="no-highlight">(Hook, Hwnd, EventTime)</code>. <em>Count</em> limits how many callbacks are delivered; -1 is unlimited. Window criteria use ordinary <a href="../misc/WinTitle.htm">WinTitle matching</a>.</p>
-<p>Event-specific data arrives in <a href="../Variables.htm#EventInfo">A_EventInfo</a> rather than as an extra parameter. <code>Move</code> and <code>CaretMove</code> put a rectangle there as an object with <code>X</code>, <code>Y</code>, <code>Width</code> and <code>Height</code>; every other event type leaves the event time in <code>A_EventInfo</code>. The rectangle is built only if the callback reads it.</p>
+<h2 id="Call">Creating a WinEvent</h2>
+<pre class="Syntax">Hook := <span class="func">WinEvent</span>(<span class="optional">WinTitle, WinText, ExcludeTitle, ExcludeText</span>)</pre>
+<h3 id="Parameters">Parameters</h3>
+<dl>
+  <dt>WinTitle, WinText, ExcludeTitle, ExcludeText</dt>
+  <dd>
+    <p>Type: <a href="../Concepts.htm#strings">String</a>, <a href="../Concepts.htm#numbers">Integer</a> or <a href="../Concepts.htm#objects">Object</a></p>
+    <p>If each of these is blank or omitted, every top-level window matches, subject to the captured <a href="DetectHiddenWindows.htm">DetectHiddenWindows</a> setting; unlike <a href="WinExist.htm">WinExist</a>, blank criteria do not mean the Last Found Window. Otherwise, specify for <em>WinTitle</em> a <a href="../misc/WinTitle.htm">window title or other criteria</a>, and optionally <em>WinText</em>, <em>ExcludeTitle</em> and <em>ExcludeText</em>, as for WinExist.</p>
+  </dd>
+</dl>
+<h3 id="Return_Value">Return Value</h3>
+<p>Type: <a href="../Concepts.htm#objects">Object</a></p>
+<p>This returns a new WinEvent, which is idle until <code>Start()</code> is called.</p>
+<h3 id="Criteria">Criteria and Settings</h3>
+<p>The criteria are parsed when the hook is constructed. The current thread's <a href="DetectHiddenWindows.htm">DetectHiddenWindows</a>, <a href="DetectHiddenText.htm">DetectHiddenText</a> and <a href="SetTitleMatchMode.htm">SetTitleMatchMode</a> settings are captured at the same time and used for every event, so set them before constructing the hook. The criteria can be read back from the read-only <code>WinTitle</code>, <code>WinText</code>, <code>ExcludeTitle</code> and <code>ExcludeText</code> properties.</p>
 
+<h2 id="Slots">Event Slots</h2>
+<p>Each event has a slot, a property which holds the callback for that event. A hook can use any number of its slots, which share its criteria.</p>
 <table class="info">
-  <tr><th>Method</th><th>Event</th></tr>
-  <tr><td><code>Active</code></td><td>The foreground window changed, or the active window's title changed.</td></tr>
-  <tr><td><code>Exist</code></td><td>A matching window was created, shown or changed title to match. Fires once per window and forces hidden-window detection.</td></tr>
-  <tr><td><code>NotExist</code></td><td>A matching window was destroyed, hidden/cloaked when hidden detection is off, or changed title so it no longer matches.</td></tr>
-  <tr><td><code>Move</code></td><td>A window moved or resized. A backend using polling reports changes observed between queries.</td></tr>
-  <tr><td><code>Minimize</code></td><td>A window was minimized.</td></tr>
-  <tr><td><code>Restore</code></td><td>A window was restored.</td></tr>
-  <tr><td><code>TitleChange</code></td><td>A window title changed.</td></tr>
-  <tr><td><code>CaretMove</code></td><td>The text caret (insertion point) moved: typing, clicking into text, arrow keys, scrolling a text view, or focus moving to another text field. <em>Hwnd</em> is the caret owner's <em>top-level</em> window, not the focused edit control, so ordinary window criteria apply. Consecutive events reporting an unchanged rectangle are suppressed, and an event whose caret position cannot be resolved is dropped.</td></tr>
+  <tr><th>Slot</th><th>Called when</th></tr>
+  <tr id="OnActive"><td><code>OnActive</code></td><td>A matching window becomes the active (foreground) window. Every matching activation is reported, including one which moves from one matching window to another. With criteria, the active window is also reported when its title changes to match, so a window which became active before its title matched is caught.</td></tr>
+  <tr id="OnNotActive"><td><code>OnNotActive</code></td><td>The active window stops being a matching one: another window which does not match becomes active, or, with criteria, the reported window's title changes so that it no longer matches. Activation moving from one matching window to another is not reported. <em>Hwnd</em> is the matching window which was active last, which may be the one already active when <code>Start()</code> ran.</td></tr>
+  <tr id="OnExist"><td><code>OnExist</code></td><td>A window starts to match: it is created, shown or restored, or its title changes to match. A window is reported when it starts to match, and not again until it has stopped matching. Hidden windows are detected only if <a href="DetectHiddenWindows.htm">DetectHiddenWindows</a> was on when the hook was constructed, so with it off, a window created hidden is reported when it is shown.</td></tr>
+  <tr id="OnNotExist"><td><code>OnNotExist</code></td><td>A window stops matching: it is destroyed; it is hidden or cloaked while the captured DetectHiddenWindows is off; or its title changes so that it no longer matches. <em>Hwnd</em> may already be destroyed, so a window function called with it can fail.</td></tr>
+  <tr id="OnMove"><td><code>OnMove</code></td><td>A matching window moves or resizes. On Windows and macOS, every such event is reported. On Linux, moves of one window which arrive faster than the runtime processes them are merged, so only the latest is reported.</td></tr>
+  <tr id="OnMinimize"><td><code>OnMinimize</code></td><td>A matching window is minimized.</td></tr>
+  <tr id="OnRestore"><td><code>OnRestore</code></td><td>A matching window is restored from the minimized state.</td></tr>
+  <tr id="OnTitleChange"><td><code>OnTitleChange</code></td><td>A matching window's title changes.</td></tr>
+  <tr id="OnCaretMove"><td><code>OnCaretMove</code></td><td>The text caret (insertion point) moves inside a matching window: typing, clicking into text, arrow keys, scrolling a text view, or focus moving to another text field. <em>Hwnd</em> is the caret owner's <em>top-level</em> window, not the focused edit control, so ordinary window criteria apply. An event whose caret rectangle is the same as the last one reported is suppressed, and an event whose caret position cannot be resolved is dropped.</td></tr>
 </table>
-<p class="note"><strong>Note:</strong> <code>CaretMove</code> reads the caret through the same accessibility APIs as <a href="CaretGetPos.htm">CaretGetPos</a> and has the same coverage. An application which draws its own caret without exposing it to accessibility &mdash; common in browser-based and Electron editors, and in some game and terminal interfaces &mdash; reports nothing on any platform. The caret rectangle is always in screen coordinates, regardless of <a href="CoordMode.htm">CoordMode</a>, which affects only <code>CaretGetPos</code>.</p>
-<p>The values of DetectHiddenWindows, DetectHiddenText and title-match mode are captured when the subscription is created.</p>
+<p class="note"><strong>Note:</strong> <code>OnCaretMove</code> reads the caret through the same accessibility APIs as <a href="CaretGetPos.htm">CaretGetPos</a> and has the same coverage. An application which draws its own caret without exposing it to accessibility &mdash; common in browser-based and Electron editors, and in some game and terminal interfaces &mdash; reports nothing on any platform.</p>
 
-<h2 id="Global">Global Control</h2>
-<pre class="Syntax">NewState := WinEvent.<span class="func">Pause</span>(<span class="optional">NewState := 1</span>)
-Paused := WinEvent.<span class="func">Paused</span>
-WinEvent.<span class="func">Paused</span> := NewState</pre>
-<p>Pause (1), resume (0) or toggle (-1) every subscription. Pause returns the resulting state. While this switch is on, every hook reports <code>Status</code> <code class="no-highlight">"Paused"</code> and <code>IsActive</code> false.</p>
+<h3 id="Assigning">Assigning a Slot</h3>
+<pre class="Syntax">Hook.<span class="func">OnActive</span> := Callback
+Callback := Hook.<span class="func">OnActive</span></pre>
+<p>Assigning a <a href="../misc/Functor.htm">function object</a> sets the slot's callback, and assigning <code>""</code> or <code>unset</code> clears it. Reading a slot returns its callback, or <a href="../v2.1-changes.htm#CompatMode"><em>blank-unset</em></a> if it has none.</p>
+<p>Replacing a slot's callback takes effect at once; an event already queued still calls the callback it was queued for. Setting an empty slot or clearing one restarts a running hook on the same <a href="RealThread.htm">real thread</a>: queued events are discarded and the matching and active windows are recorded afresh, so an event during the restart is not reported. Clearing the last slot stops the hook, as <code>Stop()</code> does. Setting an empty slot of a running hook repeats any permission check <code>Start()</code> makes (see <a href="#Remarks">Remarks</a>); if it is refused, the assignment raises an error and the slot is unchanged.</p>
 
-<h2 id="Hook">Subscription Members</h2>
+<h3 id="Callback">Callback Parameters</h3>
+<pre class="Syntax">Callback(Hook, Hwnd, Time)</pre>
+<dl>
+  <dt>Hook</dt>
+  <dd><p>The WinEvent object.</p></dd>
+  <dt>Hwnd</dt>
+  <dd><p>The window's unique ID (HWND). It becomes the <a href="../misc/WinTitle.htm#LastFoundWindow">Last Found Window</a> of the callback's thread.</p></dd>
+  <dt>Time</dt>
+  <dd><p>When the event occurred, in milliseconds on the same timebase as <a href="../Variables.htm#TickCount">A_TickCount</a>. On Windows it is the time the system reports for the event; on Linux and macOS it is the time the runtime received the event.</p></dd>
+</dl>
+<p>For <code>OnMove</code> and <code>OnCaretMove</code>, <a href="../Variables.htm#EventInfo">A_EventInfo</a> holds a rectangle as an object with <code>X</code>, <code>Y</code>, <code>Width</code> and <code>Height</code>: the window's position and size when the event occurred, in the coordinates <a href="WinGetPos.htm">WinGetPos</a> uses, or the caret's rectangle in screen coordinates. The other slots do not set A_EventInfo.</p>
+<p>The callback's return value is ignored.</p>
+
+<h2 id="Start">Starting and Stopping</h2>
+<p><code>Start()</code> and <code>Stop()</code> are described under <a href="EventHook.htm#Cancel">EventHook</a>. <code>Start()</code> does nothing while no slot is set.</p>
+<p><code>Start()</code> records the windows which already match, and the active window, without reporting them. Every slot therefore reports only what changes after <code>Start()</code>: <code>OnExist</code> is not called for a window which already matches, nor <code>OnActive</code> for a matching window which is already active. To handle those as well, check for them after <code>Start()</code>, using the same criteria. On Windows, the following reports every Notepad window, including those which already existed:</p>
+<pre>#Import "Ks" { WinEvent }
+
+Hook := WinEvent("ahk_exe notepad.exe")
+Hook.OnExist := NotepadAppeared
+Hook.Start()
+for Hwnd in WinGetList("ahk_exe notepad.exe")    <em>; Windows which already existed.</em>
+    NotepadAppeared(Hook, Hwnd, A_TickCount)
+
+NotepadAppeared(Hook, Hwnd, Time) {
+    ToolTip "Notepad window " Hwnd
+}</pre>
+<p>Checking after <code>Start()</code> rather than before means a window which appears in between is reported twice rather than missed. On some platforms the native source becomes live only shortly after <code>Start()</code> returns (on Windows, once the script's main thread next processes messages), and a window which appears after the check but before then is not reported. For <code>OnActive</code>, check <a href="WinActive.htm">WinActive</a> in the same way.</p>
+<p>A running WinEvent keeps the script running, so the script above needs no <a href="Persistent.htm">Persistent</a>. See <a href="EventHook.htm#Lifetime">Lifetime</a>.</p>
+
+<h2 id="Hooks">Hooks</h2>
+<pre class="Syntax">Hooks := WinEvent.<span class="func">Hooks</span></pre>
+<p>An <a href="Array.htm">Array</a> of the running WinEvent hooks. See <a href="EventHook.htm#Hooks">Listing Running Hooks</a>.</p>
+
+<h2 id="Library">Comparison with the WinEvent Library</h2>
+<p>This class follows the AutoHotkey WinEvent library's event semantics, but its shape differs:</p>
 <table class="info">
-  <tr><th>Member</th><th>Description</th></tr>
-  <tr><td><code>Stop()</code></td><td>Cancels the subscription. This is permanent.</td></tr>
-  <tr><td><code>Pause([NewState := 1])</code></td><td>Pauses, resumes or toggles this subscription and returns its new state.</td></tr>
-  <tr><td><code>Paused</code></td><td>Gets or sets this hook's own pause switch. A stopped hook reports false and ignores writes.</td></tr>
-  <tr><td><code>Status</code></td><td>The effective state: <code class="no-highlight">"Active"</code>, <code class="no-highlight">"Paused"</code> or <code class="no-highlight">"Stopped"</code>.</td></tr>
-  <tr><td><code>IsActive</code></td><td>Whether the hook is firing. A paused hook is <strong>not</strong> active.</td></tr>
-  <tr><td><code>EventType</code></td><td>The event name.</td></tr>
-  <tr><td><code>Count</code></td><td>Remaining callback count, or -1 for unlimited. A stopped hook reports 0.</td></tr>
+  <tr><th>Aspect</th><th>AutoHotkey WinEvent library</th><th>Keysharp WinEvent</th></tr>
+  <tr><td>Subscribing</td><td><code class="no-highlight">WinEvent.Exist(Callback, WinTitle, Count, WinText, ExcludeTitle, ExcludeText)</code> registers one event at once</td><td>Construct with the criteria, assign one or more slots, then call <code>Start()</code></td></tr>
+  <tr><td>Callback parameters</td><td><code class="no-highlight">(hWnd, eventObj, dwmsEventTime)</code></td><td><code class="no-highlight">(Hook, Hwnd, Time)</code>, with the hook first; a callback written for the library needs its parameters reordered</td></tr>
+  <tr><td>Windows which already exist</td><td><code>Exist</code> reports one window which already matches, the one <a href="WinExist.htm">WinExist</a> finds, at registration</td><td><code>OnExist</code> reports only windows which start to match after <code>Start()</code>; <a href="#Start">check for existing windows</a> explicitly</td></tr>
+  <tr><td>Limiting calls</td><td><em>Count</em>, decremented when the callback returns 0</td><td>No <em>Count</em>, and the return value is ignored; call <code>Stop()</code></td></tr>
+  <tr><td>Pausing</td><td><code>Pause</code> and <code>IsPaused</code>, per hook and for all hooks</td><td><code>Stop()</code> and <code>Start()</code>, with <a href="#Hooks">WinEvent.Hooks</a> to reach every hook</td></tr>
+  <tr><td>Events</td><td>Also <code>Show</code>, <code>Create</code>, <code>Close</code>, <code>MoveStart</code>, <code>MoveEnd</code> and <code>Maximize</code>, with a <em>PropertyCallback</em> for <code>Close</code> and <code>NotExist</code></td><td>Also <code>OnTitleChange</code> and <code>OnCaretMove</code>. <code>OnExist</code> and <code>OnNotExist</code> are the nearest equivalents of <code>Create</code> and <code>Close</code>; construct the hook with DetectHiddenWindows on to include hidden windows</td></tr>
+  <tr><td>Hidden windows</td><td><code>Create</code> and <code>Show</code> turn hidden-window detection on</td><td>Every slot uses the DetectHiddenWindows setting captured at construction</td></tr>
+  <tr><td>Title changes</td><td><code>Active</code> is reported again whenever the active matching window's title changes</td><td><code>OnActive</code> reports a title change only when it brings the active window into a match; <code>OnTitleChange</code> reports every one</td></tr>
+  <tr><td>Keeping the script running</td><td>Registering a hook calls <a href="Persistent.htm">Persistent</a>, which stays in effect after the hooks are removed</td><td>A running hook keeps the script running; once the last one stops, the script can exit</td></tr>
 </table>
-<p>A hook is in exactly one of three states, which <code>Status</code> separates: <code class="no-highlight">"Active"</code> while it fires, <code class="no-highlight">"Paused"</code> while dispatch is suppressed by its own <code>Paused</code> or by the global <a href="#Global">WinEvent.Paused</a>, and <code class="no-highlight">"Stopped"</code> once <code>Stop()</code> has run. <code>IsActive</code> only answers whether it is firing, so it is false in both of the other two states.</p>
-<p><code class="no-highlight">"Stopped"</code> is permanent. A stopped hook cannot be paused or resumed, so <code>Paused</code> reads false there, writing to it does nothing, and <code>Count</code> reads 0.</p>
-<p>These members are defined by <code>Ks.EventHook</code>, which every subscription object derives from, so <a href="Monitor.htm#OnChange">Monitor.OnChange</a> and <a href="Clipboard.htm#ClipboardHook">ClipboardHook</a> subscriptions carry them identically.</p>
-<pre>hook := WinEvent.Active(OnActive)
-hook.Pause()
-MsgBox hook.Status "  " hook.IsActive   <em>; Paused  0</em>
-hook.Stop()
-MsgBox hook.Status "  " hook.Paused     <em>; Stopped  0</em></pre>
-<p>The subscription stops during <code>__Delete</code>, but garbage collection is non-deterministic. Call <code>Stop()</code> when the subscription is no longer needed.</p>
-<p><a href="Clipboard.htm#ClipboardHook">ClipboardHook</a> and the <a href="Monitor.htm#OnChange">Monitor.OnChange</a> subscription carry the same three members with the same meanings, minus the global switch.</p>
 
-<h2 id="Remarks">Platform Remarks</h2>
-<p>Event availability depends on the platform source, the window properties it exposes and its permissions.</p>
-
-<h3 id="Windows">Windows</h3>
-<p>Window events come from SetWinEventHook. <code>CaretMove</code> uses the MSAA caret, and its rectangle is read from the same GUITHREADINFO source as <a href="CaretGetPos.htm">CaretGetPos</a>, so the two always agree.</p>
+<h2 id="Remarks">Remarks</h2>
 
 <h3 id="Linux">Linux</h3>
-<p>Window subscriptions require <code class="no-highlight">keysharp-desktop</code> and the <code>WindowMonitoring</code> grant. See <a href="../Platforms.htm#Linux">Linux Platform Support</a>.</p>
-<p><strong>X11:</strong> Window events use the desktop component's XCB property and structure subscriptions. When the window manager supplies no EWMH client list, subscriptions fall back to polling window queries.</p>
-<p><strong>Wayland:</strong> GNOME Shell and Cinnamon supply push events through their extensions. KWin and generic Wayland backends use polling, limited to the window properties their APIs expose. Polling can miss changes which occur between queries.</p>
-<p><code>CaretMove</code> is not a display-server event on either backend: it comes from the AT-SPI <code>object:text-caret-moved</code> signal, which is why a caret subscription works the same way under X11 and Wayland. It requires accessibility to be enabled for the session; with no AT-SPI bridge running, no caret events arrive.</p>
+<p>A WinEvent requires <code class="no-highlight">keysharp-desktop</code> and the <code>WindowMonitoring</code> grant, which <code>Start()</code> checks: if the grant is refused, <code>Start()</code> raises an error and the hook is left as it was. See <a href="../Platforms.htm#Linux">Linux Platform Support</a>.</p>
+<p><strong>X11:</strong> Window events are polled, every 250 ms by default.</p>
+<p><strong>Wayland:</strong> GNOME Shell and Cinnamon report window events as they occur. KWin and other compositors use polling, limited to the window properties they expose.</p>
+<p>Polling can miss changes which occur between polls.</p>
+<p><code>OnCaretMove</code> works the same way under X11 and Wayland and requires accessibility (AT-SPI) to be enabled for the session.</p>
 
 <h3 id="macOS">macOS</h3>
-<p>Window events come from per-application Accessibility <code>AXObserver</code> streams and require Accessibility permission; without it the stream stays empty. <code>CaretMove</code> uses the <code>AXSelectedTextChanged</code> notification, which is registered only while a caret subscription exists because it fires on every keystroke. The event is reported against the edited element's containing window.</p>
+<p>A WinEvent requires Accessibility permission: if it is refused, <code>Start()</code> raises an error and the hook is left as it was.</p>
+
+<h2 id="Related">Related</h2>
+<p><a href="EventHook.htm">EventHook</a>, <a href="WinExist.htm">WinExist</a>, <a href="WinGetList.htm">WinGetList</a>, <a href="WinWait.htm">WinWait</a>, <a href="CaretGetPos.htm">CaretGetPos</a>, <a href="../misc/WinTitle.htm">WinTitle</a></p>
+
+<h2 id="Examples">Examples</h2>
+<div class="ex" id="ExActive">
+<p><a class="ex_number" href="#ExActive"></a> Shows the title of each window as it becomes active. With no criteria, every visible top-level window matches.</p>
+<pre>#Import "Ks" { WinEvent }
+
+Hook := WinEvent()
+Hook.OnActive := (Hook, Hwnd, Time) =&gt; ToolTip(WinGetTitle(Hwnd))
+Hook.Start()</pre>
+</div>
+
+<div class="ex" id="ExLifecycle">
+<p><a class="ex_number" href="#ExLifecycle"></a> On Windows, reports Notepad windows opening, closing and moving through one hook. <em>Hwnd</em> is not used to read the title in <code>OnNotExist</code>, because the window may already be gone.</p>
+<pre>#Import "Ks" { WinEvent }
+
+Notepad := WinEvent("ahk_exe notepad.exe")
+Notepad.OnExist := (Hook, Hwnd, Time) =&gt; ToolTip("Opened: " WinGetTitle(Hwnd))
+Notepad.OnNotExist := (Hook, Hwnd, Time) =&gt; ToolTip("Closed")
+Notepad.OnMove := ShowPosition
+Notepad.Start()
+
+ShowPosition(Hook, Hwnd, Time) {
+    R := A_EventInfo
+    ToolTip R.X ", " R.Y "  " R.Width " x " R.Height
+}</pre>
+</div>
 
 </body>
 </html>

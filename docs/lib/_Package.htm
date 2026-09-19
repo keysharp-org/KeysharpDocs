@@ -18,7 +18,7 @@
 
 <pre class="Syntax"><span class="func">#Package</span> <span class="optional">*i</span> <span class="optional">Provider:</span>PackageId <span class="optional">Version</span></pre>
 
-<p class="note"><strong>Requirements:</strong> Keysharp's bundled NuGet provider runs the official NuGet restore engine inside the Keysharp process. It requires only the .NET runtime already needed by Keysharp &mdash; not the .NET SDK, MSBuild, <code class="no-highlight">dotnet</code>, <code class="no-highlight">nuget.exe</code> or another NuGet executable. A cold package set can still require network access to a configured feed. See <a href="#Resolution">Resolution and caching</a>.</p>
+<p class="note"><strong>Note:</strong> The bundled NuGet provider needs only the .NET runtime Keysharp already uses; no .NET SDK or NuGet executable is required. Restoring a package set which is not yet cached may require network access to a configured feed.</p>
 
 <h2 id="Parameters">Parameters</h2>
 <dl>
@@ -27,7 +27,7 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>The local package-system provider. If omitted, this is <code class="no-highlight">nuget</code>, so <code class="no-highlight">#Package Newtonsoft.Json</code> and <code class="no-highlight">#Package nuget:Newtonsoft.Json</code> are equivalent. A provider name begins with a letter and contains only letters, digits, <code class="no-highlight">-</code> or <code class="no-highlight">_</code>.</p>
-    <p>Providers are installed as loose payloads under Keysharp's <code class="no-highlight">components/packages/&lt;name&gt;</code> directory and are loaded only when used. An installation can therefore add another package system without changing this directive; for example, <code class="no-highlight">#Package aris:dev/name</code> would pass <code class="no-highlight">dev/name</code> to an installed <code class="no-highlight">aris</code> provider. Keysharp does not download missing providers.</p>
+    <p>Providers are installed under Keysharp's <code class="no-highlight">components/packages/&lt;name&gt;</code> directory, and a missing one is not downloaded. For example, <code class="no-highlight">#Package aris:dev/name</code> passes <code class="no-highlight">dev/name</code> to an installed <code class="no-highlight">aris</code> provider.</p>
   </dd>
 
   <dt>PackageId</dt>
@@ -50,7 +50,6 @@
       <tr><td><code class="no-highlight">13.*</code></td><td>A floating version.</td></tr>
       <tr><td><code class="no-highlight">[13.0,14.0)</code></td><td>A NuGet interval.</td></tr>
     </table>
-    <p>Whatever is written, the version actually chosen is <em>pinned</em>: it is recorded in the resolved package set and, for a compiled script, in the script assembly itself. A later run therefore does not silently change dependencies.</p>
     <p>Prerelease versions are not selected unless the version says so explicitly (for example <code class="no-highlight">1.0.0-beta.1</code>).</p>
     <p class="note"><strong>Note:</strong> This parameter is not an expression. Neither parameter accepts <a href="../Variables.htm">variable references</a>.</p>
   </dd>
@@ -58,43 +57,40 @@
   <dt>*i</dt>
   <dd>
     <p>If present, the package is optional: if it or its separately installed provider cannot be made available, the script continues without it instead of stopping. The reason is reported through <a href="OutputDebug.htm">OutputDebug</a>. If the provider is installed, malformed provider-specific package or version syntax is still an error.</p>
-    <p>Use this only when the script can actually run without the package, such as a feature that degrades gracefully. Note that the eventual failure is less informative &mdash; instead of a resolution error naming the package, the script fails later at the point a type from it is used.</p>
+    <p>If the package is not available, an error is raised only where a type from it is used.</p>
   </dd>
 </dl>
 
 <h2 id="Resolution">Resolution and caching</h2>
-<p>Each package system is implemented by a local provider. The bundled NuGet provider uses the official NuGet client libraries in-process to choose the right build for the current framework, resolve dependencies, reconcile versions, select platform-specific native files, access feeds and maintain the global package folder. No SDK, MSBuild or external executable is invoked.</p>
-<p><strong>Resolution happens when the script is compiled, not when it runs.</strong> The exact version each request resolved to is recorded inside the built script, and that is what loads on every later run &mdash; so a floating version such as <code class="no-highlight">#Package Newtonsoft.Json</code> is decided once, by the build, rather than being decided again by each machine that runs it. This is the arrangement a .NET project uses, and it is what lets <a href="_CSharp.htm">inline C#</a> <code class="no-highlight">using</code> a type from a package the script declares: the compiler knows those assemblies because it resolved them itself.</p>
+<p><strong>Packages are resolved when the script is compiled.</strong> The exact version each request resolved to is recorded in the built script and loaded on every later run, so a floating version such as <code class="no-highlight">#Package Newtonsoft.Json</code> is decided once, by the build. This is also what lets <a href="_CSharp.htm">inline C#</a> use types from a declared package.</p>
 
 <p>Resolution happens in this order:</p>
 <ol>
   <li>If the requested set, provider version and relevant configuration match a successful cached graph whose assets still exist, that graph is used without network access.</li>
   <li>Otherwise the selected provider resolves the set. The NuGet provider can use the global package folder and any enabled feeds, so a cold set might require network access.</li>
-  <li>The compiler records the exact resolved graph and assets in the script manifest. Runtime startup reads that manifest and never calls a provider or restores the declarative set.</li>
 </ol>
 
-<p class="note"><strong>Note:</strong> <code class="no-highlight">--validate</code> and <code class="no-highlight">Ks.ParseScript</code> never restore. They are checks rather than builds, so a package set that has not been restored on this machine yet is <em>reported</em> as exactly that instead of triggering a download &mdash; which matters most in an editor, where a check may run every time you stop typing. Running or compiling the script restores it.</p>
-<p>The NuGet provider discovers <code class="no-highlight">NuGet.Config</code> beginning at the script directory. Its enabled package sources, credentials, package-source mapping, trusted-signer policy, global-packages folder, fallback folders and ordinary NuGet feed/network behavior apply. Feed URLs, proxies, mirrors and source policy therefore belong in NuGet configuration rather than in this directive. Changing a discovered config file or enabled source invalidates the cached graph.</p>
-<p>Keysharp's cache stores per-set resolution metadata. Package contents live in the global packages folder selected by NuGet configuration (<code class="no-highlight">%NUGET_PACKAGES%</code> when set, otherwise the NuGet default), shared with other .NET tooling.</p>
-<p class="note"><strong>Package compatibility:</strong> Keysharp consumes managed compile/runtime assemblies, resource assemblies and native libraries selected for the current runtime. It does not execute package MSBuild props or targets, custom tasks, analyzers, source generators or <code class="no-highlight">contentFiles</code>. A package which requires one of those build-time hooks is not suitable for this directive even if its dependency graph restores successfully.</p>
+<p class="note"><strong>Note:</strong> <code class="no-highlight">--validate</code> and <a href="ValidateScript.htm#CompileScript">CompileScript</a> do not restore packages; a package set which has not been restored on this machine is reported as such. Running or compiling the script restores it.</p>
+<p>The NuGet provider discovers <code class="no-highlight">NuGet.Config</code> beginning at the script directory. Its enabled package sources, credentials, package-source mapping, trusted-signer policy, global-packages folder, fallback folders and ordinary NuGet feed/network behavior apply. Changing a discovered config file or enabled source invalidates the cached graph.</p>
+<p>Package contents live in the global packages folder selected by NuGet configuration (<code class="no-highlight">%NUGET_PACKAGES%</code> when set, otherwise the NuGet default), shared with other .NET tooling.</p>
+<p class="note"><strong>Note:</strong> A package contributes its assemblies, resource assemblies and native libraries for the current runtime. Its MSBuild tasks, analyzers, source generators and <code class="no-highlight">contentFiles</code> are not used, so a package which depends on them may not work.</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p>Every #Package directive in a script is resolved together, grouped by provider, and each must appear at the top level of a script or module. Resolving them separately could settle on two different versions of a shared dependency and load both, so requesting the same provider/package identity twice with different versions is a load-time error. Requesting it twice with the same version is accepted and has no additional effect.</p>
-<p>Types from a package's own dependencies are reachable too, even though the script never names those packages. A dependency is not loaded until something is actually used from it.</p>
-<p>No further syntax is needed to use what was made available: types are reached through <a href="Clr.htm">Clr</a> by namespace, in the ordinary way.</p>
+<p>Every #Package directive in a script is resolved together, grouped by provider, and each must appear at the top level of a script or module. Requesting the same provider/package identity twice with different versions is a load-time error. Requesting it twice with the same version is accepted and has no additional effect.</p>
+<p>Types are reached through <a href="Clr.htm">Clr</a> by namespace. Types from a package's own dependencies are reachable too, even though the script never names those packages.</p>
 <p>Like other directives, #Package cannot be executed conditionally.</p>
 <p>If the NuGet provider reports a known security advisory for a resolved package, the advisory is passed through to <a href="OutputDebug.htm">OutputDebug</a> and the script continues.</p>
 
-<p class="note"><strong>This is not <a href="_DllLoad.htm">#DllLoad</a>.</strong> That directive loads a <em>native</em> module so <a href="DllCall.htm">DllCall</a> can reach it, and has no effect on what <a href="Clr.htm">Clr</a> can see &mdash; pointing it at a .NET assembly does not make that assembly's types available. Use #Package for packages, or <a href="Clr.htm#Load">Clr.Load</a> for a .NET assembly already on disk.</p>
+<p>For a .NET assembly already on disk, use <a href="Clr.htm#Load">Clr.Load</a>.</p>
 
-<p class="warning"><strong>Security:</strong> A package is third-party code, and it runs inside the script's process with the script's full privileges. Packages are not reviewed, vetted, or endorsed by this project; the trust decision is the same one a .NET project makes, and it is the script author's. Treat an unfamiliar package name with the same caution as an unfamiliar DLL.</p>
+<p class="warning"><strong>Warning:</strong> A package is third-party code, and it runs inside the script's process with the script's full privileges. Packages are not reviewed by the Keysharp project. Treat an unfamiliar package name with the same caution as an unfamiliar DLL.</p>
 
-<p class="note"><strong>Compiled scripts:</strong> A <a href="../Scripts.htm#ahk2exe">compiled script</a> carries the exact declarative package assets it was built against, so the target machine needs neither a provider, network access nor a populated package cache for #Package. A normal executable or raw <code class="no-highlight">.cks</code> stores them in a private package/version-scoped <code class="no-highlight">.keysharp/packages</code> hierarchy beside the output; distribute that directory with the artifact. An <code class="no-highlight">exe-min</code> embeds the assets in the generated script assembly instead. Same-named files from different packages cannot overwrite one another. If an asset is missing at startup, the script stops with an error naming the package and version rather than failing later when a type is used.</p>
+<p class="note"><strong>Note:</strong> A compiled script carries the exact package assets it was built against, so the target machine needs no provider, network access or package cache for #Package. Distribute the <code class="no-highlight">.keysharp/packages</code> directory written beside a <code class="no-highlight">.cks</code> or executable with it; an <code class="no-highlight">exe-min</code> embeds the assets instead (see <a href="../Program.htm#cmd">--compile</a>). If an asset is missing at startup, the script stops with an error naming the package and version.</p>
 
-<p>For the cases a directive cannot express &mdash; a package chosen by a computed name, or one needed only on some code paths &mdash; see <a href="Clr.htm#LoadPackage">Clr.LoadPackage</a>. Prefer this directive where it fits: it resolves every package in one step, pins the result, and needs no provider at runtime.</p>
+<p>For a package chosen by a computed name, or one needed only on some code paths, use <a href="Clr.htm#LoadPackage">Clr.LoadPackage</a>.</p>
 
 <h2 id="Related">Related</h2>
-<p><a href="Clr.htm">Clr</a>, <a href="Clr.htm#LoadPackage">Clr.LoadPackage</a>, <a href="_DllLoad.htm">#DllLoad</a>, <a href="_Requires.htm">#Requires</a>, <a href="_Include.htm">#Include</a></p>
+<p><a href="Clr.htm">Clr</a>, <a href="Clr.htm#LoadPackage">Clr.LoadPackage</a>, <a href="_DllLoad.htm">#DllLoad</a>, <a href="_Requires.htm">#Requires</a></p>
 
 <h2 id="Examples">Examples</h2>
 

@@ -13,7 +13,7 @@
 
 <h1>ComObjGet</h1>
 <p>Returns a reference to an object provided by a COM component.</p>
-<p class="note"><strong>Notice:</strong> Apple Events has no monikers, so on macOS this behaves as <a href="ComObjActive.htm">ComObjActive</a>.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS, this function behaves as <a href="ComObjActive.htm">ComObjActive</a>.</p>
 <pre class="Syntax">ComObj := <span class="func">ComObjGet</span>(Name)</pre>
 
 <h2 id="Parameters">Parameters</h2>
@@ -23,7 +23,6 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>The display name of the object to be retrieved. See <a href="https://learn.microsoft.com/windows/win32/api/objbase/nf-objbase-mkparsedisplayname">MkParseDisplayName (Microsoft Docs)</a> for more information.</p>
-    <p>On Linux, the D-Bus target to connect to, in the form described under <a href="../Platforms.htm#Linux_DBus">Interprocess automation with ComObject</a>. D-Bus has no equivalent of a moniker, so a display name is not parsed.</p>
   </dd>
 
 </dl>
@@ -34,12 +33,6 @@
 
 <h2 id="Error_Handling">Error Handling</h2>
 <p>An exception is thrown on failure.</p>
-<p>On Linux, an error is thrown if no service currently owns the requested bus name.</p>
-
-<h2 id="Remarks">Remarks</h2>
-
-<h3 id="Linux">Linux</h3>
-<p>Connects to a D-Bus service which is already on the bus, and is equivalent to <a href="ComObjActive.htm">ComObjActive</a>. A service which is not running is not activated.</p>
 
 <h2 id="Related">Related</h2>
 <a href="ComObject.htm">ComObject</a>, <a href="ComObjActive.htm">ComObjActive</a>, <a href="ComObjConnect.htm">ComObjConnect</a>, <a href="ComObjQuery.htm">ComObjQuery</a>, <a href="https://learn.microsoft.com/windows/win32/api/objbase/nf-objbase-cogetobject">CoGetObject (Microsoft Docs)</a>

@@ -16,8 +16,8 @@
 
 <p>Creates an object containing everything on the clipboard (such as pictures and formatting).</p>
 <pre class="Syntax">ClipSaved := <span class="func">ClipboardAll</span>(<span class="optional">Data, Size</span>)</pre>
-<p class="note"><strong>Note:</strong> Capturing the current clipboard by omitting <em>Data</em> can require ClipboardMonitoring. Constructing from supplied data and restoring that data are ungated.</p>
-<p class="note"><strong>Note:</strong> On Wayland sessions which use the desktop-extension fallback, restoring a ClipboardAll object can publish only one of its captured MIME representations. Native data-control backends restore all captured formats.</p>
+<p class="note"><strong>Note:</strong> Capturing the current clipboard by omitting <em>Data</em> can require ClipboardMonitoring.</p>
+<p class="note"><strong>Note:</strong> On Cinnamon under Wayland, restoring a ClipboardAll object restores only one of its formats.</p>
 <p><em></em><code>ClipboardAll</code> itself is a <a href="Class.htm">class</a> derived from <code>Buffer</code>.</p>
 
 <h2 id="Parameters">Parameters</h2>

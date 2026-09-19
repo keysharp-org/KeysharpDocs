@@ -105,12 +105,12 @@
 
 <h3 id="Linux_User">Installing without root</h3>
 <p>Extract the Keysharp archive and run <code class="no-highlight">bash ./install.sh</code> without sudo to install under <code class="no-highlight">$HOME/.local</code>, or run <code class="no-highlight">app/Keysharp</code> directly. The .NET 10 runtime and native runtime libraries must already be available. This does not install either native component; an existing system installation of them can still be used.</p>
-<p>The desktop component also supports a <a href="https://github.com/keysharp-org/keysharp-desktop/blob/main/docs/install.md#install-for-one-user">user-owned authority</a>, whose consent dialogs require zenity or kdialog. Its grants record consent without protecting against other programs running as the same user, and are separate from system input grants. Input hooks and synthesis still require the system input component.</p>
+<p>The desktop component also supports a <a href="https://github.com/keysharp-org/keysharp-desktop/blob/main/docs/install.md#install-for-one-user">user-owned authority</a>, whose consent dialogs require zenity or kdialog. See <a href="../Platforms.htm#Linux_Permissions">Linux permissions</a> for what its grants cover. Input hooks and synthesis require the system input component.</p>
 
 <h2 id="Verify">Verify the Installation</h2>
 <p>Save this as <code class="no-highlight">hello.ks</code>:</p>
 <pre>MsgBox "Hello from Keysharp!"</pre>
-<p>Double-click the file. A message box appears if the installation is working &mdash; the installers associate <code class="no-highlight">.ks</code> and <code class="no-highlight">.cks</code> files with Keysharp, so scripts run like any other program.</p>
+<p>Double-click the file. A message box appears if the installation is working.</p>
 <p>It can also be run from a terminal, which is how you see any output a script writes:</p>
 <pre class="no-highlight">keysharp hello.ks</pre>
 <p>On Windows the command is <code class="no-highlight">Keysharp.exe hello.ks</code>, and for a <a href="#Portable_Windows">portable copy</a> it is <code class="no-highlight">.\Keysharp.exe hello.ks</code> from the extracted directory.</p>
@@ -135,30 +135,10 @@ tccutil reset All org.keysharp.keyview</pre>
 <p>macOS can keep opening applications from the Trash, so empty it if removed applications stay associated with <code class="no-highlight">.ks</code> or <code class="no-highlight">.ahk</code> files.</p>
 
 <h2 id="Build">Building from Source</h2>
-<p>Building requires the .NET 10 SDK. On Linux and macOS it also requires the Keysharp branch of <a href="https://github.com/keysharp-org/Eto/tree/Keysharp">the Keysharp Eto fork</a>, cloned beside the Keysharp repository:</p>
-<p>From the Keysharp repository:</p>
-<pre class="no-highlight">git clone -b Keysharp https://github.com/keysharp-org/Eto.git ../Eto
+<p>Building requires the .NET 10 SDK. On Linux and macOS, clone the Keysharp branch of <a href="https://github.com/keysharp-org/Eto/tree/Keysharp">the Keysharp Eto fork</a> beside the Keysharp repository. From the Keysharp repository:</p>
+<pre class="no-highlight">git clone -b Keysharp --recurse-submodules https://github.com/keysharp-org/Eto.git ../Eto
 dotnet build Keysharp.sln -c Debug</pre>
-<p>See the <a href="https://github.com/keysharp-org/Keysharp/blob/master/docs/building.md">build guide</a> for runtime dependencies and launching the output. Packaging is a separate step:</p>
-<table class="info">
-  <tr><th>Platform</th><th>Build and package</th><th>Output in <code class="no-highlight">dist/</code></th></tr>
-  <tr>
-    <td>Windows</td>
-    <td><code class="no-highlight">Keysharp.Install\package-windows.ps1</code></td>
-    <td>MSI and portable ZIP. The MSI needs the Microsoft Visual Studio Installer Projects extension; the ZIP does not.</td>
-  </tr>
-  <tr>
-    <td>Linux</td>
-    <td><code class="no-highlight">Keysharp.Install/package-linux.sh</code></td>
-    <td>Portable directory and tarball, plus a <code class="no-highlight">.deb</code> when <code class="no-highlight">dpkg-deb</code> is present.</td>
-  </tr>
-  <tr>
-    <td>macOS</td>
-    <td><code class="no-highlight">bash ./Keysharp.Install/package-macos.sh</code></td>
-    <td>DMG and PKG for the host architecture. Set <code class="no-highlight">RID=osx-x64</code> to cross-publish; signing and notarization are skipped unless <code class="no-highlight">ADHOC_SIGN=true</code>.</td>
-  </tr>
-</table>
-<p>To run without packaging, build the solution and launch the executable from the build directory &mdash; on Windows, open <code class="no-highlight">Keysharp.sln</code> in <a href="https://visualstudio.microsoft.com/vs/community/">Visual Studio 2022</a>, build, then run <code class="no-highlight">.\Keysharp.exe yourscript.ahk</code> from <code class="no-highlight">bin\Release\net10.0-windows</code>.</p>
+<p>See the <a href="https://github.com/keysharp-org/Keysharp/blob/master/docs/building.md">build guide</a> for output locations, runtime dependencies and release packaging.</p>
 
 <h2 id="Next_Steps">Next Steps</h2>
 <ul>

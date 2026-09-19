@@ -29,24 +29,19 @@
   <li>Edit it in Keyview or another <a href="misc/Editors.htm">text editor</a>.</li>
   <li>Save your changes before running or reloading the script.</li>
 </ol>
-<p>Keyview is distributed with Keysharp and provides a convenient Keysharp-oriented viewer/editor. AutoHotkey v2 editor extensions can also provide useful syntax highlighting because the languages are intentionally compatible, although their launch and debugging integration may require configuration.</p>
-<p>Keyview displays generated C# and validation feedback while editing, and can open, save, run and compile source files. Its editor features are still developing.</p>
+<p>Keyview, which is distributed with Keysharp, shows the generated C# and validation feedback while editing, and can run and compile the script.</p>
 
-<h2 id="install">Install and Update</h2>
+<h2 id="install"><span id="update"></span>Install and Update</h2>
 <p>See <a href="howto/Install.htm">Install Keysharp</a> for supported installers, portable layouts, source builds, platform prerequisites and uninstall instructions.</p>
 
 <h3 id="portability">Portable Use</h3>
-<p>On Windows, extract the portable ZIP and run <code class="no-highlight">Keysharp.exe</code> directly. See the <a href="howto/Install.htm#Portable_Windows">portable Windows instructions</a>. Linux source builds and macOS source archives can likewise run from their build or extracted directories after their platform prerequisites are installed.</p>
-
-<h3 id="update">Updates</h3>
-<p>Install a newer release using the same method as the original installation. Check the <a href="https://github.com/keysharp-org/Keysharp/releases">Keysharp releases</a> and read <a href="ChangeLog.htm">Recent Changes</a> before replacing an existing installation.</p>
+<p>On Windows, extract the portable ZIP and run <code class="no-highlight">Keysharp.exe</code> directly; see the <a href="howto/Install.htm#Portable_Windows">portable Windows instructions</a>. On Linux, run <code class="no-highlight">app/Keysharp</code> from the extracted archive; see <a href="howto/Install.htm#Linux_User">Installing without root</a>.</p>
 
 <h3 id="Installer_uiAccess">UI Access on Windows</h3>
-<p>Keysharp executables do not use a Windows <code class="no-highlight">uiAccess</code> manifest. AutoHotkey instructions which rely on an installed UI-access executable therefore do not apply. To automate an elevated target, run the script at a sufficient integrity level and consider the security implications before doing so.</p>
+<p>Keysharp does not provide UI-access executables. To automate an elevated window, run the script at a sufficient integrity level.</p>
 
-<h2 id="dash">The Dash and Keyview</h2>
-<p>Keysharp ships its own Dash, a launcher for creating a script from a template, running an existing one, and opening the bundled tools and demos. Editing happens in Keyview or a configured text editor.</p>
-<p>This is not AutoHotkey Dash, and the two are not the same program. References to Dash in inherited AutoHotkey compatibility material describe the AutoHotkey tool.</p>
+<h2 id="dash">The Dash</h2>
+<p>The Dash is a launcher for creating a script from a template, running an existing one, and opening the bundled tools and demos.</p>
 
 <h2 id="execution-model">How a Script Executes</h2>
 <ol>
@@ -55,11 +50,10 @@
   <li>Roslyn compiles the generated C# to a .NET assembly in memory.</li>
   <li>The runtime loads the assembly and invokes its entry point.</li>
 </ol>
-<p>This differs from a traditional interpreter: script code executes as a compiled .NET program. Use <code class="no-highlight">--transpile</code> to write the generated C# without running the script, or a <code class="no-highlight">--compile</code> mode to write a reusable assembly or executable.</p>
+<p>Use <code class="no-highlight">--transpile</code> to write the generated C# without running the script, or a <code class="no-highlight">--compile</code> mode to write a reusable assembly or executable.</p>
 
 <h3 id="internal-names">Internal Type Names</h3>
-<p>Some built-in classes carry a different name in the compiled assembly, because the documented name collides with a .NET framework type: <a href="lib/Object.htm">Object</a> is implemented as <code>KeysharpObject</code>, <a href="lib/File.htm">File</a> as <code>KeysharpFile</code> and <a href="lib/Func.htm">Func</a> as <code>KeysharpFunc</code>. The <a href="Structs.htm#numeric-types">numeric struct types</a> are similarly implemented as <code>StructInt32</code> and so on.</p>
-<p>Only the documented names are valid in script code; the internal names are not class names a script can use, and <a href="lib/Type.htm">Type</a> reports the documented name. The internal names can still appear in diagnostic output that reports managed types directly, such as the call frames of <a href="lib/Error.htm#Stack">Error.Stack</a> or the type shown for a variable by <a href="lib/ListVars.htm">ListVars</a>. Read them as the documented class of the same name.</p>
+<p>Diagnostic output which reports managed types, such as the call frames of <a href="lib/Error.htm#Stack">Error.Stack</a> and the types shown by <a href="lib/ListVars.htm">ListVars</a>, can show implementation names for some built-in classes: <code>KeysharpObject</code> for <a href="lib/Object.htm">Object</a>, <code>KeysharpFile</code> for <a href="lib/File.htm">File</a>, <code>KeysharpFunc</code> for <a href="lib/Func.htm">Func</a>, and <code>StructInt32</code> and so on for the <a href="Structs.htm#numeric-types">numeric struct types</a>. Scripts use only the documented names, which <a href="lib/Type.htm">Type</a> reports.</p>
 
 <h2 id="run">Run a Script</h2>
 <p>Pass the script path to the Keysharp executable:</p>
@@ -71,26 +65,19 @@
 <p>Started with no script at all, Keysharp looks for one named after its own executable — <code class="no-highlight">Keysharp.ahk</code>, then <code class="no-highlight">Keysharp.ks</code>, then <code class="no-highlight">Keysharp.cks</code> — first in the working directory and then beside the executable.</p>
 
 <h2 id="cmd">Command-Line Options</h2>
-<p>Options must appear before the script or assembly input. After the input is found, all remaining arguments are passed to its entry point. Options can begin with <code class="no-highlight">-</code> or <code class="no-highlight">--</code>; AutoHotkey-compatible run options can also begin with <code class="no-highlight">/</code> on Windows.</p>
+<p>Options must appear before the script or assembly input. After the input is found, all remaining arguments are passed to its entry point. Options can begin with <code class="no-highlight">-</code> or <code class="no-highlight">--</code>; AutoHotkey-compatible run options can also begin with <code class="no-highlight">/</code> on Windows. The AutoHotkey-compatible options are described in <a href="Scripts.htm#cmd">Passing Command Line Parameters to a Script</a>.</p>
 <table class="info">
   <tr><th>Option</th><th>Behavior</th></tr>
-  <tr><td><code class="no-highlight">--script</code></td><td>In a compiled executable, ignore the embedded script and run the source script supplied as the input.</td></tr>
-  <tr><td><code class="no-highlight">--force</code>, <code class="no-highlight">--restart</code></td><td>Override single-instance behavior.</td></tr>
-  <tr><td><code class="no-highlight">--errorstdout[=ENC]</code></td><td>Write load-time errors to standard error, optionally using the specified encoding.</td></tr>
-  <tr><td><code class="no-highlight">--cpN</code></td><td>Read source files using code page <em>N</em>.</td></tr>
-  <tr><td><code class="no-highlight">--include &lt;file&gt;</code></td><td>Include a file before the main script.</td></tr>
   <tr><td><code class="no-highlight">--define:NAME[,NAME...]</code></td><td>Predefine <a href="lib/KeysharpDirectives.htm#Conditional">conditional-compilation symbols</a>. Repeatable, and also applied to any module the script imports. A symbol carries no value, so the name must be a plain identifier.</td></tr>
-  <tr><td><code class="no-highlight">--debug</code></td><td>Reserved for compatibility with the AutoHotkey debugging-client switch; it does not start a Keysharp debugger.</td></tr>
-  <tr><td><code class="no-highlight">--iLib &lt;ignored&gt;</code></td><td>Deprecated alias for <code class="no-highlight">--validate</code>.</td></tr>
   <tr><td><code class="no-highlight">--validate</code></td><td>Parse and compile the source without running it.</td></tr>
   <tr><td><code class="no-highlight">--validate-syntax</code></td><td>Parse the source without lowering, compiling or loading Roslyn. <code class="no-highlight">--syntax-only</code> and <code class="no-highlight">--parse-only</code> are aliases.</td></tr>
   <tr><td><code class="no-highlight">--transpile</code></td><td>Write generated C# beside the source and do not run the script.</td></tr>
-  <tr><td><code class="no-highlight">--compile</code>, <code class="no-highlight">--compile asm</code> or <code class="no-highlight">--compile dll</code></td><td>Write a raw compiled <code class="no-highlight">.cks</code> assembly. <code class="no-highlight">asm</code> and <code class="no-highlight">dll</code> are aliases. Several scripts may follow, each compiled to a <code class="no-highlight">.cks</code> beside its own source; they share one warm parser and compiler, so this is considerably faster than one command per script. A script using <a href="lib/_Package.htm">#Package</a> also writes its private <code class="no-highlight">.keysharp/packages</code> hierarchy. Runtime <a href="lib/Clr.htm#LoadPackage">Clr.LoadPackage</a> calls use the provider installed with the launcher.</td></tr>
+  <tr><td><code class="no-highlight">--compile</code>, <code class="no-highlight">--compile asm</code> or <code class="no-highlight">--compile dll</code></td><td>Write a raw compiled <code class="no-highlight">.cks</code> assembly. <code class="no-highlight">asm</code> and <code class="no-highlight">dll</code> are aliases. Several scripts may follow, each compiled to a <code class="no-highlight">.cks</code> beside its own source. This is faster than running one command per script. A script using <a href="lib/_Package.htm">#Package</a> also writes its private <code class="no-highlight">.keysharp/packages</code> hierarchy. Runtime <a href="lib/Clr.htm#LoadPackage">Clr.LoadPackage</a> calls use the provider installed with the launcher.</td></tr>
   <tr><td><code class="no-highlight">--compile exe</code></td><td>Build a standalone executable which still requires .NET 10. A script using <a href="lib/_Package.htm">#Package</a> carries its assets in a private <code class="no-highlight">.keysharp/packages</code> hierarchy beside the output. Statically visible <a href="lib/Clr.htm#LoadPackage">Clr.LoadPackage</a> use carries its runtime provider under <code class="no-highlight">components/packages/&lt;name&gt;</code>.</td></tr>
   <tr><td><code class="no-highlight">--compile exe-min</code></td><td>Build an executable with dependencies, including <a href="lib/_Package.htm">#Package</a> assets and statically required package providers, embedded in the generated DLL. Embedded providers are verified and extracted on first use. The result consists of the executable, DLL, Keysharp.Core DLL, deps file and runtime-config file.</td></tr>
-  <tr><td><code class="no-highlight">--dest &lt;path&gt;</code></td><td>Select the output file or directory for a compile operation. For assembly output, <code class="no-highlight">*</code> writes the bytes to standard output. It names a single output, so it takes a single script.</td></tr>
+  <tr><td><code class="no-highlight">--dest &lt;path&gt;</code></td><td>Select the output file or directory for a compile operation. For assembly output, <code class="no-highlight">*</code> writes the bytes to standard output. It accepts only one script.</td></tr>
   <tr><td><code class="no-highlight">--with-parser</code>, <code class="no-highlight">--with-compiler</code></td><td>Include the selected optional first-party deployment unit in a compiled artifact.</td></tr>
-  <tr><td><code class="no-highlight">--with-component &lt;parser|compiler&gt;</code></td><td>Generic form of the two unit-inclusion options. It accepts the stable unit IDs, not the capability aliases.</td></tr>
+  <tr><td><code class="no-highlight">--with-component &lt;parser|compiler&gt;</code></td><td>Generic form of the two unit-inclusion options.</td></tr>
   <tr><td><code class="no-highlight">--without-parser</code>, <code class="no-highlight">--without-compiler</code></td><td>Exclude the selected component, including one detected from a call in the script.</td></tr>
   <tr><td><code class="no-highlight">--without-component &lt;parser|compiler&gt;</code></td><td>Generic form of the two component-exclusion options.</td></tr>
   <tr><td><code class="no-highlight">--asm</code>, <code class="no-highlight">--assembly</code></td><td>Run a precompiled assembly from a file or from standard input (<code class="no-highlight">*</code>). A <code class="no-highlight">.cks</code> or <code class="no-highlight">.dll</code> input is recognized without this option.</td></tr>
@@ -103,38 +90,34 @@
   <tr><td><code class="no-highlight">--help</code>, <code class="no-highlight">-h</code>, <code class="no-highlight">-?</code></td><td>Show command-line help.</td></tr>
 </table>
 <p>Release builds use the compile daemon for ordinary source runs by default; Debug builds do not. Set <code class="no-highlight">KEYSHARP_DAEMON</code> to <code class="no-highlight">1</code>, <code class="no-highlight">true</code>, <code class="no-highlight">yes</code> or <code class="no-highlight">on</code> to force it, or <code class="no-highlight">0</code>, <code class="no-highlight">false</code>, <code class="no-highlight">no</code> or <code class="no-highlight">off</code> to bypass it.</p>
-<p>Use <code class="no-highlight">Keysharp.exe --help</code> to confirm the options supported by the installed build.</p>
 
 <h2 id="compile">Compile a Script</h2>
 <pre class="no-highlight">Keysharp.exe --compile exe hello.ks</pre>
-<p>Compilation first parses and lowers the Keysharp script to C#, then compiles it with Roslyn. Use <code class="no-highlight">--validate</code> for a quick syntax and compilation check, or <code class="no-highlight">--transpile</code> when diagnosing generated-code behavior.</p>
 
 <h3 id="components">Optional Scripting Components</h3>
-<p>The runtime, parser and compiler are separate assemblies. The fixed IDs <code class="no-highlight">parser</code> and <code class="no-highlight">compiler</code> identify optional first-party deployment units below <code class="no-highlight">components/scripting</code>. Each descriptor declares a schema and contract version, and Keysharp only reports a unit as available after it is compatible and loadable. A compiled script needs only Keysharp.Core and the small scripting-contract assembly unless it uses a source-processing feature. The parser unit has no Roslyn dependency and is sufficient for <code class="no-highlight">--validate-syntax</code>. The compiler unit contains lowering, compilation and Roslyn support.</p>
-<p>A statically visible call to <a href="lib/RunScript.htm">RunScript</a> or <a href="lib/ParseScript.htm">ParseScript</a> includes the compiler automatically. Use the <code class="no-highlight">--with-*</code> options for explicit inclusion. Use <code class="no-highlight">--without-*</code> to override detection when code checks <a href="lib/ComponentAvailable.htm">ComponentAvailable</a> and has a compiler-free path.</p>
-<p>For a normal executable or <code class="no-highlight">.cks</code>, components are deployed below <code class="no-highlight">components/scripting</code>. A minimal executable embeds the selected payload, verifies it and extracts it to the per-user component cache on first use.</p>
+<p>The parser and compiler are optional components. A compiled script includes the compiler when it makes a statically visible call to <a href="lib/RunScript.htm">RunScript</a> or <a href="lib/ValidateScript.htm#CompileScript">CompileScript</a>, and the parser when it makes one to <a href="lib/ValidateScript.htm">ValidateScript</a>; otherwise it includes neither. The parser alone is sufficient for <code class="no-highlight">--validate-syntax</code>. Use the <code class="no-highlight">--with-*</code> options for explicit inclusion, or <code class="no-highlight">--without-*</code> to override detection when code checks <a href="lib/IsComponentAvailable.htm">IsComponentAvailable</a> and has a compiler-free path.</p>
+<p>A normal executable or <code class="no-highlight">.cks</code> deploys the selected components below <code class="no-highlight">components/scripting</code>; a minimal executable embeds them and extracts them to the per-user component cache on first use.</p>
 
 <h3 id="embedded-scripts">Embedded Scripts</h3>
 <p>A compiled executable normally runs its embedded script. Pass <code class="no-highlight">--script</code> and a source-script path to run that script in place of the embedded one; remaining arguments are passed to the selected script.</p>
 
 <h2 id="tray-icon">Running Scripts and the Tray</h2>
-<p>On supported desktop platforms, a persistent script can expose a notification-area icon and menu. The available presentation is platform-dependent. Functions such as <a href="lib/Pause.htm">Pause</a>, <a href="lib/Suspend.htm">Suspend</a>, <a href="lib/Reload.htm">Reload</a>, and <a href="lib/ExitApp.htm">ExitApp</a> control the running script.</p>
+<p>On supported desktop platforms, a persistent script can expose a notification-area icon and menu. Functions such as <a href="lib/Pause.htm">Pause</a>, <a href="lib/Suspend.htm">Suspend</a>, <a href="lib/Reload.htm">Reload</a>, and <a href="lib/ExitApp.htm">ExitApp</a> control the running script.</p>
 <p>The standard menu includes Help, Window Spy, Reload Script, Edit Script, Suspend Hotkeys and Exit. Help opens the issue tracker. On Linux and macOS it also includes an Accessibility Spy item.</p>
 
 <h2 id="main-window">The Script Main Window</h2>
 <p>The script main window provides views of debug output, variables, hotkeys and key history. Open it from the standard tray menu when <a href="Variables.htm#AllowMainWindow"><code>A_AllowMainWindow</code></a> permits it. <a href="Variables.htm#ScriptHwnd"><code>A_ScriptHwnd</code></a> identifies the window.</p>
-<p>The views are snapshots of the current runtime state and refresh when selected. Functions such as <a href="lib/ListVars.htm">ListVars</a>, <a href="lib/ListHotkeys.htm">ListHotkeys</a>, <a href="lib/KeyHistory.htm">KeyHistory</a> and <a href="lib/ListLines.htm">ListLines</a> select related views; ListLines itself does not provide interpreter line history.</p>
+<p>The views are snapshots of the current runtime state and refresh when selected. Functions such as <a href="lib/ListVars.htm">ListVars</a>, <a href="lib/ListHotkeys.htm">ListHotkeys</a> and <a href="lib/KeyHistory.htm">KeyHistory</a> select related views.</p>
 
 <h3 id="title">Default Title</h3>
 <p>The main window's default title is the script name. Single-instance detection uses this window and title, so changing or destroying the main window can prevent a later launch from identifying the existing instance.</p>
 
 <h2 id="Window_Spy">Window and Accessibility Inspectors</h2>
-<p>Window Spy is a bundled script which reports window titles, classes, process information, controls, coordinates and colors. Launch it from the standard tray menu or the script main window. The bundled <code class="no-highlight">WindowSpy.cks</code> is preferred when present, with <code class="no-highlight">WindowSpy.ks</code> used as a fallback.</p>
-<p>On Linux, Accessibility Spy launches <a href="https://github.com/keysharp-org/Keysharp/blob/master/Keysharp/Scripts/AtSpi.ks"><code>AtSpi.ks</code></a>. On macOS it launches <code class="no-highlight">Ax.ks</code>. These inspectors expose platform accessibility information which is not represented by Windows ClassNN values.</p>
+<p>Window Spy is a bundled script which reports window titles, classes, process information, controls, coordinates and colors. Launch it from the standard tray menu or the script main window.</p>
+<p>On Linux, Accessibility Spy launches <a href="https://github.com/keysharp-org/Keysharp/blob/master/Keysharp/Scripts/AtSpi.ks"><code>AtSpi.ks</code></a>. On macOS it launches <code class="no-highlight">Ax.ks</code>.</p>
 
 <h2 id="platforms">Platform Differences</h2>
 <p>Language parsing and general runtime behavior are intended to be cross-platform, but window management, keyboard hooks, COM, registry access, GUI behavior, and other operating-system integrations can differ. See <a href="Platforms.htm">Platform Support</a> and each affected reference page.</p>
-<p class="note"><strong>Compatibility note:</strong> Much of this reference originated in AutoHotkeyDocs. A described function may be part of the language target before its Keysharp implementation is complete. Reproducible gaps should be reported to the <a href="https://github.com/keysharp-org/Keysharp/issues">Keysharp issue tracker</a>.</p>
 
 </body>
 </html>
