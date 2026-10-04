@@ -40,8 +40,8 @@
   </tr>
   <tr>
     <td><strong>Wayland &mdash; Cinnamon</strong></td>
-    <td>Window queries and control, push window events, window capture, cursor queries and movement, and Taskbar badge/progress integration with the grouped-window-list.</td>
-    <td>Requires the keysharp-desktop Cinnamon extension. Area capture is unavailable. There is no shell Eval fallback.</td>
+    <td>Window queries and control, push window events, area and window capture, cursor queries and movement, and Taskbar badge/progress integration with the grouped-window-list.</td>
+    <td>Requires the keysharp-desktop Cinnamon extension. Area capture requires the compositor's stage capture API. There is no shell Eval fallback.</td>
   </tr>
   <tr>
     <td><strong>Wayland &mdash; KWin/KDE Plasma</strong></td>
@@ -55,6 +55,7 @@
   </tr>
 </table>
 <p>Run <code class="no-highlight">keysharp-desktop probe</code> as your graphical user to inspect the active backend. The <a href="https://github.com/keysharp-org/keysharp-desktop/blob/main/docs/platforms.md">desktop component's support table</a> describes the individual operations.</p>
+<p><a href="lib/PixelGetColor.htm">PixelGetColor</a>, <a href="lib/PixelSearch.htm">PixelSearch</a>, <a href="lib/ImageSearch.htm">ImageSearch</a> and the screen capture factories of <a href="lib/Image.htm">Image</a> require a backend which can supply the requested screen area. On Cinnamon Wayland, area capture reads the visible composited stage in memory, using one pixel scale across the requested area even when it spans monitors with different scales. Monitor gaps and portions outside the outputs are transparent padding; a rectangle wholly outside the outputs fails. Window capture reads the window's own actor and can include transparency, so its pixels can differ from the visible screen.</p>
 
 <h3 id="Linux_Permissions">Permissions</h3>
 <p>System installations use polkit to approve permanent scopes for an executable. <a href="lib/RequestCapabilities.htm">RequestCapabilities</a> and <a href="lib/_Requires.htm#Capability">#Requires capability</a> can request the required scopes together; input and desktop scopes may need separate prompts. Once granted, a scope is reused until revoked. The system components share the <code>InputControl</code> grant. Cursor position, work area, keyboard-map and idle queries do not request an interactive grant.</p>

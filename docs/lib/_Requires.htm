@@ -33,13 +33,14 @@
   </dd>
   <dt id="CapabilityNames">CapabilityNames</dt>
   <dd>
-    <p>One or more case-insensitive capability names, separated by commas or whitespace. The permissions are requested together at startup, before hotkeys are registered. If any requested capability is denied or unsupported, the script exits.</p>
+    <p>One or more case-insensitive capability names, separated by commas or whitespace. The permissions are requested together at startup, before hotkeys are registered. If any requested capability is denied or unsupported, an error is reported and the script exits.</p>
     <p>For the names, and to request capabilities at run time without exiting, see <a href="RequestCapabilities.htm#Names">RequestCapabilities</a>.</p>
   </dd>
 </dl>
 
 <h2 id="Error_Message">Error Message</h2>
 <p>The error identifies the unmet requirement and the version available to the script.</p>
+<p>For a capability requirement, the error names the unmet capabilities and includes any available permission details. It appears in a dialog by default; <a href="_ErrorStdOut.htm">#ErrorStdOut</a> sends it to standard error instead.</p>
 <p>If the script is launched with an interpreter that does not support this directive, the error message may instead resemble:</p>
 <pre class="no-highlight">Line Text: #Requires <i>%Requirement%</i>
 Error: This line does not contain a recognized action.</pre>
