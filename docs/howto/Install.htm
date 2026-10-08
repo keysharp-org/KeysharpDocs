@@ -13,7 +13,7 @@
 <body><script>site.init();</script>
 <h1>How to Install Keysharp</h1>
 
-<p>Pick your system. Each button downloads the standard installer; other formats are listed beneath it.</p>
+<p>Pick your system. The Windows and macOS buttons download the standard installer. The Linux button opens the installation instructions below; individual packages and archives are listed beneath it.</p>
 
 <div class="dl-grid">
   <div class="dl-col">
@@ -46,9 +46,7 @@
        data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-osx-x64.pkg">PKG installer</a></p>
   </div>
   <div class="dl-col">
-    <a class="dl-card no-ext" data-os="linux" title="keysharp_0.0.0.17_amd64.deb" href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
-       data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
-       data-arm64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_arm64.deb">
+    <a class="dl-card no-ext" data-os="linux" title="Linux installation instructions" href="#Linux">
       <svg class="dl-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path fill="currentColor" d="M12 1.8c-2.2 0-3.5 1.7-3.5 3.9 0 .9.1 1.5.1 2.1 0 .8-.6 1.5-1.2 2.6-.9 1.5-2 3.3-2 5.6 0 .8.2 1.4.5 2-.3.6-.4 1.2-.2 1.8.3.9 1.2 1.3 2.2 1.5 1.3.2 2.2.7 3 1.2.4.3.9.4 1.4.4s1-.1 1.4-.4c.8-.5 1.7-1 3-1.2 1-.2 1.9-.6 2.2-1.5.2-.6.1-1.2-.2-1.8.3-.6.5-1.2.5-2 0-2.3-1.1-4.1-2-5.6-.6-1.1-1.2-1.8-1.2-2.6 0-.6.1-1.2.1-2.1 0-2.2-1.3-3.9-3.5-3.9z"/>
         <circle cx="10.5" cy="6" r=".95" fill="#fff"/>
@@ -58,7 +56,9 @@
       <span class="dl-os">Linux</span>
       <span class="dl-detected"></span>
     </a>
-    <p class="dl-alt"><a href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-x64.tar.gz"
+    <p class="dl-alt"><a href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
+       data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
+       data-arm64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_arm64.deb">DEB package</a> <a href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-x64.tar.gz"
        data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-x64.tar.gz"
        data-arm64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-arm64.tar.gz">Portable tarball</a></p>
   </div>
@@ -107,6 +107,7 @@
 <p>The standalone <code class="no-highlight">.pkg</code> uses the same Apple Installer and installation choices as <strong>Install Keysharp</strong> in the disk image. Double-click it in Finder, or run <code class="no-highlight">sudo installer -pkg &lt;package&gt;.pkg -target /</code> for a system-wide installation.</p>
 
 <h2 id="Linux">Linux</h2>
+<p class="note"><strong>Note:</strong> Linux automation uses two separately installed native components: <code class="no-highlight">keysharp-input</code> for keyboard and mouse hooks and input synthesis, and <code class="no-highlight">keysharp-desktop</code> for window automation and screen capture. Keysharp can run without them; see <a href="../Platforms.htm#Linux">Linux Platform Support</a> for feature requirements and permissions.</p>
 <h3 id="Linux_PPA">Ubuntu and compatible derivatives: Launchpad PPA</h3>
 <p>On Ubuntu 24.04 (noble), Ubuntu 26.04 (resolute), and derivatives using those bases, including Pop!_OS 24.04, prefer the <a href="https://launchpad.net/~descolada/+archive/ubuntu/keysharp">Launchpad PPA</a> for amd64 and arm64. Apt keeps installed packages updated:</p>
 <pre class="no-highlight">sudo apt install software-properties-common
