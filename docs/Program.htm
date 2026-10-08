@@ -62,7 +62,7 @@
 <pre class="no-highlight">keysharp hello.ks</pre>
 <p>Quote paths containing spaces. Arguments after the script path are made available to the script through <a href="Variables.htm#Args"><code>A_Args</code></a>.</p>
 <pre class="no-highlight">Keysharp.exe "C:\My Scripts\hello.ks" first "second argument"</pre>
-<p>Started with no script at all, Keysharp looks for one named after its own executable — <code class="no-highlight">Keysharp.ahk</code>, then <code class="no-highlight">Keysharp.ks</code>, then <code class="no-highlight">Keysharp.cks</code> — first in the working directory and then beside the executable.</p>
+<p>Started with no script at all, Keysharp looks for one named after its own executable — <code class="no-highlight">Keysharp.ahk</code>, then <code class="no-highlight">Keysharp.ks</code>, then <code class="no-highlight">Keysharp.cks</code> — first in the working directory and then beside the executable. Release packages include the <a href="#dash">Dash</a> as <code class="no-highlight">Keysharp.cks</code> at the install root, so a bare launch opens it unless a matching script of your own is found first.</p>
 
 <h2 id="cmd">Command-Line Options</h2>
 <p>Options must appear before the script or assembly input. After the input is found, all remaining arguments are passed to its entry point. Options can begin with <code class="no-highlight">-</code> or <code class="no-highlight">--</code>; AutoHotkey-compatible run options can also begin with <code class="no-highlight">/</code> on Windows. The AutoHotkey-compatible options are described in <a href="Scripts.htm#cmd">Passing Command Line Parameters to a Script</a>.</p>
@@ -104,7 +104,7 @@
 
 <h2 id="tray-icon">Running Scripts and the Tray</h2>
 <p>On supported desktop platforms, a persistent script can expose a notification-area icon and menu. Functions such as <a href="lib/Pause.htm">Pause</a>, <a href="lib/Suspend.htm">Suspend</a>, <a href="lib/Reload.htm">Reload</a>, and <a href="lib/ExitApp.htm">ExitApp</a> control the running script.</p>
-<p>The standard menu includes Help, Window Spy, Reload Script, Edit Script, Suspend Hotkeys, Pause Script and Exit. Help opens the issue tracker. On Linux and macOS it also includes an Accessibility Spy item.</p>
+<p>The standard menu includes Help, Window Spy, Reload Script, Edit Script, Suspend Hotkeys, Pause Script and Exit. On Windows, Help opens the Keysharp project repository; on Linux and macOS, it opens the issue tracker. On Linux and macOS it also includes an Accessibility Spy item.</p>
 
 <h2 id="main-window">The Script Main Window</h2>
 <p>The script main window provides views of debug output, variables, hotkeys and key history. Open it from the standard tray menu when <a href="Variables.htm#AllowMainWindow"><code>A_AllowMainWindow</code></a> permits it. <a href="Variables.htm#ScriptHwnd"><code>A_ScriptHwnd</code></a> identifies the window.</p>

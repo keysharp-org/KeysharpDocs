@@ -369,7 +369,7 @@ MyGui.Show("h70")</pre>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>In addition to the <a href="Gui.htm#Add_Options">general options and styles</a>, the following are supported or noteworthy:</p>
     <p><strong>Limit</strong><em>N</em>: Restricts the user's input. If <em>N</em> is omitted, input is restricted to the visible width of the edit field. Otherwise, specify for <em>N</em> a specific number of characters to limit input. For example, <code class="no-highlight">Limit10</code> would allow no more than 10 characters to be entered. On Linux and macOS, this option is ignored by multi-line Edit controls.</p>
-    <p><strong>Uppercase</strong> or <strong>Lowercase</strong>: The characters typed by the user are automatically converted to uppercase or lowercase. On Linux and macOS, this also applies to pasted text and text assigned by the script.</p>
+    <p><strong>Uppercase</strong> or <strong>Lowercase</strong>: The characters typed by the user are automatically converted to uppercase or lowercase.</p>
     <p id="EditMulti"><strong>Multi:</strong> Makes it possible to have more than one line of text. However, it is usually not necessary to specify this because the control is auto-detected as multi-line if <em>Text</em> containing multiple lines, its <a href="#Edit_R">height</a> being taller than its default row height, or its <a href="#Edit_R">row-count</a> having been explicitly specified as greater than 1. For example, specifying <code class="no-highlight">r3</code> in <em>Options</em> will create a 3-line edit control with the following default properties: a vertical scroll bar, word-wrapping enabled, and <kbd>Enter</kbd> captured as part of the input rather than triggering the window's <a href="#DefaultButton">default button</a>.</p>
     <p id="EditNum"><strong>Number:</strong> Prevents the user from typing anything other than digits into the field (however, it is still possible to paste non-digits into it). An alternate way of forcing a numeric entry is to attach an <a href="#UpDown">UpDown</a> control to the Edit.</p>
     <p><strong>Password:</strong> Hides the user's input (such as for password entry) by substituting masking characters for what the user types. If a non-default masking character is desired, include it immediately after the word Password. For example, <code class="no-highlight">Password*</code> would make the masking character an asterisk rather than the black circle (bullet). Note that this option has no effect for <a href="#EditMulti">multi-line</a> edit controls.</p>
@@ -418,7 +418,7 @@ MyGui.Show()</pre>
   <dt>Options</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>The same options an <a href="#Edit">Edit</a> takes, with these differences: multi-line mode is on by default; <code>WantReturn</code> and <code>Password</code> are not supported; and <code>Uppercase</code> and <code>Lowercase</code> affect typed characters but not pasted text on Windows. On Linux and macOS, casing also applies to pasted text and text assigned by the script. See also <a href="Gui.htm#Add_Options">general options and styles</a>.</p>
+    <p>The same options an <a href="#Edit">Edit</a> takes, with these differences: multi-line mode is on by default; <code>WantReturn</code> and <code>Password</code> are not supported; and on Windows, <code>Uppercase</code> and <code>Lowercase</code> do not convert pasted text. See also <a href="Gui.htm#Add_Options">general options and styles</a>.</p>
   </dd>
   <dt>Text</dt>
   <dd>

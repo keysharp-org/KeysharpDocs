@@ -502,6 +502,30 @@ IsVisible := MyMenu.<span class="func">ToggleItemVis</span>(MenuItemName)</pre>
 <p>Whenever a function is called via a menu item, it starts off fresh with the default values for settings such as <a href="SendMode.htm">SendMode</a>. These defaults can be changed during <a href="../Scripts.htm#auto">script startup</a>.</p>
 <p>When building a menu whose contents are not always the same, one approach is to point all such menu items to the same function and have that function refer to its <a href="#CallbackOrSubmenu">parameters</a> to determine what action to take. Alternatively, a <a href="../misc/Functor.htm">function object</a>, <a href="../Functions.htm#closures">closure</a> or <a href="../Variables.htm#fat-arrow">fat arrow function</a> can be used to bind one or more values or variables to the menu item's callback function.</p>
 
+<h3 id="WindowsCommands">Standard menu commands</h3>
+<p>The standard items in <a href="../Variables.htm#TrayMenu">A_TrayMenu</a> and the main window's File, View and Help menu items deliver <code>WM_COMMAND</code> (<code>0x0111</code>) to <a href="../Variables.htm#ScriptHwnd">A_ScriptHwnd</a> before performing their action. The command ID is in the low word of <em>wParam</em>, and <em>lParam</em> is <code>0</code>. An <a href="OnMessage.htm">OnMessage</a> callback can intercept the action by returning a non-empty numeric value, including <code>0</code>. On Windows, sending or posting the same command to A_ScriptHwnd performs the corresponding action. On Linux and macOS the messages are synthesized from menu events. Menu interception is verified on Linux X11 under Xvfb; Wayland and macOS menu interception remain unverified.</p>
+<table class="info">
+  <tr><th>Action</th><th>Tray command ID</th><th>Main-window command ID</th></tr>
+  <tr><td>Open main window</td><td>65300</td><td>&mdash;</td></tr>
+  <tr><td>Help</td><td>65301</td><td>&mdash;</td></tr>
+  <tr><td>Window Spy</td><td>65302</td><td>65402</td></tr>
+  <tr><td>Reload Script</td><td>65303</td><td>65400</td></tr>
+  <tr><td>Edit Script</td><td>65304</td><td>65401</td></tr>
+  <tr><td>Suspend Hotkeys</td><td>65305</td><td>65404</td></tr>
+  <tr><td>Pause Script</td><td>65306</td><td>65403</td></tr>
+  <tr><td>Exit</td><td>65307</td><td>65405</td></tr>
+  <tr><td>Accessibility Spy (Linux and macOS)</td><td>65308</td><td>&mdash;</td></tr>
+  <tr><td>Variables and their contents</td><td>&mdash;</td><td>65407</td></tr>
+  <tr><td>Hotkeys and their methods</td><td>&mdash;</td><td>65408</td></tr>
+  <tr><td>Key history and script info</td><td>&mdash;</td><td>65409</td></tr>
+  <tr><td>Refresh</td><td>&mdash;</td><td>65410</td></tr>
+  <tr><td>User Manual</td><td>&mdash;</td><td>65411</td></tr>
+  <tr><td>Clear debug log</td><td>&mdash;</td><td>65413</td></tr>
+  <tr><td>About</td><td>&mdash;</td><td>65414</td></tr>
+</table>
+<p>On Windows, the tray Help command (<code>65301</code>) opens the Keysharp project repository; sending or posting command <code>65412</code> also opens it. On Linux and macOS, tray Help opens the issue tracker. The User Manual command (<code>65411</code>) displays an unimplemented-feature message. Commands <code>65308</code>, <code>65413</code> and <code>65414</code> are Keysharp extensions; the Accessibility Spy item is present only on Linux and macOS. Command <code>65406</code> (AutoHotkey's ListLines view) has no corresponding action. Script-defined menu items and standard items added to other Menu objects use their registered <a href="#CallbackOrSubmenu">callbacks</a>.</p>
+<p>Tray-icon notifications can be monitored with <code>AHK_NOTIFYICON</code> (<code>0x0404</code>). On Linux and macOS only toolkit activation events can be synthesized; the current Linux backend does not raise them. See the Windows, Linux and macOS notes under <a href="OnMessage.htm#Remarks">OnMessage</a>.</p>
+
 <h2 id="Related">Related</h2>
 <p><a href="Gui.htm">GUI</a>, <a href="../misc/Threads.htm">Threads</a>, <a href="Thread.htm">Thread</a>, <a href="Critical.htm">Critical</a>, <a href="_NoTrayIcon.htm">#NoTrayIcon</a>, <a href="../Functions.htm">Functions</a>, <a href="Return.htm">Return</a>, <a href="SetTimer.htm">SetTimer</a></p>
 

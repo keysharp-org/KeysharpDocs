@@ -50,7 +50,7 @@
 <p>On Linux and macOS, window styles, control messages and other Win32-level GUI facilities are unavailable or approximated; <a href="lib/GuiControls.htm">GUI Control Types</a> and <a href="lib/GuiOnEvent.htm">GUI Events</a> record where.</p>
 
 <h3 id="Managed">A managed object model</h3>
-<p>Objects are .NET objects. <a href="Objects.htm#Lifetime">Object lifetime and finalization</a> follow the garbage collector instead of reference counting, so <code>__Delete</code> runs when the collector reclaims the object rather than when the last reference goes away, and the <a href="lib/ObjAddRef.htm">reference-counting functions</a> reflect the managed runtime.</p>
+<p>Objects are .NET objects. <a href="Objects.htm#Lifetime">Object lifetime and finalization</a> follow the garbage collector instead of reference counting, so <code>__Delete</code> runs when the collector reclaims the object rather than when the last reference goes away. The <a href="lib/ObjAddRef.htm">reference-counting functions</a> manage native COM references on Windows, including those of a script object's COM wrapper.</p>
 <p>The same applies wherever a script reaches outside itself for memory: <a href="lib/DllCall.htm">DllCall</a>, <a href="lib/CallbackCreate.htm">CallbackCreate</a>, <a href="lib/StrPtr.htm">StrPtr</a> and <a href="Objects.htm#ObjPtr">ObjPtr</a> operate on managed values, and <a href="lib/StringBuffer.htm">StringBuffer</a> is the writable string-memory type to pass to native code. For calling .NET directly, <a href="lib/Clr.htm">Clr</a> is available.</p>
 
 <h3 id="Language">Language additions</h3>

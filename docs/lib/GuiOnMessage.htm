@@ -15,7 +15,7 @@
 <h1>OnMessage (GUI) <span class="ver">[v2.1-alpha.1+]</span></h1>
 <p>Registers a function or method to be called whenever the GUI window or control receives the specified message.</p>
 
-<p class="note"><strong>Note:</strong> On Linux and macOS, only mouse and keyboard input messages (WM_MOUSEMOVE, the left, right and middle button down, up and double-click messages, WM_MOUSEWHEEL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP and WM_CHAR) are delivered; callbacks for other messages are never called.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS, only mouse and keyboard input messages (WM_MOUSEMOVE, the left, right and middle button down, up and double-click messages, WM_MOUSEWHEEL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP and WM_CHAR) are synthesized from the script's own GUI events; callbacks for other messages are never called. Delivery is verified on Linux X11 and Wayland; macOS delivery remains unverified.</p>
 <pre class="Syntax"><a href="Gui.htm">Gui</a>.<span class="func">OnMessage</span>(MsgNumber, Callback <span class="optional">, AddRemove</span>)
 <a href="GuiControl.htm">GuiCtrl</a>.<span class="func">OnMessage</span>(MsgNumber, Callback <span class="optional">, AddRemove</span>) <em>; Requires <span class="ver">[v2.1-alpha.7+]</span></em></pre>
 
@@ -65,7 +65,8 @@
 <p><span class="ver">[v2.1-alpha.7+]</span>: When the callback is called, A_EventInfo and the last found window are set as per <a href="OnMessage.htm#Additional_Information_Available_to_the_Callback">Additional Information Available to the Callback</a>.</p>
 <p>Gui-specific message callbacks are called after global message callbacks (registered with the <a href="OnMessage.htm">OnMessage</a> function), but before the GUI window's own default processing takes place.</p>
 <p>The callback function may be called recursively if the message is received while the callback is already running. The number of threads that can be started is limited only by <a href="_MaxThreads.htm">#MaxThreads</a>.</p>
-<p><span class="ver">[v2.1-alpha.7+]</span>: For GuiCtrl.OnMessage, window subclassing is used to detect or intercept messages sent directly to the control. These messages are not detected by the global <a href="OnMessage.htm">OnMessage</a> function.</p>
+<p><span class="ver">[v2.1-alpha.7+]</span>: On Windows, GuiCtrl.OnMessage uses window subclassing to detect or intercept messages sent directly to the control. These directly sent messages are not detected by the global <a href="OnMessage.htm">OnMessage</a> function.</p>
+<p>On Linux and macOS, synthesized GUI input messages reach global OnMessage callbacks first, then Gui.OnMessage for a message addressed to the GUI window or GuiCtrl.OnMessage for one addressed to a control. Events not raised by the toolkit are not delivered. On Linux, GTK's single-line Edit consumes mouse-button presses before these callbacks can observe them.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="Gui.htm">Gui</a> and <a href="GuiControl.htm">GuiControl</a> methods: <a href="GuiOnEvent.htm">OnEvent</a>, <a href="GuiOnNotify.htm">OnNotify</a>, <a href="GuiOnCommand.htm">OnCommand</a></p>

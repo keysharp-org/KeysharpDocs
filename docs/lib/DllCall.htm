@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>DllCall - Syntax &amp; Usage | Keysharp</title>
-<meta name="description" content="The DllCall function calls a function inside a DLL, such as a standard Windows API function." />
+<meta name="description" content="The DllCall function calls an exported function in a native library on Windows, Linux or macOS." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" />
@@ -13,7 +13,8 @@
 
 <h1>DllCall</h1>
 
-<p>Calls a function inside a DLL, such as a standard Windows API function.</p>
+<p>Calls an exported function in a native library: a DLL on Windows, a shared object (.so) on Linux, or a dynamic library (.dylib) on macOS.</p>
+<p>Native libraries and their exported functions are platform-specific. A call to a Windows DLL or Win32 function requires Windows.</p>
 
 <pre class="Syntax">Result := <span class="func">DllCall</span>("<span class="optional">DllFile\</span>Function" <span class="optional">, Type1, Arg1, Type2, Arg2, "Cdecl ReturnType"</span>)</pre>
 <h2 id="Parameters">Parameters</h2>
@@ -22,9 +23,9 @@
   <dt>[DllFile\]Function</dt>
   <dd>
       <p>Type: <a href="../Concepts.htm#strings">String</a> or <a href="../Concepts.htm#numbers">Integer</a></p>
-      <p>The DLL or EXE file name followed by a backslash and the name of the function. For example: <code>"MyDLL\MyFunction"</code> (the file extension ".dll" is the default when omitted). If an absolute path isn't specified, <em>DllFile</em> is assumed to be in the system's PATH or <a href="../Variables.htm#WorkingDir">A_WorkingDir</a>. Note that DllCall expects a path with backslashes (\). Forward slashes (/) are not supported.</p>
-      <p id="std"><em>DllFile</em> may be omitted when calling a function that resides in User32.dll, Kernel32.dll, ComCtl32.dll, or Gdi32.dll. For example, <code>"User32\IsWindowVisible"</code> produces the same result as <code>"IsWindowVisible"</code>.</p>
-      <p>If no function can be found by the given name, a "W" (Unicode) suffix is automatically appended. For example, <code>"MessageBox"</code> is the same as <code>"MessageBoxW"</code>.</p>
+      <p>The native library's name or path followed by a backslash (\) or forward slash (/) and the name of the function. For example: <code>"MyDLL\MyFunction"</code>. An omitted extension defaults to .dll on Windows, .so on Linux or .dylib on macOS. A relative library name or path is resolved by the platform's native library loader.</p>
+      <p id="std">On Windows, <em>DllFile</em> may be omitted when calling a function that resides in User32.dll, Kernel32.dll, ComCtl32.dll, or Gdi32.dll. For example, <code>"User32\IsWindowVisible"</code> produces the same result as <code>"IsWindowVisible"</code>. On Linux, bare function names are searched in libc and libm; on macOS, they are searched in libSystem, also available through the libc alias. Libraries loaded with <a href="_DllLoad.htm">#DllLoad</a> are also searched.</p>
+      <p>On Windows, if no function can be found by the given name, a "W" (Unicode) suffix is automatically appended. For example, <code>"MessageBox"</code> is the same as <code>"MessageBoxW"</code>. Linux and macOS require the exported name exactly.</p>
       <p>Performance can be dramatically improved when making <em>repeated</em> calls to a DLL by <a href="#load">loading it beforehand</a>.</p>
       <p>This parameter may also consist solely of an integer, which is interpreted as the address of the function to call. Sources of such addresses include <a href="#COM">COM</a> and <a href="CallbackCreate.htm">CallbackCreate</a>.</p>
       <p>If this parameter is an object, the value of the object's <code class="no-highlight">Ptr</code> property is used. If no such property exists, a <a href="Error.htm#PropertyError">PropertyError</a> is thrown.</p>

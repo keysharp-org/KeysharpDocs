@@ -37,7 +37,7 @@
       <p><strong>P:</strong> Retrieve the physical state (i.e. whether the user is physically holding it down). The physical state of a key or mouse button will usually be the same as the logical state unless the keyboard and/or mouse hooks are installed, in which case it will accurately reflect whether or not the user is physically holding down the key or button (as long as it was pressed down while the keyboard hook was installed). You can determine if your script is using the  hooks via the <a href="KeyHistory.htm">KeyHistory</a> function or menu item. You can force the hooks to be installed by calling <a href="InstallKeybdHook.htm">InstallKeybdHook</a> and/or <a href="InstallMouseHook.htm">InstallMouseHook</a>.</p>
       <p><strong>T:</strong> Retrieve the toggle state. For keys other than <kbd>CapsLock</kbd>, <kbd>NumLock</kbd> and <kbd>ScrollLock</kbd>, the toggle state is generally 0 when the script starts and is not synchronized between processes.</p>
       <p><strong>Device identifier:</strong> A positive integer, as reported by the <code>DeviceId</code> property of <a href="../Variables.htm#EventInfo">A_EventInfo</a> in a hotkey, retrieves the physical state of that one input source. A device identifier always reads physical state. The identifier belongs to the broker process and must be refreshed after the service restarts; an unknown or disconnected identifier returns 0. Keypad names such as <code>Numpad1</code> and <code>NumpadEnd</code> follow the NumLock and logical Shift state shared by all keyboards, as hotkeys do.</p>
-      <p>The letters query every source at once, and the logical state also includes generated input. Device identifiers are supported on Linux and require keysharp-input client ABI 0.4 or newer together with InputMonitoring permission, even for a modifier or lock key; the letters read modifier state and the toggle state (<code>T</code>) of lock keys without it. When the keysharp-input client library or service is older or the library cannot be loaded, and on Windows and macOS, a device identifier throws a <a href="Error.htm#ValueError">ValueError</a>.</p>
+      <p>The letters query every source at once, and the logical state also includes generated input. Device identifiers are supported on Linux and require keysharp-input client ABI 1.0 or a newer 1.x minor version together with InputMonitoring permission, even for a modifier or lock key; the letters read modifier state and the toggle state (<code>T</code>) of lock keys without it. On Linux, an unavailable or incompatible input component makes the device-state query return 0; a refused InputMonitoring permission request raises an error. Windows and macOS raise a <a href="Error.htm#ValueError">ValueError</a> for a device identifier.</p>
   </dd>
 
 </dl>
@@ -98,7 +98,7 @@ else
 </div>
 
 <div class="ex" id="ExDevice">
-<p><a class="ex_number" href="#ExDevice"></a> On Linux, reads the left Shift key on the keyboard that triggered the hotkey. Requires keysharp-input client ABI 0.4 or newer and the input permissions required by hotkeys.</p>
+<p><a class="ex_number" href="#ExDevice"></a> On Linux, reads the left Shift key on the keyboard that triggered the hotkey. Requires keysharp-input client ABI 1.0 or a newer 1.x minor version and the input permissions required by hotkeys.</p>
 <pre>F8::
 {
     DeviceID := A_EventInfo.DeviceId

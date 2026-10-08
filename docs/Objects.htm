@@ -617,13 +617,13 @@ MsgBox "".test  <em>; 1</em>
 
 <h3 id="ObjPtr">Pointers to Objects</h3>
 <p class="note"><strong>Note:</strong> The object-pointer conversion functions are available only on Windows.</p>
-<p><code>ObjPtr(Object)</code> returns the object's IUnknown address without adding a reference, so it is valid only while the object is kept alive by other means. <code>ObjPtrAddRef(Object)</code> also adds a native COM reference, which must be released with <code>ObjRelease</code>.</p>
+<p><code>ObjPtr(Object)</code> returns an Integer containing the object's IUnknown address without adding a reference, so this borrowed pointer is valid only while the object is kept alive by other means. <code>ObjPtrAddRef(Object)</code> returns an Integer address and adds a native COM reference, which must be released with <code>ObjRelease</code>.</p>
 <pre>borrowed := ObjPtr(myObject)
 address := ObjPtrAddRef(myObject)
 try DllCall("NativeFunction", "Ptr", address)
 finally ObjRelease(address)</pre>
 <p>See <a href="lib/ObjAddRef.htm">ObjAddRef and ObjRelease</a>.</p>
-<p id="ObjFromPtr"><code>ObjFromPtr(Address)</code> converts an IUnknown pointer back to a managed object or wrapped COM object and consumes the supplied COM reference where applicable. <code>ObjFromPtrAddRef(Address)</code> converts it while retaining an additional reference.</p>
+<p id="ObjFromPtr"><code>ObjFromPtr(Address)</code> converts an IUnknown pointer back to a managed object or wrapped COM object. A returned COM wrapper takes ownership of the supplied counted reference; a managed object is returned directly without consuming a native reference. <code>ObjFromPtrAddRef(Address)</code> also returns a managed object directly, but a returned COM wrapper acquires an additional native reference. The caller retains responsibility for any counted reference supplied to ObjFromPtrAddRef.</p>
 
 </body>
 </html>

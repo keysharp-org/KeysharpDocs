@@ -49,10 +49,12 @@ $docsRoot = Join-Path $repoRoot 'docs'
 
 # Both forms of the version appear in a release URL and have to move together:
 #   .../releases/download/v0.0.0.16/keysharp-0.0.0.16-win-x64.msi
+#   .../releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb
 $patterns = @(
     @{ Name = 'release tag';      Find = '(?<=/releases/download/v)\d+(?:\.\d+){1,3}(?=/)' }
     # No leading slash is required, so filenames shown in tooltips are rewritten alongside the URLs.
     @{ Name = 'asset filename';   Find = '(?<=keysharp-)\d+(?:\.\d+){1,3}(?=-(?:win|linux|osx)-(?:x64|arm64)\.)' }
+    @{ Name = 'Debian filename';  Find = '(?<=keysharp_)\d+(?:\.\d+){1,3}(?=_(?:amd64|arm64)\.deb)' }
     @{ Name = 'version marker';   Find = '(?<=<!--ksver-->)[^<]*(?=<!--/ksver-->)' }
 )
 

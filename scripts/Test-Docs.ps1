@@ -119,6 +119,7 @@ foreach ($file in $htmlFiles) {
     foreach ($pattern in @(
             '/releases/download/v(\d+(?:\.\d+){1,3})/',
             'keysharp-(\d+(?:\.\d+){1,3})-(?:win|linux|osx)-(?:x64|arm64)\.',
+            'keysharp_(\d+(?:\.\d+){1,3})_(?:amd64|arm64)\.deb',
             '<!--ksver-->([^<]*)<!--/ksver-->')) {
         foreach ($match in [regex]::Matches($text, $pattern)) {
             [void]$downloadVersions.Add($match.Groups[1].Value)
