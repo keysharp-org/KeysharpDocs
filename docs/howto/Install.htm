@@ -13,7 +13,7 @@
 <body><script>site.init();</script>
 <h1>How to Install Keysharp</h1>
 
-<p>Pick your system. The Windows and macOS buttons download the standard installer. The Linux button opens the installation instructions below; individual packages and archives are listed beneath it.</p>
+<p>Pick your system. The Windows and macOS buttons download the standard installer. The Linux button opens the installation instructions below; other download formats are listed beneath the buttons.</p>
 
 <div class="dl-grid">
   <div class="dl-col">
@@ -56,11 +56,7 @@
       <span class="dl-os">Linux</span>
       <span class="dl-detected"></span>
     </a>
-    <p class="dl-alt"><a href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
-       data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
-       data-arm64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_arm64.deb">DEB package</a> <a href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-x64.tar.gz"
-       data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-x64.tar.gz"
-       data-arm64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-arm64.tar.gz">Portable tarball</a></p>
+    <p class="dl-alt"><a href="https://github.com/keysharp-org/Keysharp/releases/latest/download/keysharp-linux-setup.sh">Installer (.sh)</a></p>
   </div>
 </div>
 <p class="dl-status">Keysharp <!--ksver-->0.0.0.17<!--/ksver-->. Other architectures and individual packages are on the <a href="https://github.com/keysharp-org/Keysharp/releases/latest">release page</a>.</p>
@@ -122,7 +118,11 @@ sudo apt install keysharp</pre>
 <pre class="no-highlight">sudo sh ./keysharp-linux-setup.sh</pre>
 <p>Setup installs Keysharp and any missing or incompatible <code class="no-highlight">keysharp-input</code> and <code class="no-highlight">keysharp-desktop</code> components from their own releases. It uses Debian packages on Debian and Ubuntu, or archives on other supported systemd distributions. It creates the <code class="no-highlight">keysharp</code> command and file associations. GNOME or Cinnamon extension activation may require a logout; setup reports when this is needed.</p>
 <p>A healthy compatible native component is kept. To update the components too, rerun setup with <code class="no-highlight">--upgrade-components</code>. For a local installation report, run <code class="no-highlight">sh ./keysharp-linux-setup.sh --diagnose</code>. Component selection, requirements and repairs are covered in the <a href="https://github.com/keysharp-org/Keysharp/blob/master/docs/install-linux.md">Linux installation guide</a>.</p>
-<p>The individual Keysharp package or archive contains Keysharp alone. On Debian or Ubuntu, install the package with <code class="no-highlight">sudo apt install ./keysharp_&lt;version&gt;_amd64.deb</code> (use <code class="no-highlight">arm64</code> instead of <code class="no-highlight">amd64</code> on ARM64); apt also installs available recommended native components. For an archive, extract it and run <code class="no-highlight">sudo bash ./install.sh</code>, then install the native components separately. See <a href="../Platforms.htm#Linux">Linux Platform Support</a> for their operations and permissions.</p>
+<p>The individual Keysharp <a href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
+   data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_amd64.deb"
+   data-arm64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp_0.0.0.17_arm64.deb">DEB package</a> or <a href="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-x64.tar.gz"
+   data-x64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-x64.tar.gz"
+   data-arm64="https://github.com/keysharp-org/Keysharp/releases/download/v0.0.0.17/keysharp-0.0.0.17-linux-arm64.tar.gz">portable tarball</a> contains Keysharp alone. On Debian or Ubuntu, install the package with <code class="no-highlight">sudo apt install ./keysharp_&lt;version&gt;_amd64.deb</code> (use <code class="no-highlight">arm64</code> instead of <code class="no-highlight">amd64</code> on ARM64); apt also installs available recommended native components. For an archive, extract it and run <code class="no-highlight">sudo bash ./install.sh</code>, then install the native components separately. See <a href="../Platforms.htm#Linux">Linux Platform Support</a> for their operations and permissions.</p>
 
 <h3 id="Linux_User">Installing without root</h3>
 <p>Extract the Keysharp archive and run <code class="no-highlight">bash ./install.sh</code> without sudo to install under <code class="no-highlight">$HOME/.local</code>, or run <code class="no-highlight">app/Keysharp</code> directly. The .NET 10 runtime and native runtime libraries must already be available. This does not install either native component; an existing system installation of them can still be used.</p>
