@@ -98,11 +98,15 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
     <p><strong>Type</strong> <span class="ver">[v2.1-alpha.30+]</span>: The struct class identifying the type of the property to define. <em>Obj</em> must be a Prototype. This and the properties above are mutually-exclusive. See <a href="../Structs.htm">Structures</a> for general information and <a href="../Structs.htm#defprop">Using DefineProp</a> for an example.</p>
     <p id="DefinePropPack"><strong>Pack</strong> <span class="ver">[v2.1-alpha.19+]</span>: One of the following integers specifying the maximum alignment requirement for the property: 0, 1, 2, 4 or 8. This affects the alignment of the property and overall struct only if non-zero and less than the type's default alignment requirement, or if non-zero and <em>Type</em> is an integer. When defining a property in a class definition, the most recent <a href="_StructPack.htm">#StructPack</a> directive sets the value for <em>Pack</em>.</p>
     <p id="DefinePropOffset"><strong>Offset</strong> <span class="ver">[v2.1-alpha.24+]</span>: The offset of the struct field. To use the same offset as a previously defined property, specify its name. Otherwise specify the offset in bytes.</p>
+    <p>When a property is being created or redefined, the following own property may also be present:</p>
+    <p id="DefinePropEnumerable"><strong>Enumerable</strong> <span class="ver">[v2.1-alpha.34+]</span>: If false (0), the property is hidden from enumeration by <a href="Props.htm">Props</a>.</p>
   </dd>
 </dl>
 <h4 id="DefineProp_Return_Value">Return Value</h4>
 <p>Type: <a href="../Concepts.htm#objects">Object</a></p>
 <p>This method returns the target object.</p>
+<h4 id="DefineProp_Error_Handling">Error Handling</h4>
+<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>Descriptor</em> does not describe exactly one kind of property: <em>Value</em> alone, <em>Type</em> with optional <em>Pack</em> and <em>Offset</em>, or any of <em>Get</em>, <em>Set</em> and <em>Call</em>. A <em>Get</em>, <em>Set</em>, <em>Call</em> or <em>Type</em> which is not an object is treated as absent.</p>
 <h4 id="DefineProp_Remarks">Remarks</h4>
 <p>Defining a value property overwrites any existing value or accessor functions.</p>
 <p>Defining a dynamic property overwrites any existing value, but retains any existing accessor functions which aren't specified by the descriptor.</p>
@@ -149,7 +153,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <h4 id="GetOwnPropDesc_Return_Value">Return Value</h4>
 <p>Type: <a href="../Concepts.htm#objects">Object</a></p>
 <p>For a dynamic property, the return value is a new object with an own property for each accessor function: <em>Get</em>, <em>Set</em>, <em>Call</em>. Each property is present only if the corresponding accessor function is defined in <em>Obj</em> itself. For a value property, the return value is a new object with a property named <em>Value</em>. In such cases, <code>Obj.GetOwnPropDesc(Name).Value == Obj.%Name%</code>.</p>
-<p><span class="ver">[v2.1-alpha.3+]</span>: For a <a href="../Structs.htm">typed property</a>, the return value is a new object with the own properties <code class="no-highlight">Type</code> and <code class="no-highlight">Offset</code>. <em>Offset</em> is the zero-based offset of the property in bytes, relative to the start of the object's structured data. <span class="ver">[v2.1-alpha.24+]</span>: <em>Type</em> is a class object.</p>
+<p><span class="ver">[v2.1-alpha.3+]</span>: For a <a href="../Structs.htm">typed property</a>, the return value is a new object with the own properties <em>Type</em> and <em>Offset</em>. <em>Offset</em> is the zero-based offset of the property in bytes, relative to the start of the object's structured data. <span class="ver">[v2.1-alpha.24+]</span>: <em>Type</em> is a class object.</p>
 <p class="note"><strong>Note:</strong> Typed properties can only be owned by a Prototype.</p>
 <p>Modifying the returned object has no effect on <em>Obj</em> unless <a href="#DefineProp">DefineProp</a> is called.</p>
 <p>The script can determine whether a property is dynamic by checking <code>not desc.HasProp("Value")</code>, where <em>desc</em> is the return value of GetOwnPropDesc.</p>
@@ -206,7 +210,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 </div>
 
 <div class="methodShort" id="__Ref"><h3>__Ref <span class="ver">[v2.1-alpha.10+]</span></h3>
-<p>Retrieves a nested struct or <a href="../Functions.htm#virtual-reference">virtual reference</a> to a property.</p>
+<p>Retrieves a nested struct or <a href="../Functions.htm#virtual-references">virtual reference</a> to a property.</p>
 <pre class="Syntax">Obj.<span class="func">__Ref</span>(Name)</pre>
 <h4 id="__Ref_Parameters">Parameters</h4>
 <dl>
@@ -222,7 +226,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <p>If the property is a <a href="../Structs.htm#pointers">pointer type</a> or not a nested struct, a <a href="PropRef.htm">PropRef</a> is created and returned.</p>
 <h4 id="__Ref_Remarks">Remarks</h4>
 <p>This method is normally called indirectly via the <a href="../Variables.htm#ref">reference operator</a>. For example, <code>&amp;Obj.Prop</code> is equivalent to <code>Obj.__Ref('Prop')</code>.</p>
-<p>A <a href="../Functions.htm#virtual-reference">virtual reference</a> can be passed to a <a href="../Functions.htm#ByRef">ByRef parameter</a> in place of a variable reference.</p>
+<p>A <a href="../Functions.htm#virtual-references">virtual reference</a> can be passed to a <a href="../Functions.htm#ByRef">ByRef parameter</a> in place of a variable reference.</p>
 </div>
 
 <h2 id="Properties">Properties</h2>

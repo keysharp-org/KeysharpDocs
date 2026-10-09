@@ -28,14 +28,6 @@
 <p><a href="lib/_Warn.htm">#Warn</a> can enable or disable warnings within the current module without affecting other modules. For details, see the <a href="lib/_Warn.htm#Remarks">#Warn remarks</a>.</p>
 <p><a href="lib/_HotIf.htm">#HotIf</a> affects only the current module. #HotIf and <a href="lib/HotIf.htm">HotIf</a> expressions are module-scoped, as they may contain references to module-level variables. For instance, the effect of <code>#HotIf myToggle</code> depends on what value <em>myToggle</em> has in the current module.</p>
 
-<h2 id="__Ref">Module.__Ref <span class="ver">[v2.1-alpha.33+]</span></h2>
-<p>Retrieves a <a href="Concepts.htm#variable-references">VarRef</a> for a module's global variable or explicitly imported name.</p>
-<pre class="Syntax">Reference := ModuleObject.<span class="func">__Ref</span>(Name)</pre>
-<p><em>Name</em> is the name of a member in the module, including a named or wildcard import. Imports may pass a name through multiple modules: every alias reaches the original variable and returns its reference. Bare and dynamic references to an explicitly imported variable share this reference and its native string memory. If the name cannot be resolved, the method returns <a href="Language.htm#unset">unset</a> without creating a variable.</p>
-<p>A reference to a function, class or read-only built-in variable can be read, but assigning through it raises a read-only error.</p>
-<p>Retrieving the reference does not read the variable's value. If that value is another VarRef, the returned reference still points to the variable holding it.</p>
-<p>The <a href="Variables.htm#ref">reference operator</a> uses this method: <code>&amp;ModuleObject.Member</code> is equivalent to <code>ModuleObject.__Ref("Member")</code>.</p>
-
 <h2 id="KS">KS Module</h2>
 <p>The built-in <code class="no-highlight">KS</code> module exports Keysharp-specific classes, functions and variables. A script must import a name to use it, and the names are not members of the <a href="#AHK">AHK module</a>.</p>
 <pre>#Import "Ks" { Image, A_DirSeparator }
@@ -113,12 +105,12 @@ MsgBox A_DirSeparator</pre>
 <h2 id="Execution">Execution</h2>
 <p>The body of each module is executed eagerly at program startup, by the <a href="Scripts.htm#auto">auto-execute thread</a>. A module normally executes after the modules it imports. Declaration order resolves modules which are otherwise unrelated or form a cycle.</p>
 <p>This eager, import-aware order is a Keysharp difference from AutoHotkey v2.1, which starts from the last-defined module and can execute another module lazily when one of its variables or constants is first referenced. For example:</p>
-<pre>#module A
+<pre>#Module A
 MsgBox "A executing"  <em>; Shown first.</em>
 global ANSWER := 42
 
-#module B
-#import A {ANSWER}
+#Module B
+#Import A {ANSWER}
 MsgBox "B executing"  <em>; Shown second.</em>
 MsgBox ANSWER</pre>
 
@@ -134,13 +126,24 @@ MsgBox ANSWER</pre>
 </ul>
 <p>For example, <code>#Import M</code> may load the file with exact name <code class="no-highlight">M</code>, <code class="no-highlight">M\__Init.ahk</code> or <code class="no-highlight">M.ahk</code>. <code>#Import "M"</code> is the same except that the name <em>M</em> is not added to the current module.</p>
 
+<h2 id="Class">Module Class</h2>
+<p>The module alias defined in an <a href="lib/_Import.htm">#Import</a> directive is assigned an instance of the "Module" class. Each name exported from the module is exposed as a virtual property. In the current release, these virtual properties are not visible to <a href="lib/Props.htm">Props</a>, <a href="lib/HasProp.htm">HasProp</a> or <a href="lib/HasMethod.htm">HasMethod</a>. This may change in a future release.</p>
+
+<h3 id="__Ref">Module.__Ref <span class="ver">[v2.1-alpha.33+]</span></h3>
+<p>Retrieves a <a href="Concepts.htm#variable-references">VarRef</a> for a module's global variable or explicitly imported name.</p>
+<pre class="Syntax">Reference := ModuleObject.<span class="func">__Ref</span>(Name)</pre>
+<p><em>Name</em> is the name of a member in the module, including a named or wildcard import. Imports may pass a name through multiple modules: every alias reaches the original variable and returns its reference. Bare and dynamic references to an explicitly imported variable share this reference and its native string memory. If the name cannot be resolved, the method returns <a href="Language.htm#unset">unset</a> without creating a variable.</p>
+<p>A reference to a function, class or read-only built-in variable can be read, but assigning through it raises a read-only error.</p>
+<p>Retrieving the reference does not read the variable's value. If that value is another VarRef, the returned reference still points to the variable holding it.</p>
+<p>The <a href="Variables.htm#ref">reference operator</a> uses this method: <code>&amp;ModuleObject.Member</code> is equivalent to <code>ModuleObject.__Ref("Member")</code>.</p>
+
 <h2 id="Examples">Examples</h2>
 
 <div class="ex" id="ExSimple"><p><a class="ex_number" href="#ExSimple"></a> Each module has its own global variables (<code>MyVar</code> and <code>ShowVar</code>).</p>
 <pre>
 #Import Other
 MyVar := 1
-      ShowVar()  <em>; Our MyVar is 1.</em>
+ShowVar()  <em>; Our MyVar is 1.</em>
 Other.ShowVar()  <em>; Other MyVar is still 2.</em>
 MsgBox "Within main, Other.MyVar = " (Other.MyVar ?? "inaccessible")  <em>; MyVar is accessible in v2.1-alpha.19+.</em>
 ShowVar() =&gt; MsgBox("Main MyVar = " MyVar)
@@ -174,7 +177,7 @@ Check(n) =&gt; n = Calculate()
 
 <div class="ex" id="ExAHK"><p><a class="ex_number" href="#ExAHK"></a> Access shadowed built-in functions.</p>
 <pre>
-#import AHK
+#Import AHK
 
 MsgBox "Hello, world!",, "T2"
 

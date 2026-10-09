@@ -14,7 +14,7 @@
 
 <h1>#Module <span class="ver">[v2.1-alpha.11+]</span></h1>
 
-<p>Starts a new module or reopens an existing module.</p>
+<p>Starts a new <a href="../Modules.htm">module</a> or reopens an existing module.</p>
 
 <pre class="Syntax"><span class="func">#Module</span> ModuleName</pre>
 
@@ -35,7 +35,7 @@
 <p>Modules defined this way take precedence over modules in the file system when <em>ModuleName</em> matches using ordinal case-insensitive comparison.</p>
 <p><span class="ver">[v2.1-alpha.20+]</span>: If <em>ModuleName</em> is <code class="no-highlight">AHK</code>, <code class="no-highlight">__Main</code> or a name used with a previous #Module directive, the existing module is "reopened", allowing <a href="../Modules.htm#Execution">startup code</a> and definitions to be added.</p>
 <p><code>#Module __Init</code> reopens the initial module of the current group. <code>#Module __Main</code> reopens the main script module, including when the directive appears in an imported file.</p>
-<p><span class="ver">[v2.1-alpha.21+]</span> The use of #Module in a file which is loaded multiple times via <a href="_Include.htm">#Include</a> is prohibited. This is because the module would be "reopened" and its content duplicated, often resulting in misleading messages about duplicate declarations. Note that this restriction does not apply to multiple instances of #Include in the same module, as in such cases the file is included only once.</p>
+<p><span class="ver">[v2.1-alpha.21+]</span>: The use of #Module in a file which is loaded multiple times via <a href="_Include.htm">#Include</a> is prohibited. This is because the module would be "reopened" and its content duplicated, often resulting in misleading messages about duplicate declarations. Note that this restriction does not apply to multiple instances of #Include in the same module, as in such cases the file is included only once.</p>
 <p>#Module cannot be used within a block or as the body of a control flow statement.</p>
 
 <h2 id="Related">Related</h2>

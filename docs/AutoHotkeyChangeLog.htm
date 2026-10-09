@@ -19,6 +19,38 @@
 </ul>
 <p>For full technical details of changes, refer to <a href="https://github.com/AutoHotkey/AutoHotkey">GitHub</a>.</p>
 
+<h2 id="v2.1-alpha.34">2.1-alpha.34 - October 9, 2026</h2>
+<p>Improved the reliability of FileSetTime with respect to restricted permissions and file locks. [PR #358 by miaminlk] </p>
+<p>Removed message filtering for TreeView controls and FileSelect dialogs. This reverts a bug-fix added in <a href="https://www.autohotkey.com/docs/v1/ChangeLogHelp.htm#v1.0.44.11">v1.0.44.11</a>, which worked around an issue on OS versions which are no longer supported, but caused the same issue with DirSelect on newer OS versions. This has no known effect on FileSelect on any supported OS.</p>
+<p>Added numeric type class support to NumPut/NumGet.</p>
+<p>Added support for <a href="Structs.htm#classdef-union">anonymous unions</a>.</p>
+<p>Added support for hiding properties from <a href="lib/Props.htm">Props</a> and the debugger by including <code>Enumerable: false</code> in the <a href="lib/Object.htm#DefineProp">DefineProp</a> descriptor.</p>
+<p><strong>Changes applicable only to alpha users:</strong></p>
+<p>Changed #Requires inside a function or #Include file to never affect the current module's compatibility mode for global code.</p>
+<p>Changed Clone to throw TypeError if typed properties exist, instead of producing a broken object.</p>
+<p>Changed typed properties and DllCall to let a <em>StructClass</em>.Array "decay" to a <em>StructClass</em>.Ptr.</p>
+<p>Fixed some inconsistencies with <em>NumericClass</em>.Ptr versus other structs.</p>
+<p>Changed <code>a.%b?% ?? c</code> to be consistent with <code>%r?% ?? c</code>. It now short-circuits instead of invoking the default property.</p>
+<p>Improved validation of DefineProp's Descriptor parameter.</p>
+
+<h2 id="v2.0.30">2.0.30 - October 9, 2026</h2>
+<p>Fixed Gui.Move moving the window incorrectly if it has an owner. [PR #359 by iPhilip]</p>
+<p>Fixed <code>a &amp; b::AltTabMenu</code> and similar crashing the program when activated [broken by v2.0.20].</p>
+
+<h2 id="v2.0.29">2.0.29 - October 3, 2026</h2>
+<p>Fixed OnMessage crashing if more than 65536 monitors are registered.</p>
+
+<h2 id="v2.1-alpha.33">2.1-alpha.33 - October 3, 2026</h2>
+<p><strong>Changes applicable only to alpha users:</strong></p>
+<p>Added the capability to use #Import inside a function.</p>
+<p>Added __Ref method to Module, to support <code>&amp;MyMod.MyVar</code>.</p>
+<p>Fixed <code>a.b[c]</code> crash when <code>a.b</code> returns unset.</p>
+<p>Fixed ObjSetCapacity and related to throw if target is Struct.</p>
+<p>Fixed EditGetLine, ControlChooseIndex and ControlDeleteItem on 32-bit.</p>
+<p>Fixed <code>DlCall(..., Struct.Ptr, unset)</code> on 32-bit.</p>
+<p>Fixed Struct.Array DllCall parameter types on 32-bit.</p>
+<p>Fixed CallbackCreate with 64-bit numeric parameter types on 32-bit.</p>
+
 <h2 id="v2.1-alpha.32">2.1-alpha.32 - September 12, 2026</h2>
 <p>Added the <a href="lib/Gui.htm#FontHandle">FontHandle property (Gui)</a>.</p>
 <p>Fixed Gui.Move to not DPI-scale X or Y.</p>
@@ -442,7 +474,7 @@
 <p>Changed how KeyOpt (InputHook) applies option removal for SC-based keys.</p>
 <p>Changed WinTitles with two different ahk_id values to yield no match.</p>
 <p>Changed RegExReplace to support binary zero in Replacement.</p>
-<p>Implemented <a href="Functions.htm#virtual-reference">virtual references</a>.</p>
+<p>Implemented <a href="Functions.htm#virtual-references">virtual references</a>.</p>
 <p>Added Object.Prototype.Props(), which enumerates own and inherited properties.</p>
 <p>Improved DBGp property and context commands:</p>
 <ul>
@@ -624,7 +656,7 @@
 <p>Added <code>Class(Name, BaseClass, Args*)</code> and <code>Class(BaseClass, Args*)</code> (see <a href="lib/Class.htm#StaticCall">Class.Call</a>).</p>
 <p>Added support for left/right modifiers in {Blind}, as in <code class="no-highlight">{Blind&gt;^}</code>.</p>
 <p>Changed remapping to utilize left/right modifiers in Blind; e.g. <code>&gt;^a::b</code> remaps RCtrl-A to B and LCtrl-RCtrl-A to LCtrl-B, instead of just B.</p>
-<p>Changed DllCall to permit CDecl to be omitted for all functions (see <a href="lib/DllCall.htm#cdecl">CDecl</a>).</p>
+<p>Changed DllCall to permit CDecl to be omitted for all functions (see <a href="lib/DllCall.htm#CDecl">CDecl</a>).</p>
 <p>Revised parsing of statements. Global, local and static variable declarations with multiple initializers are now evaluated as one, so there is no need to step over each initializer individually while debugging.</p>
 <p>Changed ListVars to show unset vars as "varname: unset".</p>
 <p>Changed Throw to be a function, <strike>permitting thrown errors to be continuable</strike> (see <a href="lib/Throw.htm#Remarks">Throw</a>).</p>

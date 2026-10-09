@@ -18,11 +18,34 @@
 <h2 id="Documented_Version">Documented Version</h2>
 <table class="info">
   <tr><th>Property</th><th>Value</th></tr>
-  <tr><td>Keysharp version described here</td><td>0.0.0.17</td></tr>
-  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.33</td></tr>
+  <tr><td>Keysharp version described here</td><td>0.0.0.18 (in development)</td></tr>
+  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.34</td></tr>
 </table>
 <p>See <a href="KeysharpDifferences.htm">Changes from AutoHotkey to Keysharp</a> for the differences, <a href="Platforms.htm">Platform Support</a> for per-platform availability, and the platform remarks on each affected reference page.</p>
 <p>The corresponding upstream language changes are described in <a href="v2.1-changes.htm">Changes from v2.0 to v2.1</a>.</p>
+
+<h2 id="v0.0.0.18">0.0.0.18 (in development)</h2>
+<p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.34">AutoHotkey v2.1-alpha.34</a>.</p>
+
+<h3 id="v0.0.0.18-breaking">Breaking Changes</h3>
+<ul>
+  <li><a href="lib/Object.htm#DefineProp">DefineProp</a> validates its descriptor as AutoHotkey does: a descriptor naming more than one kind of property, such as Value with Pack, raises a ValueError; a Get, Set, Call or Type which is not an object is ignored instead of raising an error; and a Map's items are not read as descriptor properties.</li>
+  <li><a href="lib/_Requires.htm#CompatMode">#Requires</a>: a module's compatibility mode comes from its first version directive outside functions, classes and #Include files, instead of the last one including those in #Include files. A directive applies to the function and class definitions after it, so a function above a script's first #Requires runs in v2.0 mode.</li>
+  <li><code>Length</code> is defined only on <a href="lib/StructArray.htm">structured arrays</a> (<em>StructClass</em>.Array). Other structs have no inherited Length property, instead of one which raised a PropertyError when read.</li>
+</ul>
+
+<h3 id="v0.0.0.18-new">New</h3>
+<ul>
+  <li><a href="lib/Object.htm#DefinePropEnumerable">DefineProp's Enumerable</a> option hides a property from <a href="lib/Props.htm">Props</a>.</li>
+  <li><a href="lib/NumGet.htm">NumGet</a> and <a href="lib/NumPut.htm">NumPut</a> accept a <a href="Structs.htm#numeric-types">numeric type class</a> such as <code>UInt32</code> as the type.</li>
+  <li><a href="Structs.htm#classdef-union">Union blocks</a> define overlapping typed properties in a struct.</li>
+  <li>A <a href="Structs.htm#arrays">structured array</a> is accepted where <em>StructClass</em>.Ptr is expected, by a <a href="Structs.htm#pointers_fields">typed pointer property</a> and by a <a href="Structs.htm#pointers_DllCall">DllCall</a> parameter.</li>
+  <li><code>a.%b?% ?? c</code> short-circuits from within the <a href="Variables.htm#maybe">property name substitution</a>, without invoking any property, if <em>b</em> is unset.</li>
+  <li>A <a href="lib/_Requires.htm#CompatMode">#Requires</a> directive inside a class body sets the compatibility mode of that class's methods, properties and nested classes, and one inside a function body also sets the mode of that function.</li>
+</ul>
+
+<h3 id="v0.0.0.18-fixes">Fixes and Performance</h3>
+<p><a href="lib/Any.htm#Base">Any.Prototype.Base</a>, and the Base of any other object which has none, reads as <em>blank-unset</em> (<code>""</code> in v2.0 mode), as in AutoHotkey. <code>a &amp; b::AltTabMenu</code> and similar <a href="Hotkeys.htm#alttab">Alt-Tab hotkeys</a> work without faulting the keyboard hook.</p>
 
 <h2 id="v0.0.0.17">0.0.0.17</h2>
 <p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.33">AutoHotkey v2.1-alpha.33</a>.</p>
@@ -34,7 +57,7 @@
   <li>On Windows, <a href="Objects.htm#ObjPtr">ObjPtr</a> returns an Integer borrowed IUnknown address: <code>ObjPtr(Obj).Ptr</code> becomes <code>ObjPtr(Obj)</code>. Keep the object alive while using the address. Use ObjPtrAddRef and a matching ObjRelease when a separately counted COM reference is needed.</li>
   <li><a href="lib/DllCall.htm">DllCall</a> releases its own newly loaded library reference after the call. Use <a href="lib/_DllLoad.htm">#DllLoad</a> to keep a library resident when retaining its function pointers or native state.</li>
   <li><a href="lib/StringBuffer.htm">StringBuffer</a> supports UTF-16 only; <code>"ANSI"</code> was removed. Use a <a href="lib/Buffer.htm">Buffer</a> with <code>StrGet(Buf, "CP0")</code> for ANSI output. Capacity is the requested character count, without the former extra character.</li>
-  <li>Direct references to a variable share one <a href="Concepts.htm#variable-references">VarRef</a>, so <code>&amp;x == &amp;x</code> is true. Output and ByRef parameters require a VarRef or <a href="Functions.htm#virtual-reference">virtual reference</a>; ordinary objects cannot receive them.</li>
+  <li>Direct references to a variable share one <a href="Concepts.htm#variable-references">VarRef</a>, so <code>&amp;x == &amp;x</code> is true. Output and ByRef parameters require a VarRef or <a href="Functions.htm#virtual-references">virtual reference</a>; ordinary objects cannot receive them.</li>
   <li>Numeric conversion, operators and built-in validation follow AutoHotkey more closely. Invalid numeric text raises an error, relational operators compare numbers only, and documented ranges are enforced. Use <a href="lib/StrCompare.htm">StrCompare</a> to order strings. Implicit object-to-string conversion requires <code>ToString</code>; Map.ToString uses square brackets.</li>
   <li>A <a href="lib/Buffer.htm">Buffer</a> without FillByte is uninitialized. Pass <code>0</code> explicitly for zero-filled memory. <a href="lib/Image.htm#GetPixelData">Image.GetPixelData</a> defaults to 4 bytes per pixel (RGBA); pass <code>1</code> for grayscale. Crypt string input defaults to UTF-8 instead of UTF-16.</li>
   <li>Float-to-string conversion uses 17 significant digits, so <code>0.1</code> displays as <code>0.10000000000000001</code>. <a href="lib/InStr.htm">InStr</a> and <a href="lib/StrReplace.htm">StrReplace</a> use Unicode ordinal case folding for both Off and Locale.</li>

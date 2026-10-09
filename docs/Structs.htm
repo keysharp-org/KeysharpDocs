@@ -38,6 +38,21 @@
 <p>Fields defined by a subclass are always placed after fields defined by the base class. For example, when class StructB extends StructA, the layout is the same as if StructB extends Object but begins with a nested StructA. However, inherited properties are accessed directly, not through a nested struct.</p>
 <p><a href="lib/_StructPack.htm">#StructPack</a> can be used to override the default alignment of fields within the struct.</p>
 <p>All elements of a <a href="Objects.htm#Custom_Classes">class definition</a> are permitted, but an initializer such as <code>x := 0</code> cannot create a new property.</p>
+<p>In AutoHotkey v2.1, typed properties can also be declared in a class which is not a struct class. In Keysharp, typed properties can be declared only in a struct class; declaring one in any other class raises an error.</p>
+
+<h3 id="classdef-union">Union Block <span class="ver">[v2.1-alpha.34+]</span></h3>
+<p>Within a struct or class definition, a union block can be used to define overlapping typed properties. For example, an incomplete definition of the <a href="https://learn.microsoft.com/windows/win32/api/winuser/ns-winuser-input">INPUT</a> structure used with <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-sendinput">SendInput</a> might look like this:</p>
+<pre>struct INPUT {
+    <span class="no-highlight">type</span> : UInt32
+    union {
+        mi : MOUSEINPUT
+        ki : KEYBDINPUT
+    }
+}</pre>
+<p>In this example, <em>mi</em> and <em>ki</em> start at the same offset within the structure. Either <em>mi</em> or <em>ki</em> is valid, depending on the value of <em>type</em>. This is known as a <a href="https://en.wikipedia.org/wiki/Tagged_union">tagged union</a>.</p>
+<p>The overall size of the union is the size of its largest member.</p>
+<p>A union block must contain only typed property declarations, although each declaration may have an initializer. Unlike C and C++, nested structure definitions are not currently supported. A structure can instead be defined outside of the union and then used in a property declaration inside the union.</p>
+<p>For backward-compatibility, an empty union block is interpreted as an empty dynamic property, as "union" is also a valid property name.</p>
 
 <h2 id="defprop">Using DefineProp</h2>
 <p>A struct can be defined at runtime by creating a <a href="lib/Class.htm">Class</a> object and adding typed properties to its <a href="lib/Class.htm#Prototype">Prototype</a> with <a href="lib/Object.htm#DefineProp">DefineProp</a>. For example:</p>
@@ -78,18 +93,18 @@ MsgBox AB().Size
 </ul>
 <p class="note"><strong>Note:</strong> AutoHotkey does not support 64-bit unsigned integers, but signed integers can generally be used instead.</p>
 <p>As these are struct classes, each one has a <a href="#pointers">pointer class</a> and <a href="#arrays">array classes</a>. For example, <code>UInt32.Ptr</code> is equivalent to <code>"UInt*"</code> when used with <a href="lib/DllCall.htm">DllCall</a>, and <code>UInt8[64]</code> is the class of an array of 64 bytes.</p>
-<p>When used as a property type, DllCall parameter type or array element type, conversion is handled directly and the class is not instantiated. For DllCall, this includes the pointer classes. For instance, a return value of type <code>Int32.Ptr</code> is exactly equivalent to <code>"int*"</code> and always dereferences the pointer (returns the integer value it points to) rather than returning a boxed pointer.</p>
-<p>An instance of a numeric struct class acts not as a number, but as a <a href="Functions.htm#virtual-reference">virtual reference</a> to a numeric variable. As with struct instances, we call it a <a href="#Boxed_Pointer">boxed pointer</a> if it encapsulates an unsafe pointer, or a <a href="#Boxed_Pointer">boxed struct</a> if its lifecycle is managed by the script. An instance can be created as follows:</p>
+<p>When used as a property type, DllCall parameter type or array element type, conversion is handled directly and the class is not instantiated. For DllCall, this includes the pointer classes. For instance, a return value of type <code>Int32.Ptr</code> is exactly equivalent to <code>"Int*"</code> and always dereferences the pointer (returns the integer value it points to) rather than returning a boxed pointer.</p>
+<p>An instance of a numeric struct class acts not as a number, but as a <a href="Functions.htm#virtual-references">virtual reference</a> to a numeric variable. As with struct instances, we call it a <a href="#Boxed_Pointer">boxed pointer</a> if it encapsulates an unsafe pointer, or a <a href="#Boxed_Pointer">boxed struct</a> if its lifecycle is managed by the script. An instance can be created as follows:</p>
 <ul>
   <li>Directly calling the class creates a boxed struct.</li>
   <li>A property of a pointer type such as <code>Int32.Ptr</code> can return a boxed pointer.</li>
   <li>A <a href="lib/CallbackCreate.htm">callback</a> can convert an incoming pointer value to a boxed pointer when the parameter type is a pointer type such as <code>Int32.Ptr</code>.</li>
   <li>The <a href="lib/Struct.htm#At">At</a> method creates a boxed pointer.</li>
 </ul>
-<p>Each instance has a property named __Value of the type represented by the class. This is typically invoked by the <a href="Variables.htm#deref">dereference operator</a> or when using the instance as a <a href="Functions.htm#virtual-reference">virtual reference</a>. For example, <code>MouseGetPos(Int32.at(pt.ptr))</code> would store the X coordinate at the beginning of the struct <code>pt</code>.</p>
+<p>Each instance has a property named __Value of the type represented by the class. This is typically invoked by the <a href="Variables.htm#deref">dereference operator</a> or when using the instance as a <a href="Functions.htm#virtual-references">virtual reference</a>. For example, <code>MouseGetPos(Int32.at(pt.ptr))</code> would store the X coordinate at the beginning of the struct <code>pt</code>.</p>
 
 <h2 id="nested-structs">Nested Structs</h2>
-<p>Nested structs are constructed in order of definition, prior to initialization of the outer struct. The nested struct's own field initializers are evaluated and <a href="Objects.htm#Custom_NewDelete">__New</a> is called (without parameters) before before any initializers in the outer struct.</p>
+<p>Nested structs are constructed in order of definition, prior to initialization of the outer struct. The nested struct's own field initializers are evaluated, and <a href="Objects.htm#Custom_NewDelete">__New</a> is called (without parameters) before any initializers in the outer struct.</p>
 <p class="note"><strong>Note:</strong> Due to their specific needs for memory allocation and initialization, nested structs are constructed directly, not by calling the static Call method of the class.</p>
 <p>When the outer struct is about to be deleted, <a href="Objects.htm#Custom_NewDelete">__Delete</a> is called for the outer struct first, followed by each nested struct (if defined) in reverse order of definition. The memory of the outer struct is deleted only after all destructors are called.</p>
 <p>By default, the property corresponding to a nested struct returns a reference to the nested struct, and cannot be assigned a value. This can be overridden by defining a getter and/or setter for the <a href="#abstract">__Value property</a>. If a setter is defined and no getter, the struct itself is still returned by default.</p>
@@ -119,23 +134,24 @@ Example()</pre>
 <p>There are a variety of conventions for strings in structs and DllCall. Currently typed properties have no built-in support for strings or arrays, but they can be implemented by scripts using these mechanisms. The <a href="#ExCString">CString</a> and <a href="#ExBSTR">BSTR</a> examples demonstrate this.</p>
 
 <h2 id="pointers">Pointers to Structs <span class="ver">[v2.1-alpha.22+]</span></h2>
-<p>Each struct class has a static property named <strong>Ptr</strong> which returns a pointer class. A pointer class is generally not instantiated, but is used with <a href="lib/DllCall.htm">DllCall</a> and typed properties to specify a pointer-to-struct parameter or field. For example, given an appropriate definition of the RECT struct class, <code>RECT.Ptr</code> represents the C type <code>RECT*</code> or <code>LPRECT</code>.</p>
+<p>Each struct class has a static property named <strong>Ptr</strong> which returns a pointer class. A pointer class is generally not instantiated, but is used with <a href="lib/DllCall.htm">DllCall</a> and typed properties to specify a pointer-to-struct parameter or field. For example, given an appropriate definition of the RECT struct class, <code>RECT.Ptr</code> represents the C type <code class="no-highlight">RECT*</code> or <code class="no-highlight">LPRECT</code>.</p>
 
 <h3 id="Boxed_Pointer">Boxed Pointer</h3>
 <p>Rather than encapsulating pointer values as their own unique type, they are treated as instances of the target struct class, with all of the same properties and type identity. To differentiate, we can use the term "boxed struct" to refer to an instance constructed by the script, and "boxed pointer" to refer to an instance which encapsulates a pointer value.</p>
 <p>An address (pointer value) can be boxed by calling the <a href="lib/Struct.htm#At">At</a> method.</p>
 <pre>Ref := StructClass.At(Address)</pre>
-<p>Since Ref is treated as an instance of StructClass, <code>Ref is StructClass &amp;&amp; Ref.Ptr = Address</code> is true and <code>Ref.Size</code> returns the size of the struct (defined by the class). This means that if Ref is passed to a <a href="lib/DllCall.htm">DllCall</a> <a href="lib/DllCall.htm#ptr">Ptr</a> parameter, <a href="lib/NumGet.htm">NumGet</a> or <a href="lib/NumPut.htm">NumPut</a>, the parameter value or target address is the address of the struct, not the address at which the pointer is stored.</p>
+<p>Since Ref is treated as an instance of StructClass, <code>Ref is StructClass &amp;&amp; Ref.Ptr = Address</code> is true and <code>Ref.Size</code> returns the size of the struct (defined by the class). This means that if Ref is passed to a <a href="lib/DllCall.htm">DllCall</a> <a href="lib/DllCall.htm#Ptr">Ptr</a> parameter, <a href="lib/NumGet.htm">NumGet</a> or <a href="lib/NumPut.htm">NumPut</a>, the parameter value or target address is the address of the struct, not the address at which the pointer is stored.</p>
 <p>The lifetime of the actual struct is independent from the lifetime of a boxed pointer - the "box" only contains the pointer, not the struct. In many cases the struct is constructed by external code; the method of allocation can vary and may be unknowable. The script must ensure that no typed properties are queried after the struct is deleted.</p>
 <p class="warning"><strong>Warning:</strong> The debugger may query properties automatically, so it is best to always release any boxed pointers before the target struct is deleted.</p>
 <p>The struct is expected to have already been constructed (typically by external code), so __Init and __New are not called by At.</p>
 <p>Any number of boxed pointers can exist for a given address, and can even have different classes. Different instances do not compare equal; the "boxes" are compared, not the pointer value.</p>
 
 <h3 id="pointers_DllCall">DllCall</h3>
-<p>When used as a DllCall parameter type, <code>StructClass.Ptr</code> is handled similarly to any type with the <a href="lib/DllCall.htm#asterisk">* suffix</a>. That is, the parameter can accept a VarRef, a value of the base type, or a value which can be converted to the base type. If a VarRef is passed, the value is read back after the call and assigned to the VarRef, potentially converting it in the process. The specifics are as follows:</p>
+<p>When used as a DllCall parameter type, <code>StructClass.Ptr</code> is handled similarly to any type with the <a href="lib/DllCall.htm#Pointer_Types">asterisk/P suffix</a>. That is, the parameter can accept a VarRef, a value of the base type, or a value which can be converted to the base type. If a VarRef is passed, the value is read back after the call and assigned to the VarRef, potentially converting it in the process. The specifics are as follows:</p>
 <ul>
   <li>If <a href="Language.htm#unset">unset</a>, a null pointer (0) is passed.</li>
   <li>If a StructClass.Ptr is passed, the pointer value it contains is passed (but this is not typical usage).</li>
+  <li><span class="ver">[v2.1-alpha.34+]</span>: If an <a href="#arrays">array of StructClass</a> is passed, the address of its first element is passed. In other words, an array can "decay" to a pointer.</li>
   <li>If a <a href="Concepts.htm#variable-references">VarRef</a> is passed, its value (if any) is used as input.</li>
   <li>If the input is an instance of StructClass, its address is passed.</li>
   <li>In any other case, a new instance of StructClass is constructed.
@@ -157,6 +173,7 @@ Example()</pre>
 <p>For both assignment and return, <a href="Language.htm#unset">unset</a> is used to represent a null pointer (0).</p>
 <p>When non-null, the high-level value of the property is an instance of the target class (either a <a href="#Boxed_Pointer">boxed pointer</a> or a <a href="#Boxed_Pointer">boxed struct</a>).</p>
 <p>If a <a href="#Boxed_Pointer">boxed struct</a> of an appropriate type is assigned to the property, a reference is retained to ensure it is not deleted until after the script releases its reference to the outer struct or <a href="#Boxed_Pointer">boxed pointer</a>. For example, it is typically safe to use <code>outer.lpEx := Example()</code>, whereas <code>myVar := Example().Ptr</code> would free the new struct immediately after the assignment. If the underlying pointer value has been changed, evaluating <code>outer.lpEx</code> causes the held reference to be released.</p>
+<p><span class="ver">[v2.1-alpha.34+]</span>: A <a href="#arrays">structured array</a> can be assigned if the base element class is exactly equal to that of the pointer's target. In that case, evaluating the pointer property will return a reference to the original array. For example, an instance of <code>UInt8[32]</code> can be assigned to a property of type <code>UInt8.Ptr</code>.</p>
 <p>If a pointer class is constructed directly, its __Value property behaves as described above.</p>
 
 <h2 id="arrays">Structured Arrays <span class="ver">[v2.1-alpha.23+]</span></h2>

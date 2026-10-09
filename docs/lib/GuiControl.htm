@@ -257,7 +257,7 @@
 <h4 id="Opt_Remarks">Remarks</h4>
 <p>All valid options and styles are usually recognized. However, this does not mean that all of them are applied or removed after a control has been created. Some <a href="../misc/Styles.htm">styles</a> cannot be changed retroactively. For <a href="Gui.htm#PosSize">positioning and sizing options</a>, use <a href="#Move">GuiControl.Move</a> instead, optionally with <a href="GuiControl.htm#GetPos">GuiControl.GetPos</a> for relative adjustments.</p>
 <p>If a change could not be applied, an exception is thrown. Even if a change is successfully applied, the control might choose to ignore it.</p>
-<p>Named options and numeric styles are not applied identically by <a href="Gui.htm#Add">Gui.Add</a> and Opt. Consistent option application and native style updates are <a href="../Keysharp.htm#ReleaseReview">deferred release-review work</a>.</p>
+<p>Named options and numeric styles are not applied identically by <a href="Gui.htm#Add">Gui.Add</a> and Opt.</p>
 <p>Raw style numbers are generally ignored on Linux and macOS. UpDown emulates <code class="no-highlight">0x80</code> to suppress thousands separators.</p>
 </div>
 <span id="redraw-remarks"></span><div class="methodShort" id="Redraw">
