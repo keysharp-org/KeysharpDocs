@@ -115,16 +115,19 @@ MsgBox "B executing"  <em>; Shown second.</em>
 MsgBox ANSWER</pre>
 
 <h2 id="Search_Path">Search Path <span class="ver">[v2.1-alpha.20+]</span></h2>
-<p>The module search path is a list of directories which the <a href="lib/_Import.htm">#Import</a> statement looks in to find module files. The directory of the file which contains the #Import directive is always searched first. The <code class="no-highlight">AhkImportPath</code> environment variable can contain a semicolon-delimited list of additional directories to search. If it is not defined, the default list is as follows:</p>
-<pre class="no-highlight">%A_ScriptDir%;%A_MyDocuments%\AutoHotkey;%A_AhkPath%\..</pre>
-<p>Built-in variables may be used in the value of AhkImportPath by enclosing them in percent signs. Any percent signs which are not part of a valid variable reference are interpreted literally. References to environment variables are not resolved by AutoHotkey, as they are typically resolved before the process starts. List items can be absolute paths or relative to the directory containing the script (<a href="Variables.htm#ScriptDir">A_ScriptDir</a>). The list is resolved only once, so <a href="Variables.htm#LineFile">A_LineFile</a> always refers to the main script.</p>
+<p>The module search path is a list of directories which <a href="lib/_Import.htm">#Import</a> looks in to find module files. The directory of the source file containing the directive is searched first, followed by the directory of the current module's root file and the main script directory (<a href="Variables.htm#ScriptDir">A_ScriptDir</a>).</p>
+<p>The <code class="no-highlight">AhkLibPath</code> environment variable can contain a semicolon-delimited list of additional directories. It replaces the default additional directories below, without removing the initial directories:</p>
+<pre class="no-highlight">%A_MyDocuments%\Keysharp\Lib;%A_MyDocuments%\AutoHotkey\Lib;%A_AhkPath%\..\Lib</pre>
+<p>Built-in variables may be used in AhkLibPath by enclosing them in percent signs. Relative entries are resolved against the current module's root file directory, and <a href="Variables.htm#LineFile">A_LineFile</a> refers to that root file. A named module declared with <a href="lib/_Module.htm">#Module</a> uses the same root as its containing file module. Empty entries and nonexistent directories are ignored. The same additional directories are used by <a href="lib/_Include.htm">#Include &lt;LibName&gt;</a>.</p>
 <p>Directories are searched in the order they are listed. Within each directory, files are considered in this order:</p>
 <ul>
   <li><code class="no-highlight"><i>ModuleName</i></code></li>
+  <li><code class="no-highlight"><i>ModuleName</i>\__Init.ks</code></li>
   <li><code class="no-highlight"><i>ModuleName</i>\__Init.ahk</code></li>
+  <li><code class="no-highlight"><i>ModuleName</i>.ks</code></li>
   <li><code class="no-highlight"><i>ModuleName</i>.ahk</code></li>
 </ul>
-<p>For example, <code>#Import M</code> may load the file with exact name <code class="no-highlight">M</code>, <code class="no-highlight">M\__Init.ahk</code> or <code class="no-highlight">M.ahk</code>. <code>#Import "M"</code> is the same except that the name <em>M</em> is not added to the current module.</p>
+<p>A directory is checked for <code class="no-highlight">__Init.ks</code> before <code class="no-highlight">__Init.ahk</code>. For example, <code>#Import M</code> may load the file with exact name <code class="no-highlight">M</code>, a directory initializer or <code class="no-highlight">M.ks</code> or <code class="no-highlight">M.ahk</code>. <code>#Import "M"</code> is the same except that the name <em>M</em> is not added to the current module.</p>
 
 <h2 id="Class">Module Class</h2>
 <p>The module alias defined in an <a href="lib/_Import.htm">#Import</a> directive is assigned an instance of the "Module" class. Each name exported from the module is exposed as a virtual property. In the current release, these virtual properties are not visible to <a href="lib/Props.htm">Props</a>, <a href="lib/HasProp.htm">HasProp</a> or <a href="lib/HasMethod.htm">HasMethod</a>. This may change in a future release.</p>

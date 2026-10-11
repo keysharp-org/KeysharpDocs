@@ -35,8 +35,10 @@
   <dt>&lt;LibName&gt;</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>A library file or function name. For example, <code>#Include &lt;lib&gt;</code> and <code>#Include &lt;lib_func&gt;</code> would both include lib.ahk from one of the <a href="../Scripts.htm#lib">Lib folders</a>. Variable references are not allowed.</p>
-    <p>A subdirectory can be specified, with the caveat that the first underscore may be interpreted as a delimiter as described under <a href="../Scripts.htm#lib">Script Library Folders</a>, e.g. <code>#Include &lt;a_b\c&gt;</code> will try a.ahk if a_b\c.ahk is not found.</p>
+    <p>A library file or function name, optionally containing a subdirectory. Variable references are not allowed. See <a href="../Scripts.htm#lib">Script Library Folders</a> for the search directories and the AhkLibPath environment variable.</p>
+    <p>In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, the source file's directory is searched first, followed by the library directories. Each directory is checked for the exact filename, then .ks and .ahk extension candidates. There is no underscore fallback, and a directory's __Init file is not included.</p>
+    <p>In v2.0 mode, only the library directories are searched, with .ks and .ahk appended to <em>LibName</em>. If no file is found, the search repeats after removing the last underscore and the text following it, continuing with each remaining underscore. For example, <code>#Include &lt;lib_func&gt;</code> can include lib.ahk if lib_func.ahk is absent.</p>
+    <p>These are load-time rules, using the <a href="_Requires.htm#CompatMode">#Requires</a> mode in effect at the directive. A mode selected inside a function, class or included file follows Keysharp's scoping rules; the enclosing mode is restored at the end of that scope or file.</p>
   </dd>
 
 </dl>

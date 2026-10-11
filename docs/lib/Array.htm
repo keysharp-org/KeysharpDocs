@@ -104,6 +104,7 @@ ArrayObj := Array.<span class="func">Call</span>(<span class="optional">Value, V
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>A valid array index.</p>
+    <p>In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, a non-integer index raises <a href="Error.htm#TypeError">TypeError</a>. Integer strings are accepted; Float values, including <code>1.0</code>, float numeric strings such as <code>"1.0"</code> and nonnumeric values are rejected. v2.0 mode truncates floating-point indices.</p>
   </dd>
 </dl>
 <h4 id="Delete_Return_Value">Return Value</h4>
@@ -119,6 +120,7 @@ ArrayObj := Array.<span class="func">Call</span>(<span class="optional">Value, V
 <pre class="Syntax">Value := ArrayObj.<span class="func">Get</span>(Index <span class="optional">, Default</span>)</pre>
 <p>This method carries out the following steps:</p>
 <ol>
+  <li>In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, throw a <a href="Error.htm#TypeError">TypeError</a> if <em>Index</em> is not an integer or integer string.</li>
   <li>Throw an <a href="Error.htm#IndexError">IndexError</a> if <em>Index</em> is zero or out of range.</li>
   <li>Return the value at <em>Index</em>, if there is one (see <a href="#Has">Has</a>).</li>
   <li>Return the value of the <em>Default</em> parameter, if specified.</li>
@@ -132,6 +134,7 @@ ArrayObj := Array.<span class="func">Call</span>(<span class="optional">Value, V
 <div class="methodShort" id="Has"><h3>Has</h3>
 <p>Returns a non-zero number if the index is valid and there is a value at that position.</p>
 <pre class="Syntax">HasIndex := ArrayObj.<span class="func">Has</span>(Index)</pre>
+<p>In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, a non-integer <em>Index</em> raises <a href="Error.htm#TypeError">TypeError</a>; integer strings are accepted. An integer outside the array's bounds returns false. In v2.0 mode, floating-point indices are truncated and a nonnumeric index returns false.</p>
 </div>
 
 <div class="methodShort" id="InsertAt"><h3>InsertAt</h3>
@@ -143,6 +146,7 @@ ArrayObj := Array.<span class="func">Call</span>(<span class="optional">Value, V
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>The position to insert <em>Value1</em> at. Subsequent values are inserted at Index+1, Index+2, etc. Specifying an index of 0 is the same as specifying <a href="#Length">Length</a> + 1.</p>
+    <p>In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, a non-integer index raises <a href="Error.htm#TypeError">TypeError</a>; integer strings are accepted. v2.0 mode truncates floating-point indices.</p>
   </dd>
   <dt>Value1 ...</dt>
   <dd>
@@ -200,6 +204,7 @@ ArrayObj.<span class="func">RemoveAt</span>(Index, Length)</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>The index of the value or values to remove.</p>
+    <p>In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, a non-integer index raises <a href="Error.htm#TypeError">TypeError</a>; integer strings are accepted. v2.0 mode truncates floating-point indices.</p>
   </dd>
   
   <dt>Length</dt>
@@ -341,6 +346,7 @@ Value := ArrayObj.<span class="func">__Item</span>[Index]</pre>
 <pre class="Syntax">ArrayObj[Index] := Value
 ArrayObj.<span class="func">__Item</span>[Index] := Value</pre>
 <p><em>Index</em> is an <a href="../Concepts.htm#numbers">integer</a> representing a valid array index; that is, an integer with absolute value between 1 and <a href="#Length">Length</a> (inclusive). A negative index can be used to address elements in reverse, so that -1 is the last element, -2 is the second last element, and so on. Attempting to use an index which is out of bounds (such as zero, or if its absolute value is greater than the <a href="#Length">Length</a> of the array) is considered an error and will cause an <a href="Error.htm#IndexError">IndexError</a> to be thrown.</p>
+<p>In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, <em>Index</em> must be an integer or integer string. A Float, including <code>1.0</code>, a float numeric string such as <code>"1.0"</code> or a nonnumeric value raises <a href="Error.htm#TypeError">TypeError</a> when getting or setting an element. v2.0 mode truncates floating-point indices and raises IndexError for a nonnumeric index.</p>
 <p>The property name __Item is typically omitted, as shown above, but is used when overriding the property.</p>
 <p><span class="ver">[v2.1-alpha.29+]</span>: In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, the return value is <code>unset</code> if the array element has no value and <a href="#Default">Default</a> is not defined. This may result in the caller throwing an <a href="Error.htm#UnsetError">UnsetError</a>.</p>
 </div>

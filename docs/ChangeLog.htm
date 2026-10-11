@@ -19,16 +19,19 @@
 <table class="info">
   <tr><th>Property</th><th>Value</th></tr>
   <tr><td>Keysharp version described here</td><td>0.0.0.18 (in development)</td></tr>
-  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.34</td></tr>
+  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.35</td></tr>
 </table>
 <p>See <a href="KeysharpDifferences.htm">Changes from AutoHotkey to Keysharp</a> for the differences, <a href="Platforms.htm">Platform Support</a> for per-platform availability, and the platform remarks on each affected reference page.</p>
 <p>The corresponding upstream language changes are described in <a href="v2.1-changes.htm">Changes from v2.0 to v2.1</a>.</p>
 
 <h2 id="v0.0.0.18">0.0.0.18 (in development)</h2>
-<p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.34">AutoHotkey v2.1-alpha.34</a>.</p>
+<p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.35">AutoHotkey v2.1-alpha.35</a>.</p>
 
 <h3 id="v0.0.0.18-breaking">Breaking Changes</h3>
 <ul>
+  <li>In <a href="lib/_Requires.htm#CompatMode">v2.1 mode</a>, <a href="lib/Array.htm">Array</a> rejects non-integer indices with TypeError. Integer strings remain valid array indices. v2.0 mode retains Float truncation.</li>
+  <li>The Export modifier of <a href="lib/_Import.htm">#Import</a> cannot be used inside a function.</li>
+  <li><a href="Modules.htm#Search_Path">Module and library lookup</a> uses AhkLibPath instead of AhkImportPath, with relative entries based on the current module's root file. The module and main script directories always precede the additional import path; their Lib subdirectories always precede the additional include path. In v2.1 mode, <a href="lib/_Include.htm">#Include &lt;LibName&gt;</a> searches the source file's directory, accepts exact filenames and has no underscore fallback.</li>
   <li><a href="lib/Object.htm#DefineProp">DefineProp</a> validates its descriptor as AutoHotkey does: a descriptor naming more than one kind of property, such as Value with Pack, raises a ValueError; a Get, Set, Call or Type which is not an object is ignored instead of raising an error; and a Map's items are not read as descriptor properties.</li>
   <li><a href="lib/_Requires.htm#CompatMode">#Requires</a>: a module's compatibility mode comes from its first version directive outside functions, classes and #Include files, instead of the last one including those in #Include files. A directive applies to the function and class definitions after it, so a function above a script's first #Requires runs in v2.0 mode.</li>
   <li><code>Length</code> is defined only on <a href="lib/StructArray.htm">structured arrays</a> (<em>StructClass</em>.Array). Other structs have no inherited Length property, instead of one which raised a PropertyError when read.</li>

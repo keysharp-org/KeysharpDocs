@@ -40,7 +40,7 @@
   <dt id="Library">Library</dt>
   <dd>
     <p>Type: Name</p>
-    <p>Reads <code class="no-highlight">Library.cs</code> using the same Lib-folder search order and underscore fallback as <a href="_Include.htm">#Include &lt;Library&gt;</a>.</p>
+    <p>Reads <code class="no-highlight">Library.cs</code> using the <a href="../Scripts.htm#lib">library directories</a>, including AhkLibPath. It uses a .cs suffix and repeated last-underscore fallback in either compatibility mode.</p>
     <p>For example, <code class="no-highlight">#CSharp &lt;Math_Add&gt;</code> searches for <code class="no-highlight">Math_Add.cs</code> in every Lib folder, then for <code class="no-highlight">Math.cs</code>. Variable references are not allowed.</p>
   </dd>
 </dl>

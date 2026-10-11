@@ -169,12 +169,14 @@ MsgBox Format(FormatStr, A_TickCount, A_Now)</pre>
 <p>The piecemeal construction of a continuation section by means of <a href="lib/_Include.htm">#Include</a> is not supported.</p>
 
 <h2 id="lib">Script Library Folders</h2>
-<p>The library folders provide a few standard locations to keep shared scripts which other scripts utilise by means of <a href="lib/_Include.htm">#Include</a>. A library script typically contains a function or class which is designed to be used and reused in this manner. Placing library scripts in one of these locations makes it easier to write scripts that can be shared with others and work across multiple setups. The library locations are:</p>
-<pre><a href="Variables.htm#ScriptDir">A_ScriptDir</a> "\Lib\"  <em>; Local library.</em>
-<a href="Variables.htm#MyDocuments">A_MyDocuments</a> "\AutoHotkey\Lib\"  <em>; User library.</em>
-"directory-of-the-currently-running-AutoHotkey.exe\Lib\"  <em>; Standard library.</em></pre>
-<p>The library folders are searched in the order shown above.</p>
-<p>For example, if a script includes the line <code>#Include &lt;MyLib&gt;</code>, the program searches for a file named "MyLib.ahk" in the local library. If not found there, it searches for it in the user library, and then the standard library. If a match is still not found and the library's name contains an underscore (e.g. <code class="no-highlight">MyPrefix_MyFunc</code>), the program searches again with just the prefix (e.g. <code class="no-highlight">MyPrefix.ahk</code>).</p>
+<p>The library folders provide standard locations to keep shared scripts used by <a href="lib/_Include.htm">#Include &lt;LibName&gt;</a>. A library script typically contains reusable functions or classes. The default locations, in search order, are:</p>
+<pre class="no-highlight">current-module-root-directory\Lib
+%A_ScriptDir%\Lib
+%A_MyDocuments%\Keysharp\Lib
+%A_MyDocuments%\AutoHotkey\Lib
+%A_AhkPath%\..\Lib</pre>
+<p>The <code class="no-highlight">AhkLibPath</code> environment variable replaces the last three default locations with a semicolon-delimited list. The current module's Lib directory and the main script's Lib directory remain first. Relative entries and <a href="Variables.htm#LineFile">A_LineFile</a> are resolved against the module's root file. For <a href="lib/_Import.htm">#Import</a>, the module root and main script directories are searched instead of their Lib subdirectories; see <a href="Modules.htm#Search_Path">Module Search Path</a>.</p>
+<p>In <a href="v2.1-changes.htm#CompatMode">v2.1 mode</a>, the source file's directory is searched before the library folders. The exact filename is checked before .ks and .ahk extension candidates; underscores are part of the filename. In v2.0 mode, only the library folders are searched and .ks or .ahk is appended. If no match is found, the search repeats after removing the last underscore and the text following it, continuing through each remaining underscore. For example, <code>#Include &lt;MyPrefix_MyFunc&gt;</code> can find MyPrefix.ahk in v2.0 mode.</p>
 <p>Although by convention a library file generally contains only a single function or class of the same name as its filename, it may also contain private functions that are called only by it. However, such functions should have fairly distinct names because they will still be in the global namespace; that is, they will be callable from anywhere in the script.</p>
 
 <h2 id="ahk2exe">Convert a Script to an EXE (Ahk2Exe)</h2>

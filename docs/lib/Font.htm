@@ -68,7 +68,7 @@
   <tr id="GuiDefault"><td><code>Font.GuiDefault</code></td><td>The font a new <a href="Gui.htm">Gui</a> starts with. This can differ from UiDefault.</td></tr>
   <tr id="FamilyList"><td><code>Font.Families</code></td><td>An <a href="Array.htm">Array</a> of the family names installed on the system, sorted alphabetically.</td></tr>
 </table>
-<p class="note"><strong>Note:</strong> On Linux and macOS the system cannot be asked for its interface font until the first window exists, so <code>Font.UiDefault</code> falls back to the platform's usual family before then.</p>
+<p>On Linux, an unavailable GTK theme font resolves to the installed family selected by Pango.</p>
 
 <p>These Font objects set size and styles only when the toolkit can resolve them, and never set text color.</p>
 <h2 id="Exists">Exists</h2>

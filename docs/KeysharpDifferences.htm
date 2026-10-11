@@ -67,6 +67,7 @@
 <ul>
   <li><a href="Variables.htm#IncDec">Increment/decrement</a>, <a href="Variables.htm#concat">concatenation</a>, <a href="Variables.htm#AssignOp">concatenation assignment</a>, <a href="Concepts.htm#numbers">numeric literals</a>, <a href="Concepts.htm#unset">unset values</a> and <a href="Variables.htm#deref">dynamic dereferencing</a> have documented implementation differences.</li>
   <li><a href="Functions.htm#ByRef">Reference parameters</a> accept additional target forms.</li>
+  <li><a href="lib/Map.htm">Map</a> accepts Float keys in both compatibility modes and preserves their type, so <code>1</code>, <code>1.0</code> and <code>"1.0"</code> can identify separate entries. AutoHotkey converts Float keys to String in v2.0 mode and rejects them in v2.1-alpha.35's v2.1 mode.</li>
   <li><a href="lib/StrCompare.htm">Case-insensitive comparisons</a> retain Unicode folding, and <a href="Variables.htm#EventInfo">A_EventInfo</a> provides an object for input hook events.</li>
 </ul>
 

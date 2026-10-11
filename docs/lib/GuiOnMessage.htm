@@ -15,7 +15,7 @@
 <h1>OnMessage (GUI) <span class="ver">[v2.1-alpha.1+]</span></h1>
 <p>Registers a function or method to be called whenever the GUI window or control receives the specified message.</p>
 
-<p class="note"><strong>Note:</strong> On Linux and macOS, only mouse and keyboard input messages (WM_MOUSEMOVE, the left, right and middle button down, up and double-click messages, WM_MOUSEWHEEL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP and WM_CHAR) are synthesized from the script's own GUI events; callbacks for other messages are never called. Delivery is verified on Linux X11 and Wayland; macOS delivery remains unverified.</p>
+<p class="note"><strong>Note:</strong> On Linux and macOS, only mouse and keyboard input messages (WM_MOUSEMOVE, WM_MOUSELEAVE, the left, right and middle button down, up and double-click messages, WM_MOUSEWHEEL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP and WM_CHAR) are synthesized from the script's own GUI events; callbacks for other messages are never called. Motion, button, wheel and key delivery is verified on Linux X11 and Wayland; native mouse-leave delivery is verified on X11 under Xvfb, while Wayland mouse-leave delivery and all macOS delivery remain unverified.</p>
 <pre class="Syntax"><a href="Gui.htm">Gui</a>.<span class="func">OnMessage</span>(MsgNumber, Callback <span class="optional">, AddRemove</span>)
 <a href="GuiControl.htm">GuiCtrl</a>.<span class="func">OnMessage</span>(MsgNumber, Callback <span class="optional">, AddRemove</span>) <em>; Requires <span class="ver">[v2.1-alpha.7+]</span></em></pre>
 
@@ -67,6 +67,7 @@
 <p>The callback function may be called recursively if the message is received while the callback is already running. The number of threads that can be started is limited only by <a href="_MaxThreads.htm">#MaxThreads</a>.</p>
 <p><span class="ver">[v2.1-alpha.7+]</span>: On Windows, GuiCtrl.OnMessage uses window subclassing to detect or intercept messages sent directly to the control. These directly sent messages are not detected by the global <a href="OnMessage.htm">OnMessage</a> function.</p>
 <p>On Linux and macOS, synthesized GUI input messages reach global OnMessage callbacks first, then Gui.OnMessage for a message addressed to the GUI window or GuiCtrl.OnMessage for one addressed to a control. Events not raised by the toolkit are not delivered. On Linux, GTK's single-line Edit consumes mouse-button presses before these callbacks can observe them.</p>
+<p><code>WM_MOUSELEAVE</code> (<code>0x02A3</code>) reports the pointer leaving the window or control, with both <em>wParam</em> and <em>lParam</em> set to <code>0</code>. On Linux and macOS it comes from the toolkit's local leave event, so it does not require global cursor or window geometry.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="Gui.htm">Gui</a> and <a href="GuiControl.htm">GuiControl</a> methods: <a href="GuiOnEvent.htm">OnEvent</a>, <a href="GuiOnNotify.htm">OnNotify</a>, <a href="GuiOnCommand.htm">OnCommand</a></p>

@@ -16,7 +16,7 @@
 <pre class="NoIndent">class Map extends Object</pre>
 
 <p>A <strong>Map</strong> object associates or <em>maps</em> one set of values, called <em>keys</em>, to another set of values. A key and the value it is mapped to are known as a key-value pair. A map can contain any number of key-value pairs, but each key must be unique.</p>
-<p>A key may be any <a href="../Concepts.htm#numbers">Integer</a>, <a href="../Objects.htm">object</a> reference or null-terminated <a href="../Concepts.htm#strings">String</a>. Comparison of string keys is case-sensitive, while objects are compared by reference/address. <a href="../Concepts.htm#numbers">Float</a> keys are automatically converted to String.</p>
+<p>A key may be any <a href="../Concepts.htm#numbers">Integer or Float</a>, <a href="../Objects.htm">object</a> reference or null-terminated <a href="../Concepts.htm#strings">String</a>. Comparison of string keys is case-sensitive, while objects are compared by reference/address. Float keys remain Float keys in both <a href="../v2.1-changes.htm#CompatMode">compatibility modes</a>, distinct from Integer and String keys: <code>1</code>, <code>1.0</code> and <code>"1.0"</code> can identify separate entries. AutoHotkey converts Float keys to String in v2.0 mode and rejects them with TypeError in v2.1-alpha.35's v2.1 mode.</p>
 <p>The simplest use of a map is to retrieve or set a key-value pair via the implicit <a href="#__Item">__Item</a> property, by simply writing the key between brackets following the map object. For example:</p>
 <pre>clrs := Map()
 clrs["Red"] := "ff0000"
@@ -91,7 +91,7 @@ MapObj := Map.<span class="func">Call</span>(Key1, Value1, Key2, Value2, ...)</p
 <dl>
   <dt>Key</dt>
   <dd>
-    <p>Type: <a href="../Concepts.htm#numbers">Integer</a>, <a href="../Concepts.htm#objects">Object</a> or <a href="../Concepts.htm#strings">String</a></p>
+    <p>Type: <a href="../Concepts.htm#numbers">Integer or Float</a>, <a href="../Concepts.htm#objects">Object</a> or <a href="../Concepts.htm#strings">String</a></p>
     <p>Any single key. If the map does not contain this key, an <a href="Error.htm#UnsetError">UnsetItemError</a> is thrown (except in <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>).</p>
   </dd>
 </dl>
@@ -200,7 +200,7 @@ Value := MapObj.<span class="func">__Item</span>[Key]</pre>
 MapObj.<span class="func">__Item</span>[Key] := Value</pre>
 <p>When retrieving a value, <em>Key</em> must be a unique value previously associated with another value. An <a href="Error.htm#UnsetError">UnsetItemError</a> is thrown if <em>Key</em> has no associated value within the map, unless a <a href="#Default">Default</a> property is defined, in which case its value is returned.</p>
 <p><span class="ver">[v2.1-alpha.29+]</span>: In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, the return value is <code>unset</code> if there is no value to return. This may result in the caller throwing an <a href="Error.htm#UnsetError">UnsetError</a>.</p>
-<p>When assigning a value, <em>Key</em> can be any value to associate with <em>Value</em>; in other words, the <em>key</em> used to later access <em>Value</em>. <a href="../Concepts.htm#numbers">Float</a> keys are automatically converted to String.</p>
+<p>When assigning a value, <em>Key</em> can be any value to associate with <em>Value</em>; in other words, the <em>key</em> used to later access <em>Value</em>. <a href="../Concepts.htm#numbers">Float</a> keys retain their type in both compatibility modes.</p>
 <p>The property name __Item is typically omitted, as shown above, but is used when overriding the property.</p>
 </div>
 
