@@ -48,7 +48,7 @@
 </ul>
 
 <h3 id="v0.0.0.18-fixes">Fixes and Performance</h3>
-<p><a href="lib/Any.htm#Base">Any.Prototype.Base</a>, and the Base of any other object which has none, reads as <em>blank-unset</em> (<code>""</code> in v2.0 mode), as in AutoHotkey. <code>a &amp; b::AltTabMenu</code> and similar <a href="Hotkeys.htm#alttab">Alt-Tab hotkeys</a> work without faulting the keyboard hook.</p>
+<p><a href="lib/Any.htm#Base">Any.Prototype.Base</a>, and the Base of any other object which has none, reads as <em>blank-unset</em> (<code>""</code> in v2.0 mode), as in AutoHotkey. <code>a &amp; b::AltTabMenu</code> and similar <a href="Hotkeys.htm#alttab">Alt-Tab hotkeys</a> work without faulting the keyboard hook. A script read from stdin (<code class="no-highlight">*</code>) is compiled by the <a href="Program.htm">compile daemon</a> like a script file, so it no longer pays a cold compile in the calling process, and its <a href="Variables.htm#ScriptName">A_ScriptName</a> is <code>*</code> rather than <code>pipestdin</code>, as in AutoHotkey.</p>
 
 <h2 id="v0.0.0.17">0.0.0.17</h2>
 <p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.33">AutoHotkey v2.1-alpha.33</a>.</p>
