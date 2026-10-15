@@ -18,7 +18,7 @@
 <pre>#Import "Ks" { Audio }</pre>
 
 <p class="note"><strong>Note:</strong> This class is experimental: it and its nested types may change or be removed without deprecation. See <a href="_Warn.htm#Experimental">#Warn Experimental</a>.</p>
-<p class="note"><strong>Note:</strong> This class has no instances; its members are used directly on the class. Calling <code class="no-highlight">Audio()</code> throws an <a href="Error.htm">Error</a>.</p>
+<p>Each object in <a href="#Devices">Audio.Devices</a> is an Audio endpoint descriptor with live device controls. Instances also come from a resource's Device property. Calling <code class="no-highlight">Audio()</code> throws an <a href="Error.htm">Error</a>; use the factory-owned instances.</p>
 
 <p>The related types below, such as <a href="#Clip">Audio.Clip</a>, are nested in <code>Audio</code>, and importing <code>Audio</code> introduces no other names.</p>
 
@@ -29,7 +29,7 @@
   <li><a href="#Conventions">Conventions</a></li>
   <li><a href="#Static">Audio</a> &mdash; probes, clips, one-line playback, devices, applications, events</li>
   <li><a href="#Clip">Audio.Clip</a></li>
-  <li><a href="#Device">Audio.Device</a></li>
+  <li><a href="#Device">Audio device members</a></li>
   <li><a href="#Output">Audio.Output</a></li>
   <li><a href="#Playback">Audio.Playback</a></li>
   <li><a href="#Session">Audio.Session</a></li>
@@ -54,7 +54,7 @@
 </table>
 
 <h3 id="Selector">Selecting a device</h3>
-<p>Everywhere a device is accepted it may be an <a href="#Device">Audio.Device</a>, an exact <code>Id</code>, an exact and unique <code>Name</code>, or an empty string for the platform's current default. A name matching several devices throws a ValueError listing their ids; a selector matching none throws an OSError.</p>
+<p>Everywhere a device is accepted it may be an <a href="#Device">Audio</a>, an exact <code>Id</code>, an exact and unique <code>Name</code>, or an empty string for the platform's current default. A name matching several devices throws a ValueError listing their ids; a selector matching none throws an OSError.</p>
 
 <h3 id="Errors">Error handling</h3>
 <table class="info">
@@ -105,13 +105,9 @@
 <p>To stop the sound, call <a href="#PlaybackStop">Stop</a> on the returned playback. To stop several sounds at once, play them through an <a href="#Output">Audio.Output</a> and call its <a href="#OutputStopAll">StopAll</a>.</p>
 
 <h3 id="Devices">Devices</h3>
-<pre class="Syntax">List := Audio.<span class="func">Devices</span>(<span class="optional">Kind</span>)</pre>
-<p>Returns an <a href="Array.htm">Array</a> of every present, usable <a href="#Device">Audio.Device</a>. <em>Kind</em> is <code class="no-highlight">"Output"</code>, <code class="no-highlight">"Input"</code> or <code class="no-highlight">"All"</code> (the default), and any other token is a ValueError. <code class="no-highlight">"All"</code> lists outputs before inputs.</p>
-<p>A host with no audio at all returns an empty Array.</p>
-
-<h3 id="DefaultDevice">DefaultDevice</h3>
-<pre class="Syntax">Device := Audio.<span class="func">DefaultDevice</span>(<span class="optional">Kind</span>)</pre>
-<p>Returns the current default <a href="#Device">Audio.Device</a> of one kind, or an empty string when the host has none. <em>Kind</em> is <code class="no-highlight">"Output"</code> (the default) or <code class="no-highlight">"Input"</code>; <code class="no-highlight">"All"</code> is a ValueError.</p>
+<pre class="Syntax">List := Audio.<span class="func">Devices</span></pre>
+<p>A read-only property returning a normal <a href="Array.htm">Array</a> of every present, usable <a href="#Device">Audio</a> endpoint. Outputs precede inputs. A host with no audio returns an empty Array. A list already held by the script is a snapshot and does not change when devices arrive or leave.</p>
+<p>Use <a href="Array.htm#Filter">Array.Filter</a> to select a kind or a default, for example <code>Audio.Devices.Filter((Device) =&gt; Device.Kind == "Output" &amp;&amp; Device.IsDefault)</code>. Indexes are ordinal positions in this Array, not device IDs.</p>
 
 <h3 id="Sessions">Sessions</h3>
 <pre class="Syntax">List := Audio.<span class="func">Sessions</span>(<span class="optional">PIDOrName, Device</span>)</pre>
@@ -132,7 +128,7 @@
 <pre class="Syntax">Hook := Audio.<span class="func">OnDeviceChange</span>(Callback <span class="optional">, Kind</span>)
 Hooks := Audio.<span class="func">Hooks</span></pre>
 <p>Calls <em>Callback</em> when a device arrives, is removed, is renamed, or becomes the default, and returns a running hook controlling the subscription.</p>
-<p><em>Callback</em> is a <a href="../misc/Functor.htm">function object</a>, called as <code class="no-highlight">Callback(Hook, Change, Device)</code>, where <em>Change</em> is <code class="no-highlight">"Added"</code>, <code class="no-highlight">"Removed"</code>, <code class="no-highlight">"Changed"</code> or <code class="no-highlight">"DefaultChanged"</code> and <em>Device</em> is the <a href="#Device">Audio.Device</a> the change concerns; for <code class="no-highlight">"Removed"</code> its <a href="#DeviceStatus">Status</a> is <code class="no-highlight">"Missing"</code>. <a href="../Variables.htm#EventInfo">A_EventInfo</a> is not set. <em>Kind</em> filters the devices reported: <code class="no-highlight">"Output"</code>, <code class="no-highlight">"Input"</code> or <code class="no-highlight">"All"</code> (the default).</p>
+<p><em>Callback</em> is a <a href="../misc/Functor.htm">function object</a>, called as <code class="no-highlight">Callback(Hook, Change, Device)</code>, where <em>Change</em> is <code class="no-highlight">"Added"</code>, <code class="no-highlight">"Removed"</code>, <code class="no-highlight">"Changed"</code> or <code class="no-highlight">"DefaultChanged"</code> and <em>Device</em> is the <a href="#Device">Audio</a> the change concerns; for <code class="no-highlight">"Removed"</code> its <a href="#DeviceStatus">Status</a> is <code class="no-highlight">"Missing"</code>. <a href="../Variables.htm#EventInfo">A_EventInfo</a> is not set. <em>Kind</em> filters the devices reported: <code class="no-highlight">"Output"</code>, <code class="no-highlight">"Input"</code> or <code class="no-highlight">"All"</code> (the default).</p>
 <p>A notification which changes nothing observable does not call back.</p>
 <p id="DeviceHook">The returned hook is an <code>Audio.DeviceHook</code>, an <a href="EventHook.htm">EventHook</a> with no additional members. <code>Audio.Hooks</code> is an Array of the running hooks.</p>
 <p>The hook does not keep the script running; a script which only waits for device changes calls <a href="Persistent.htm">Persistent</a>.</p>
@@ -151,10 +147,9 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
   <tr><td>SampleFormat</td><td>The canonical token the samples arrived as.</td></tr>
 </table>
 
-<h2 id="Device">Audio.Device</h2>
-<pre class="NoIndent">class Audio.Device extends Object</pre>
-<p>A snapshot of one audio endpoint, plus the controls that endpoint owns. A device is produced by <a href="#Devices">Audio.Devices</a> and <a href="#DefaultDevice">Audio.DefaultDevice</a>, and returned by several other members; calling <code class="no-highlight">Audio.Device()</code> throws an Error.</p>
-<p><code>Id</code> is the durable identity: <code>Refresh()</code> never adopts a same-named replacement.</p>
+<h2 id="Device">Audio device members</h2>
+<p>An Audio instance describes one audio endpoint and provides that endpoint's live controls. Descriptive properties are completed before the object is returned and stay in that snapshot until <code>Refresh()</code>. Volume, mute and running status query the endpoint when read.</p>
+<p><code>Refresh()</code> preserves the endpoint's <code>Id</code>. Each read of <a href="#Devices">Audio.Devices</a> creates new objects; compare their <code>Id</code> values to recognize endpoints. Object equality compares references.</p>
 <table class="info">
   <tr><th style="width:16em">Member</th><th abbr="Descr">Description</th></tr>
   <tr><td>Id</td><td>The opaque, platform-assigned identity, compared exactly. Read-only.</td></tr>
@@ -190,7 +185,7 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
 <h3 id="OutputMembers">Members</h3>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
-  <tr><td>Device</td><td>The <a href="#Device">Audio.Device</a> this output is pinned to, or an empty string while it follows the current default. Read-only.</td></tr>
+  <tr><td>Device</td><td>The <a href="#Device">Audio</a> this output is pinned to, or an empty string while it follows the current default. Read-only.</td></tr>
   <tr><td>Status</td><td><code class="no-highlight">"Closed"</code>, <code class="no-highlight">"Opening"</code>, <code class="no-highlight">"Open"</code>, <code class="no-highlight">"Transitioning"</code>, <code class="no-highlight">"Unavailable"</code> or <code class="no-highlight">"Disposed"</code>. Read-only.</td></tr>
   <tr><td>IsAvailable</td><td>Whether the configured binding resolves to a usable device, even while the output is closed. Read-only.</td></tr>
   <tr><td>IsFollowingDefault</td><td>Whether the output follows the default output device rather than a pinned one. Read-only.</td></tr>
@@ -224,7 +219,7 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
 <p>A playback controls only its own sound; after its voice is stolen, it controls nothing.</p>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
-  <tr><td>Device</td><td>The <a href="#Device">Audio.Device</a> this sound was admitted on. It does not track a later default change. Read-only.</td></tr>
+  <tr><td>Device</td><td>The <a href="#Device">Audio</a> this sound was admitted on. It does not track a later default change. Read-only.</td></tr>
   <tr><td>Status</td><td><code class="no-highlight">"Queued"</code>, <code class="no-highlight">"Playing"</code>, <code class="no-highlight">"Paused"</code>, <code class="no-highlight">"Ended"</code>, <code class="no-highlight">"Stopped"</code>, <code class="no-highlight">"Stolen"</code>, <code class="no-highlight">"DeviceLost"</code> or <code class="no-highlight">"Error"</code>. The first terminal reason wins, so a sound which reached its own end reports <code class="no-highlight">"Ended"</code> even after a later <code>Stop()</code>. Read-only.</td></tr>
   <tr><td>IsPlaying</td><td>True when <code>Status</code> is <code class="no-highlight">"Playing"</code> or <code class="no-highlight">"Queued"</code>; false while paused or ended. Read-only.</td></tr>
   <tr><td>DurationMilliseconds</td><td>The source clip's length. Read-only.</td></tr>
@@ -247,7 +242,7 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
   <tr><td>Id</td><td>The session's opaque identity. Read-only.</td></tr>
-  <tr><td>Device</td><td>The <a href="#Device">Audio.Device</a> this session plays or records on. Read-only.</td></tr>
+  <tr><td>Device</td><td>The <a href="#Device">Audio</a> this session plays or records on. Read-only.</td></tr>
   <tr><td>ProcessId</td><td>The owning process id, or an empty string when the backend does not report one. Read-only.</td></tr>
   <tr><td>ProcessName</td><td>The owning executable's name, or an empty string. Read-only.</td></tr>
   <tr><td>DisplayName</td><td>The name the application chose for itself, or an empty string. Read-only.</td></tr>
@@ -257,7 +252,7 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
   <tr><td>Volume</td><td>The application's own level on this device, 0 through 100. Writable.</td></tr>
   <tr><td>Mute</td><td>The application's own mute state. Writable.</td></tr>
   <tr><td>Refresh()</td><td>Re-reads this exact session. Returns the session when it is still live, or an empty string after marking it <code class="no-highlight">"Expired"</code>.</td></tr>
-  <tr><td>ToClr()</td><td>Returns the platform's own session object, with the same unspecified-type contract as <a href="#Device">Audio.Device.ToClr</a>.</td></tr>
+  <tr><td>ToClr()</td><td>Returns the platform's own session object, with the same unspecified-type contract as <a href="#Device">Audio.ToClr</a>.</td></tr>
 </table>
 <p>Operating an expired session raises an OSError telling the caller to <code>Refresh()</code> first. On a platform with no per-application audio model, every member which reaches the platform raises an OSError explaining what to use instead.</p>
 
@@ -265,7 +260,7 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
 <pre class="NoIndent">class Audio.Meter extends Object</pre>
 <pre class="Syntax">Meter := <span class="func">Audio.Meter</span>(<span class="optional">Target, IntervalMilliseconds</span>)</pre>
 <p>An explicit observation of a device's or a session's level.</p>
-<p><em>Target</em> is an <a href="#Device">Audio.Device</a>, an <a href="#Session">Audio.Session</a>, a device selector, or an empty string for the current default output. <em>IntervalMilliseconds</em> is 20 through 1000 and defaults to 50. Construction snapshots the target and opens nothing.</p>
+<p><em>Target</em> is an <a href="#Device">Audio</a>, an <a href="#Session">Audio.Session</a>, a device selector, or an empty string for the current default output. <em>IntervalMilliseconds</em> is 20 through 1000 and defaults to 50. Construction snapshots the target and opens nothing.</p>
 <p>Read <code>Peak</code> whenever a value is wanted, for instance from a <a href="SetTimer.htm">timer</a>.</p>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
@@ -290,7 +285,7 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
 <table class="info">
   <tr><th style="width:18em">Member</th><th abbr="Descr">Description</th></tr>
   <tr><td>Source</td><td><code class="no-highlight">"Microphone"</code> or <code class="no-highlight">"SystemOutput"</code>. Read-only.</td></tr>
-  <tr><td>Device</td><td>The <a href="#Device">Audio.Device</a> being captured, or an empty string while the default is used and nothing is open. Read-only.</td></tr>
+  <tr><td>Device</td><td>The <a href="#Device">Audio</a> being captured, or an empty string while the default is used and nothing is open. Read-only.</td></tr>
   <tr><td>Path</td><td>The resolved destination file, or an empty string for an in-memory recording. Read-only.</td></tr>
   <tr><td>Status</td><td><code class="no-highlight">"Ready"</code>, <code class="no-highlight">"Opening"</code>, <code class="no-highlight">"Recording"</code>, <code class="no-highlight">"Paused"</code>, <code class="no-highlight">"Finalizing"</code>, <code class="no-highlight">"Stopped"</code>, <code class="no-highlight">"DeviceLost"</code>, <code class="no-highlight">"Error"</code> or <code class="no-highlight">"Disposed"</code>. Read-only.</td></tr>
   <tr><td>DurationMilliseconds</td><td>How much audio has been captured. Read-only.</td></tr>
@@ -334,12 +329,12 @@ Hooks := Audio.<span class="func">Hooks</span></pre>
 
 <h3 id="PlatformLinux">Linux</h3>
 <p>Works on X11 and Wayland alike, and requires a reachable PulseAudio or pipewire-pulse server. An application's process name and display name are available only when it publishes them.</p>
-<p><a href="#Device">Audio.Device.Volume</a> uses the system mixer's slider percentage, so 50 means 50% in the mixer. Endpoint and session volume writes preserve channel balance; readings above 100 are clamped to 100. Session volume retains the linear-gain scale described <a href="#Levels">above</a>.</p>
+<p><a href="#Device">Audio.Volume</a> uses the system mixer's slider percentage, so 50 means 50% in the mixer. Endpoint and session volume writes preserve channel balance; readings above 100 are clamped to 100. Session volume retains the linear-gain scale described <a href="#Levels">above</a>.</p>
 <p class="note"><strong>Note:</strong> A recording can include about 100 ms of audio buffered before it started, and a capture opened immediately after another on the same source can lose a similar amount. Use <code>DurationMilliseconds</code> for a recording's length, and leave a short gap between back-to-back captures.</p>
 
 <h3 id="PlatformMacOS">macOS</h3>
 <p>Device volume and mute use the selected input or output direction. If the device only exposes channel controls, writes cover every channel. This channel fallback is unverified on hardware.</p>
-<p><a href="#Sessions">Audio.Sessions</a> returns an empty Array, and <a href="#SetApplicationVolume">SetApplicationVolume</a> and <a href="#SetApplicationMute">SetApplicationMute</a> throw an OSError. Use <a href="#Device">Audio.Device.Volume</a> and <code>Mute</code> instead.</p>
+<p><a href="#Sessions">Audio.Sessions</a> returns an empty Array, and <a href="#SetApplicationVolume">SetApplicationVolume</a> and <a href="#SetApplicationMute">SetApplicationMute</a> throw an OSError. Use <a href="#Device">Audio.Volume</a> and <code>Mute</code> instead.</p>
 <p><a href="#Meter">Audio.Meter.Start</a> throws an OSError. <a href="#Output">Audio.Output.Peak</a>, <a href="#Playback">Audio.Playback.Peak</a> and <a href="#Recorder">Audio.Recorder.Peak</a> are supported.</p>
 <p>To record system output, install a loopback device such as BlackHole and record it as an input device.</p>
 
@@ -388,7 +383,7 @@ Music.Stop()</pre>
 <pre class="NoIndent">#Import "Ks" { Audio }
 
 Text := ""
-for D in Audio.Devices("Output")
+for D in Audio.Devices.Filter((Device) =&gt; Device.Kind == "Output")
     Text .= D.Name " " Round(D.Volume) (D.IsDefault ? " (default)" : "") "`n"
 MsgBox Text</pre>
 </div>

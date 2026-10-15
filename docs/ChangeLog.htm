@@ -35,6 +35,8 @@
   <li><a href="lib/Object.htm#DefineProp">DefineProp</a> validates its descriptor as AutoHotkey does: a descriptor naming more than one kind of property, such as Value with Pack, raises a ValueError; a Get, Set, Call or Type which is not an object is ignored instead of raising an error; and a Map's items are not read as descriptor properties.</li>
   <li><a href="lib/_Requires.htm#CompatMode">#Requires</a>: a module's compatibility mode comes from its first version directive outside functions, classes and #Include files, instead of the last one including those in #Include files. A directive applies to the function and class definitions after it, so a function above a script's first #Requires runs in v2.0 mode.</li>
   <li><code>Length</code> is defined only on <a href="lib/StructArray.htm">structured arrays</a> (<em>StructClass</em>.Array). Other structs have no inherited Length property, instead of one which raised a PropertyError when read.</li>
+  <li><a href="lib/Audio.htm#Devices">Audio.Devices</a> is a property returning an Array of Audio objects. Replace <code>Audio.Devices(Kind)</code> with <code>Audio.Devices.Filter((Device) =&gt; Device.Kind == Kind)</code>. Replace <code>Audio.DefaultDevice(Kind)</code> with a filter also testing <code>Device.IsDefault</code>; the result is an Array. The <code>Audio.Device</code> type became <code>Audio</code>, including the objects returned by a resource's Device property.</li>
+  <li><a href="lib/Monitor.htm#Devices">Monitor.Devices</a> replaces <code>Monitor.All</code>; use <a href="lib/MonitorGetCount.htm">MonitorGetCount()</a> for <code>Monitor.Count</code>. Replace <code>Monitor()</code> with <code>Monitor.Primary</code>, <code>Monitor(N)</code> with <code>Monitor.Devices[N]</code>, and <code>Monitor.FromId(Id)</code> with <code>Monitor.Devices.Filter((Device) =&gt; Device.Id == Id)</code>. Filtering returns an Array and preserves ambiguous matches. Refresh returns an empty string, preserving the snapshot, when the display is unavailable or its known identity cannot be verified.</li>
 </ul>
 
 <h3 id="v0.0.0.18-new">New</h3>
@@ -45,6 +47,7 @@
   <li>A <a href="Structs.htm#arrays">structured array</a> is accepted where <em>StructClass</em>.Ptr is expected, by a <a href="Structs.htm#pointers_fields">typed pointer property</a> and by a <a href="Structs.htm#pointers_DllCall">DllCall</a> parameter.</li>
   <li><code>a.%b?% ?? c</code> short-circuits from within the <a href="Variables.htm#maybe">property name substitution</a>, without invoking any property, if <em>b</em> is unset.</li>
   <li>A <a href="lib/_Requires.htm#CompatMode">#Requires</a> directive inside a class body sets the compatibility mode of that class's methods, properties and nested classes, and one inside a function body also sets the mode of that function.</li>
+  <li><a href="lib/Audio.htm#Devices">Audio.Devices</a> and <a href="lib/Monitor.htm#Devices">Monitor.Devices</a> return snapshot Arrays of Audio and Monitor objects with completed descriptive metadata. Live device controls retain their existing behavior.</li>
 </ul>
 
 <h3 id="v0.0.0.18-fixes">Fixes and Performance</h3>
@@ -87,7 +90,7 @@
   <li><a href="lib/ImageSearch.htm">ImageSearch</a>'s *Dir takes direction names such as <code>*DirTopRight</code> instead of digits. <a href="lib/File.htm#RawWrite">File.RawWrite</a> and FileAppend RAW write string UTF-16 bytes; File.Seek returns 1/0. Built-in parameter names were corrected for <a href="Language.htm#named-parameters">named arguments</a>.</li>
   <li>Window actions target the first match, or the group with a lone <code>ahk_group</code>. <a href="lib/WinWait.htm">WinWait</a> functions and StatusBarWait check once for Timeout 0. <a href="lib/ProcessWaitClose.htm">ProcessWaitClose</a> returns 0 when all matches have closed.</li>
   <li>On Linux and macOS, <a href="lib/ControlSend.htm">ControlSend</a> and list Control functions report unsupported foreign targets or invalid controls instead of silently returning; see each function's platform limits. A_AppData and A_AppDataCommon use the platform's configuration directories.</li>
-  <li>On Linux, <a href="lib/SoundGetVolume.htm">SoundGetVolume</a>, <a href="lib/SoundSetVolume.htm">SoundSetVolume</a> and <a href="lib/Audio.htm#Device">Audio.Device.Volume</a> use mixer slider percentages: 50 means 50%, instead of approximately 79%. Session/playback volumes remain linear gain; writes preserve channel balance.</li>
+  <li>On Linux, <a href="lib/SoundGetVolume.htm">SoundGetVolume</a>, <a href="lib/SoundSetVolume.htm">SoundSetVolume</a> and <a href="lib/Audio.htm#Device">Audio.Volume</a> use mixer slider percentages: 50 means 50%, instead of approximately 79%. Session/playback volumes remain linear gain; writes preserve channel balance.</li>
 </ul>
 <p>Other removed or renamed extensions:</p>
 <table class="info">

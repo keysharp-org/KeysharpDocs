@@ -49,29 +49,26 @@
 <p class="note"><strong>Note:</strong> This class is experimental: it and its nested types may change or be removed without deprecation. See <a href="_Warn.htm#Experimental">#Warn Experimental</a>.</p>
 
 <h3 id="Snapshot">Snapshot semantics</h3>
-<p>Identity and geometry are read when a Monitor is created; call <a href="#Refresh">Refresh</a> to re-read them. Other metadata, such as <code>Model</code> or <code>RefreshRate</code>, is read when first used and then kept. <a href="#Brightness">Brightness</a> and the VCP methods query the device on every call. A property the display does not report is the empty string.</p>
+<p>Geometry and descriptive metadata, including identity, are fully resolved before a Monitor is returned. Property reads use that completed snapshot; call <a href="#Refresh">Refresh</a> to re-read it. <a href="#Brightness">Brightness</a> and the VCP methods query the device on every call. Unreported text and measurements are the empty string.</p>
+<p>Keep a Monitor object when reading several properties. For frequent polling, <a href="MonitorGetCount.htm">MonitorGetCount</a>, <a href="MonitorGet.htm">MonitorGet</a> and <a href="MonitorGetWorkArea.htm">MonitorGetWorkArea</a> avoid descriptive metadata queries.</p>
 
 <h3 id="Obtain">Obtaining a Monitor</h3>
-<pre class="Syntax">M := <span class="func">Monitor</span>(<span class="optional">N</span>)
-M := Monitor.<span class="func">Primary</span>
+<pre class="Syntax">M := Monitor.<span class="func">Primary</span>
 M := Monitor.<span class="func">FromPoint</span>(X, Y)
 M := Monitor.<span class="func">FromMouse</span>()
 M := Monitor.<span class="func">FromWindow</span>(<span class="optional">WinTitle, WinText, ExcludeTitle, ExcludeText</span>)
-M := Monitor.<span class="func">FromId</span>(Id)
-Monitors := Monitor.<span class="func">All</span>
-Count := Monitor.<span class="func">Count</span></pre>
+Monitors := Monitor.<span class="func">Devices</span></pre>
 <table class="info">
   <tr><th>Member</th><th>Description</th></tr>
-  <tr id="New"><td><code>Monitor(N)</code></td><td>The monitor with 1-based number <em>N</em>, the same numbering <a href="MonitorGet.htm">MonitorGet</a> uses. If <em>N</em> is omitted, the primary monitor. A number outside the current monitor count throws a <a href="Error.htm#ValueError">ValueError</a>.</td></tr>
   <tr id="Primary"><td><code>Monitor.Primary</code></td><td>The primary monitor.</td></tr>
-  <tr id="All"><td><code>Monitor.All</code></td><td>An <a href="Array.htm">Array</a> of every monitor, in number order, built from one enumeration. Prefer this to a loop over <code>Monitor(A_Index)</code>, whose numbering can change between calls.</td></tr>
-  <tr id="Count"><td><code>Monitor.Count</code></td><td>The number of monitors; the same value as <a href="MonitorGetCount.htm">MonitorGetCount</a>.</td></tr>
+  <tr id="Devices"><td><code>Monitor.Devices</code></td><td>A normal <a href="Array.htm">Array</a> of Monitor descriptors in number order, built from one topology enumeration. Indexes are ordinal positions. Use <a href="Array.htm#Filter">Array.Filter</a> to select by identity or other properties.</td></tr>
   <tr id="VirtualScreen"><td><code>Monitor.VirtualScreen</code></td><td>The whole desktop &mdash; the union of every monitor &mdash; as an object with <code>X</code>, <code>Y</code>, <code>Width</code> and <code>Height</code>, in native screen coordinates. <code>X</code> and <code>Y</code> are negative when a display sits left of or above the primary.</td></tr>
   <tr id="FromPoint"><td><code>Monitor.FromPoint(X, Y)</code></td><td>The monitor containing a point in native screen coordinates, or the nearest monitor when the point lies in a gap between displays.</td></tr>
   <tr id="FromMouse"><td><code>Monitor.FromMouse()</code></td><td>The monitor the mouse cursor is on. On Linux, cursor queries require a supported <code class="no-highlight">keysharp-desktop</code> backend and do not request an interactive grant.</td></tr>
   <tr id="FromWindow"><td><code>Monitor.FromWindow(WinTitle, ...)</code></td><td>The monitor a window overlaps most, matching how the platform decides which monitor owns a window. Criteria use ordinary <a href="../misc/WinTitle.htm">WinTitle matching</a>.</td></tr>
-  <tr id="FromId"><td><code>Monitor.FromId(Id)</code></td><td>The monitor whose <a href="#Id">Id</a> matches, or the empty string when that monitor is not currently attached. Matching is case-insensitive. It reads the metadata of every attached display.</td></tr>
 </table>
+
+<p>Instances are produced by these properties and factories. Calling <code>Monitor()</code> throws an <a href="Error.htm">Error</a>.</p>
 
 <h3 id="Identity">Identity</h3>
 <table class="info">
@@ -81,13 +78,14 @@ Count := Monitor.<span class="func">Count</span></pre>
   <tr id="Model"><td><code>Model</code></td><td>The panel's model name, for example <code>"U2720Q"</code>.</td></tr>
   <tr id="Manufacturer"><td><code>Manufacturer</code></td><td>The three-letter PNP manufacturer code, for example <code>"DEL"</code>.</td></tr>
   <tr id="Serial"><td><code>Serial</code></td><td>The panel's serial number.</td></tr>
-  <tr id="Id"><td><code>Id</code></td><td>An identifier for this physical monitor that survives reboots and replugging, suitable for saving in a settings file &mdash; for example to restore a window layout per monitor. Pass it back to <a href="#FromId">Monitor.FromId</a> to find the display again.</td></tr>
+  <tr id="Id"><td><code>Id</code></td><td>An identifier for this physical monitor that survives reboots and replugging, suitable for saving in a settings file &mdash; for example to restore a window layout per monitor. Filter <a href="#Devices">Monitor.Devices</a> by this value to find the display again. More than one display can match an identity the platform cannot distinguish.</td></tr>
   <tr id="Adapter"><td><code>Adapter</code></td><td>The graphics adapter driving the monitor.</td></tr>
   <tr id="Connection"><td><code>Connection</code></td><td>How the monitor is attached: <code>"HDMI"</code>, <code>"DisplayPort"</code>, <code>"eDP"</code>, <code>"DVI"</code>, <code>"VGA"</code>, <code>"Internal"</code>, or the empty string.</td></tr>
   <tr id="IsPrimary"><td><code>IsPrimary</code></td><td>Whether this is the primary monitor.</td></tr>
   <tr id="IsInternal"><td><code>IsInternal</code></td><td>Whether this is a built-in panel, such as a laptop or all-in-one screen, rather than an external monitor.</td></tr>
 </table>
 <p class="note"><strong>Note:</strong> For a monitor which reports no serial number, <code>Id</code> identifies the port it is plugged into, not the panel; on macOS, it identifies the model, so identical displays share one <code>Id</code>. <code>Id</code> is the empty string when the display exposes no usable identity.</p>
+<p>Each factory call or read of <code>Monitor.Primary</code> or <code>Monitor.Devices</code> creates new objects. Compare their <code>Id</code> values to recognize displays; object equality compares references.</p>
 
 <h3 id="Geometry">Geometry</h3>
 <table class="info">
@@ -100,7 +98,7 @@ Count := Monitor.<span class="func">Count</span></pre>
   <tr id="Physical"><td><code>PhysicalWidth</code>, <code>PhysicalHeight</code></td><td>The panel's physical size in millimetres.</td></tr>
   <tr id="RefreshRate"><td><code>RefreshRate</code></td><td>Vertical refresh in Hz as a floating-point value &mdash; 59.94, not 59.</td></tr>
   <tr id="Orientation"><td><code>Orientation</code></td><td>Clockwise rotation of the desktop content in degrees: 0, 90, 180 or 270.</td></tr>
-  <tr id="Refresh"><td><code>Refresh()</code></td><td>Re-reads this monitor's layout and metadata in place and returns the same object, so it can be chained. The monitor is matched by name, then by number. Returns an empty string when the monitor is no longer attached, leaving the object's values unchanged.</td></tr>
+  <tr id="Refresh"><td><code>Refresh()</code></td><td>Re-reads layout and metadata in place and returns the same object. Matches by name and number, preserving the number among duplicate names; if the known Id differs, searches other displays for it. Returns an empty string without changing the snapshot when the display is unavailable or that identity cannot be verified. An initially empty Id may become known.</td></tr>
 </table>
 <p class="warning"><strong>Note:</strong> <code>Scale</code> is not a screen-coordinate conversion factor and must never be applied to absolute positions.</p>
 
@@ -132,7 +130,7 @@ Hooks := Monitor.<span class="func">Hooks</span></pre>
   <tr><td><code>"Topology"</code></td><td>The set of attached monitors changed: one was plugged in or unplugged, or the machine docked or undocked.</td></tr>
   <tr><td><code>"Settings"</code></td><td>The same monitors are attached, but something about them changed: resolution, position, scale, or which one is primary.</td></tr>
 </table>
-<p>To inspect the new layout, read <a href="#Count">Monitor.Count</a> or <a href="#All">Monitor.All</a> in the callback, or call <a href="#Refresh">Refresh</a> on a Monitor obtained earlier.</p>
+<p>To inspect the new layout, read <a href="#Devices">Monitor.Devices</a> in the callback, or call <a href="#Refresh">Refresh</a> on a Monitor obtained earlier.</p>
 <p>The callback is not called for a notification which changed nothing observable.</p>
 <p>The returned hook is an <a href="EventHook.htm">EventHook</a>. <code>Monitor.Hooks</code> is an Array of the running hooks. A MonitorHook does not keep the script running, so a script which only waits for display changes calls <a href="Persistent.htm">Persistent</a>.</p>
 
@@ -184,7 +182,7 @@ Loop MonitorCount
 <p><a class="ex_number" href="#ExMonitorObject"></a> Lists every monitor using the <a href="#KS">Monitor object</a>, showing which facts the displays actually report.</p>
 <pre>#Import "Ks" { Monitor }
 
-for M in Monitor.All
+for M in Monitor.Devices
 {
     Info := "Monitor:`t#" M.Index (M.IsPrimary ? " (primary)" : "") "`n"
     Info .= "Name:`t" M.Name "`n"
@@ -200,7 +198,7 @@ for M in Monitor.All
 <p><a class="ex_number" href="#ExMonitorBrightness"></a> Dims every monitor that supports it. <a href="#IsBrightnessSupported">IsBrightnessSupported</a> is tested first so an unsupported display is skipped instead of throwing.</p>
 <pre>#Import "Ks" { Monitor }
 
-for M in Monitor.All
+for M in Monitor.Devices
     if (M.IsBrightnessSupported)
         M.Brightness := Max(0, M.Brightness - 20)</pre>
 </div>
@@ -215,7 +213,7 @@ Persistent
 DisplaysChanged(Hook, Change)
 {
     if (Change = "Topology")
-        ToolTip "Monitors attached or removed: now " Monitor.Count
+        ToolTip "Monitors attached or removed: now " MonitorGetCount()
     else
         ToolTip "Display settings changed"
 
@@ -232,12 +230,14 @@ IniWrite Id, "layout.ini", "Editor", "Monitor"
 
 ; ... on a later run:
 Saved := IniRead("layout.ini", "Editor", "Monitor", "")
-M := Monitor.FromId(Saved)
+Matches := Saved != "" ? Monitor.Devices.Filter((Device) =&gt; Device.Id == Saved) : []
 
-if (M)
-    MsgBox "That display is attached, as monitor #" M.Index
+if (Matches.Length == 1)
+    MsgBox "That display is attached, as monitor #" Matches[1].Index
+else if (Matches.Length == 0)
+    MsgBox "That display is not currently attached."
 else
-    MsgBox "That display is not currently attached."</pre>
+    MsgBox "Several displays report that identity."</pre>
 </div>
 
 </body>
