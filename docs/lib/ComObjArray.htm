@@ -47,7 +47,7 @@
     <li><code id="MaxIndex">.MaxIndex(n)</code>: Returns the upper bound of the <i>n</i>th dimension. If <i>n</i> is omitted, it defaults to 1.</li>
     <li><code id="MinIndex">.MinIndex(n)</code>: Returns the lower bound of the <i>n</i>th dimension. If <i>n</i> is omitted, it defaults to 1.</li>
     <li><code id="Clone">.Clone()</code>: Returns a copy of the array.</li>
-    <li><code id="__Enum">.__Enum()</code>: Not typically called by script; allows <a href="For.htm">for-loops</a> to be used with SafeArrays.</li>
+    <li><code id="__Enum">.__Enum(NumberOfVars)</code>: Returns an <a href="Enumerator.htm">enumerator</a> for use with <a href="For.htm">for-loops</a>. If <em>NumberOfVars</em> is omitted, it defaults to 2 (index and value). A value below 2 selects value mode. The enumerator requires two output argument slots in index/value mode and one in value mode.</li>
 </ul>
 
 <h2 id="Properties">Properties</h2>

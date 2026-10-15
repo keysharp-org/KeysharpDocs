@@ -77,6 +77,7 @@
 </ul>
 <p><strong>Match.N:</strong> Shorthand for <strong>Match["N"]</strong>, where <em>N</em> is any unquoted name or number which does not conflict with a defined property (listed above). For example, <code>match.1</code> or <code>match.Year</code>.</p>
 <p>The object also supports enumeration; that is, the <a href="For.htm">for-loop</a> is supported. Alternatively, use <code><a href="Loop.htm">Loop</a> Match.Count</code>.</p>
+<p><code>Match.__Enum(NumberOfVars)</code> returns an <a href="Enumerator.htm">enumerator</a> including the whole match at index 0. If <em>NumberOfVars</em> is omitted or 0, one output variable receives the value, and two receive the subpattern's name or index and value. Specifying 1 or 2 fixes the mode and argument count.</p>
 
 <h2 id="Performance">Performance</h2>
 <p>To search for a simple substring inside a larger string, use <a href="InStr.htm">InStr</a> because it is faster than RegExMatch.</p>

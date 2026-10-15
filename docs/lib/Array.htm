@@ -297,6 +297,8 @@ arr2 := arr.Map((x, i) =&gt; x * i)   <em>; [10, 40, 90]</em></pre>
 <p>Enumerates array elements.</p>
 <pre class="Syntax">For Value in ArrayObj</pre>
 <pre class="Syntax">For Index, Value in ArrayObj</pre>
+<pre class="Syntax">Enum := ArrayObj.<span class="func">__Enum</span>(<span class="optional">NumberOfVars</span>)</pre>
+<p>If <em>NumberOfVars</em> is omitted or 0, one output variable receives the value, and two receive the index and value. Specifying 1 or 2 fixes the mode and argument count. An enumerator can be used directly: <code>For Index, Value in ArrayObj.__Enum()</code>.</p>
 <p>Returns a new <a href="Enumerator.htm">enumerator</a>. This method is typically not called directly. Instead, the array object is passed directly to a <a href="For.htm">for-loop</a>, which calls __Enum once and then calls the enumerator once for each iteration of the loop. Each call to the enumerator returns the next array element. The for-loop's variables correspond to the enumerator's parameters, which are:</p>
 <dl>
   <dt>Index</dt>

@@ -642,6 +642,8 @@ MyGui.Show()</pre>
 <p>Enumerates the window's controls.</p>
 <pre class="Syntax">For Ctrl in MyGui</pre>
 <pre class="Syntax">For Hwnd, Ctrl in MyGui</pre>
+<pre class="Syntax">Enum := MyGui.<span class="func">__Enum</span>(<span class="optional">NumberOfVars</span>)</pre>
+<p>If <em>NumberOfVars</em> is omitted or 0, one output variable receives the control object, and two receive its handle and object. Specifying 1 or 2 fixes the mode and argument count.</p>
 <p>Returns a new <a href="Enumerator.htm">enumerator</a>. This method is typically not called directly. Instead, the Gui object is passed directly to a <a href="For.htm">for-loop</a>, which calls __Enum once and then calls the enumerator once for each iteration of the loop. Each call to the enumerator returns the next control. The for-loop's variables correspond to the enumerator's parameters, which are:</p>
 <dl>
   <dt>Hwnd</dt>
