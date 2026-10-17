@@ -36,6 +36,7 @@
 }</pre>
 <p>In the above, the braces serve to define a <a href="Functions.htm">function body</a> for the hotkey. The opening brace may also be specified on the same line as the double-colon to support the <a href="lib/Block.htm#otb">OTB (One True Brace) style</a>. However, if a hotkey needs to execute only a single line, that line can be listed to the right of the double-colon. In other words, the braces are implicit:</p>
 <pre>#n::Run "notepad"</pre>
+<p>Spaces and tabs are allowed before the <code>::</code> separator, including after <code>Up</code> and in custom combinations such as <code>F13 &amp; F14 ::</code>. <code>Up</code> must be a complete suffix: <code>Upx</code> and <code>Up extra</code> are invalid.</p>
 <p id="ThisHotkey">When a hotkey is triggered, the name of the hotkey is passed as its first parameter named <code>ThisHotkey</code> (which excludes the trailing colons). For example:</p>
 <pre>#n::MsgBox ThisHotkey  <em>; Reports #n</em></pre>
 <p>With few exceptions, this is similar to the built-in variable <a href="Variables.htm#ThisHotkey">A_ThisHotkey</a>. The parameter name can be changed by using a <a href="#Function">named function</a>.</p>
