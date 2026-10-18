@@ -21,16 +21,20 @@
 
   <dt>Label</dt>
   <dd>
-    <p>The name of the <a href="../misc/Labels.htm">label</a> to which to jump. It must be written directly in the script and be known when the script is compiled.</p>
+    <p>Type: <a href="../Concepts.htm#strings">String</a></p>
+    <p>The name of the <a href="../misc/Labels.htm">label</a> to which to jump.</p>
+    <p><em>Label</em> can be a variable or expression only if parentheses are used. For example, <code>Goto MyLabel</code> and <code>Goto("MyLabel")</code> both jump to <code>MyLabel:</code>.</p>
   </dd>
 
 </dl>
 
 <h2 id="Remarks">Remarks</h2>
-<p>The function-call form <code>Goto("Label")</code> is not supported. A missing label is reported when the script is compiled.</p>
+<p>A label written directly is checked when the script loads: it must belong to the same function, be in a block which encloses the Goto, and not be outside a <a href="Finally.htm">Finally</a> block the Goto is in. Performance is slightly reduced when using a dynamic label (that is, a variable or expression which returns a label name) because the target label must be "looked up" each time rather than only once when the script is first loaded. An error is thrown if the label does not exist or the Goto cannot reach it. To check whether the label exists, call <a href="IsLabel.htm">IsLabel()</a> beforehand. It does not check whether the Goto can reach the label. For example:</p>
+<pre>if IsLabel(VarContainingLabelName)
+    Goto(VarContainingLabelName)</pre>
 <p>The use of Goto is discouraged because it generally makes scripts less readable and harder to maintain. Consider using <a href="Else.htm">Else</a>, <a href="Block.htm">Blocks</a>, <a href="Break.htm">Break</a>, and <a href="Continue.htm">Continue</a> as substitutes for Goto.</p>
 <h2 id="Related">Related</h2>
-<p><a href="Return.htm">Return</a>, <a href="Else.htm">Else</a>, <a href="Block.htm">Blocks</a>, <a href="Break.htm">Break</a>, <a href="Continue.htm">Continue</a></p>
+<p><a href="Return.htm">Return</a>, <a href="IsLabel.htm">IsLabel</a>, <a href="Else.htm">Else</a>, <a href="Block.htm">Blocks</a>, <a href="Break.htm">Break</a>, <a href="Continue.htm">Continue</a></p>
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExBasic">
 <p><a class="ex_number" href="#ExBasic"></a> Jumps to the label named "MyLabel" and continues execution.</p>
