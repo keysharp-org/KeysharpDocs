@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Input Object | Keysharp</title>
-<meta name="description" content="Lists keyboard and mouse devices, describes input events and reads per-device physical key state." />
+<meta name="description" content="Lists keyboard and mouse devices, reports device changes and reads per-device physical key state." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" />
@@ -13,7 +13,7 @@
 
 <h1>Input Object</h1>
 <pre class="NoIndent">class Input extends Object</pre>
-<p>Describes one keyboard or mouse reported by the current input source. Instances come from <a href="#Devices">Input.Devices</a> or <a href="#EventDevice">A_EventInfo.Device</a>.</p>
+<p>Describes one keyboard or mouse reported by the current input source. Instances come from <a href="#Devices">Input.Devices</a>, <a href="#EventDevice">A_EventInfo.Device</a> or an <a href="#OnDeviceChange">OnDeviceChange</a> callback.</p>
 <p>This class is exported by the <a href="../Modules.htm#KS">Ks module</a>:</p>
 <pre>#Import Ks { Input }</pre>
 
@@ -47,6 +47,25 @@
 <p>An invalid name, including a controller or wheel name, raises a <a href="Error.htm#ValueError">ValueError</a>; a value which cannot be converted to a String raises a <a href="Error.htm#TypeError">TypeError</a>. An unsupported or unavailable source, an unknown or removed device, or a descriptor from an earlier script or input-service connection raises an <a href="Error.htm#OSError">OSError</a>. Reconnecting a device does not make its old descriptor usable again. There is no aggregate-state fallback. Use <a href="GetKeyState.htm">GetKeyState(KeyName, Mode)</a> for aggregate logical, physical or toggle state.</p>
 <p>Reading state does not request permission or install input hooks. A denied or expired grant raises OSError rather than reporting the key as up.</p>
 
+<h2 id="OnDeviceChange">OnDeviceChange</h2>
+<pre class="Syntax">Hook := Input.<span class="func">OnDeviceChange</span>(Callback)</pre>
+<p>Returns a running <a href="#DeviceHook">Input.DeviceHook</a> which calls <em>Callback</em> for changes found in the keyboard and mouse inventory. <em>Callback</em> is a <a href="../misc/Functor.htm">function object</a> accepting three arguments:</p>
+<pre class="Syntax">Callback(Hook, Change, Device)</pre>
+<p><em>Hook</em> is the subscription, <em>Change</em> is <code class="no-highlight">"Added"</code>, <code class="no-highlight">"Removed"</code> or <code class="no-highlight">"Changed"</code>, and <em>Device</em> is an Input snapshot. A removed device retains its last-known metadata, but <a href="#GetKeyState">GetKeyState</a> cannot read its state.</p>
+<p>The current inventory is the starting point; devices already present do not produce initial Added callbacks. Notifications are coalesced and report differences between inventories, so a device connected and removed between inventories might not be reported.</p>
+<p>On Windows and macOS, arrival and removal trigger inventory refreshes; a change only to a device's name or other metadata does not. Such changes can produce Changed callbacks when a later refresh discovers them.</p>
+<p>Subscribing raises an <a href="Error.htm#OSError">OSError</a> when the native device-change source is unavailable or access is denied. On Linux, notifications require keysharp-input client ABI 1.1 or newer, a matching service and an existing InputMonitoring grant. Subscribing does not request permission or install keyboard or mouse input hooks.</p>
+
+<h2 id="Hooks">Hooks</h2>
+<pre class="Syntax">Hooks := Input.<span class="func">Hooks</span></pre>
+<p>A read-only property returning a snapshot <a href="Array.htm">Array</a> of running Input.DeviceHook objects in the order they were started, across all real threads. Restarting a hook moves it to the end. Changing the returned Array does not start or stop subscriptions.</p>
+
+<h2 id="DeviceHook">Input.DeviceHook</h2>
+<pre class="NoIndent">class Input.DeviceHook extends EventHook</pre>
+<p>Created by <a href="#OnDeviceChange">Input.OnDeviceChange</a>, with no additional members beyond <a href="EventHook.htm">EventHook</a>. Use <a href="EventHook.htm#Start">Start()</a> and <a href="EventHook.htm#Stop">Stop()</a> to control the subscription, and read <a href="EventHook.htm#InProgress">InProgress</a> and <a href="EventHook.htm#EndReason">EndReason</a> for its state. Callbacks run on the real thread which started the subscription; EventHook's queued-callback rules apply.</p>
+<p>Losing the device-change source or its permission, or failing to refresh the inventory, ends the subscription with EndReason <code class="no-highlight">"Failed"</code> and stops callbacks. Call Start() to retry explicitly; a failed retry leaves the hook ended. It does not reconnect automatically.</p>
+<p>The hook does not keep the script or its real thread running. A script which only waits for device changes calls <a href="Persistent.htm">Persistent</a>.</p>
+
 <h2 id="Remarks">Remarks</h2>
 <h3 id="Windows">Windows</h3>
 <p>Lists the keyboard and mouse interfaces known to Windows Raw Input. Id contains the Raw Input device handle's value. Names and hardware identifiers come from system device metadata. VendorId and ProductId use native HID attributes when available; an ACPI identifier does not supply numeric USB vendor or product identifiers.</p>
@@ -64,6 +83,15 @@
 
 for Device in Input.Devices.Filter((Device) =&gt; Device.Kind == "Keyboard")
     OutputDebug Device.Name ": " Device.HardwareId</pre>
+</div>
+<div class="ex" id="ExOnDeviceChange">
+<p><a class="ex_number" href="#ExOnDeviceChange"></a> Logs keyboard and mouse inventory changes until the script exits.</p>
+<pre>#ErrorStdOut
+#Warn All, StdOut
+#Import Ks { Input }
+
+Persistent
+Input.OnDeviceChange((Hook, Change, Device) =&gt; OutputDebug(Change ": " Device.Kind " " Device.Name))</pre>
 </div>
 </body>
 </html>
