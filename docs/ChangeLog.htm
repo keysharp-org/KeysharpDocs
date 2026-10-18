@@ -29,6 +29,7 @@
 
 <h3 id="v0.0.0.18-breaking">Breaking Changes</h3>
 <ul>
+  <li>Per-device input uses <a href="lib/Input.htm">Input objects</a>. Use <a href="Variables.htm#EventInfo">A_EventInfo.Device</a> in place of A_EventInfo.DeviceId, and <a href="lib/Input.htm#GetKeyState">Device.GetKeyState(KeyName)</a> in place of <code>GetKeyState(KeyName, DeviceId)</code>. The global function accepts only the L, P and T modes.</li>
   <li>In <a href="lib/_Requires.htm#CompatMode">v2.1 mode</a>, <a href="lib/Array.htm">Array</a> rejects non-integer indices with TypeError. Integer strings remain valid array indices. v2.0 mode retains Float truncation.</li>
   <li>The Export modifier of <a href="lib/_Import.htm">#Import</a> cannot be used inside a function.</li>
   <li><a href="Modules.htm#Search_Path">Module and library lookup</a> uses AhkLibPath instead of AhkImportPath, with relative entries based on the current module's root file. The module and main script directories always precede the additional import path; their Lib subdirectories always precede the additional include path. In v2.1 mode, <a href="lib/_Include.htm">#Include &lt;LibName&gt;</a> searches the source file's directory, accepts exact filenames and has no underscore fallback.</li>
@@ -41,7 +42,7 @@
 
 <h3 id="v0.0.0.18-new">New</h3>
 <ul>
-  <li><a href="lib/Input.htm#Devices">Input.Devices</a> returns snapshots describing the system's keyboards and mice.</li>
+  <li><a href="lib/Input.htm#Devices">Input.Devices</a> returns snapshots describing the system's keyboards and mice. On Linux, <a href="lib/Input.htm#GetKeyState">Input.GetKeyState</a> reads one device's physical key or button state, and <a href="Variables.htm#EventInfo">A_EventInfo.Device</a> describes an identified input event's source.</li>
   <li><a href="lib/Object.htm#DefinePropEnumerable">DefineProp's Enumerable</a> option hides a property from <a href="lib/Props.htm">Props</a>.</li>
   <li><a href="lib/NumGet.htm">NumGet</a> and <a href="lib/NumPut.htm">NumPut</a> accept a <a href="Structs.htm#numeric-types">numeric type class</a> such as <code>UInt32</code> as the type.</li>
   <li><a href="Structs.htm#classdef-union">Union blocks</a> define overlapping typed properties in a struct.</li>

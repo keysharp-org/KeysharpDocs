@@ -993,7 +993,7 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
     <td><p>Contains additional information about the following events:</p>
       <ul>
         <li><a href="Hotkeys.htm#Wheel">Mouse wheel hotkeys</a> (WheelDown/Up/Left/Right)</li>
-        <li>On Linux, keyboard and mouse <a href="Hotkeys.htm">hotkeys</a>, their <a href="lib/_HotIf.htm">#HotIf</a> expressions and <a href="lib/InputHook.htm">InputHook</a> callbacks: the <code>DeviceId</code> property identifies the physical input source of the event, for use with <a href="lib/GetKeyState.htm">GetKeyState</a>. It is 0 for synthetic input.</li>
+        <li>On Linux, keyboard and mouse <a href="Hotkeys.htm">hotkeys</a>, their <a href="lib/_HotIf.htm">#HotIf</a> expressions and <a href="lib/InputHook.htm">InputHook</a> callbacks: the <a href="lib/Input.htm#EventDevice">Device</a> property describes the identified input source as an Input object, for use with <a href="lib/Input.htm#GetKeyState">Device.GetKeyState</a>. It is absent when the event has no nonzero device identifier.</li>
         <li><a href="lib/OnMessage.htm">OnMessage</a></li>
         <li><a href="lib/GuiOnMessage.htm">OnMessage (GUI)</a> <span class="ver">[v2.1-alpha.7+]</span></li>
         <li><a href="misc/RegExCallout.htm">Regular Expression Callouts</a></li>
@@ -1001,7 +1001,8 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
         <li>The <code>OnMove</code> and <code>OnCaretMove</code> slots of a <a href="lib/WinEvent.htm#Callback">WinEvent</a></li>
       </ul>
       <p>Note: Unlike variables such as A_ThisHotkey, each <a href="misc/Threads.htm">thread</a> retains its own value for A_EventInfo. Therefore, if a thread is interrupted by another, upon being resumed it will still see its original/correct values in these variables.</p>
-      <p>For keyboard and mouse hook events, A_EventInfo is an object with <code>Timestamp</code>, <code>IsInjected</code> and <code>IsAutoRepeat</code> properties. <code>SendLevel</code>, <code>DeviceId</code>, <code>IsAbsolute</code>, and screen coordinates <code>X</code>/<code>Y</code> are present only when supplied by the event. For mouse-wheel hotkeys, <code>A_EventInfo.Extra</code> holds the signed wheel delta: positive for upward scrolling and negative for downward scrolling. AutoHotkey returns the wheel amount directly in A_EventInfo.</p>
+      <p>For keyboard and mouse hook events, A_EventInfo is an object with <code>Timestamp</code>, <code>IsInjected</code> and <code>IsAutoRepeat</code> properties. <code>SendLevel</code>, <code>Device</code>, <code>IsAbsolute</code>, and screen coordinates <code>X</code>/<code>Y</code> are present only when supplied by the event. For mouse-wheel hotkeys, <code>A_EventInfo.Extra</code> holds the signed wheel delta: positive for upward scrolling and negative for downward scrolling. AutoHotkey returns the wheel amount directly in A_EventInfo.</p>
+      <p>Device is resolved only when that property is read, so reading Timestamp or IsAutoRepeat does not look up devices. An identified event retains an Input descriptor with Id and Kind even when its remaining metadata is unavailable. Native Windows and macOS hook events have no Device property.</p>
       <p>A_EventInfo can also be set by the script.</p></td>
   </tr>
   <tr id="LastError">

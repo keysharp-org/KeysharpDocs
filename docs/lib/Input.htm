@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Input Object | Keysharp</title>
-<meta name="description" content="Lists keyboard and mouse devices and describes their names and hardware identifiers." />
+<meta name="description" content="Lists keyboard and mouse devices, describes input events and reads per-device physical key state." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" />
@@ -13,7 +13,7 @@
 
 <h1>Input Object</h1>
 <pre class="NoIndent">class Input extends Object</pre>
-<p>Describes one keyboard or mouse reported by the current input source. Instances come from <a href="#Devices">Input.Devices</a>.</p>
+<p>Describes one keyboard or mouse reported by the current input source. Instances come from <a href="#Devices">Input.Devices</a> or <a href="#EventDevice">A_EventInfo.Device</a>.</p>
 <p>This class is exported by the <a href="../Modules.htm#KS">Ks module</a>:</p>
 <pre>#Import Ks { Input }</pre>
 
@@ -34,6 +34,18 @@
   <tr id="HardwareId"><td><code>HardwareId</code></td><td>The input source's hardware identity string, or an empty string when unavailable. Its format and persistence depend on the source. It may identify a model or interface rather than one physical unit.</td></tr>
 </table>
 <p>A device can expose several interfaces or both kinds, so an entry is not necessarily one physical unit. Identical devices can share a name, vendor/product pair or hardware ID. No property is guaranteed to identify one unit permanently. Compare reported values when selecting a device; objects from separate reads are distinct descriptors.</p>
+
+<h2 id="EventDevice">The current event's device</h2>
+<pre class="Syntax">Device := A_EventInfo.Device</pre>
+<p>For Linux keyboard and mouse hotkeys, their <a href="_HotIf.htm">#HotIf</a> expressions and <a href="InputHook.htm">InputHook</a> callbacks, <a href="../Variables.htm#EventInfo">A_EventInfo.Device</a> is an Input descriptor when the event identifies a nonzero device. Generated input without a device identifier and native Windows/macOS hook events have no Device property.</p>
+<p>The description is resolved when Device is read; reading Timestamp or IsAutoRepeat does not look up devices. Cached metadata from the event's original source remains available after device removal or source loss. If no metadata is known, the descriptor contains its captured Id and Kind, with other text fields empty and numbers 0.</p>
+
+<h2 id="GetKeyState">GetKeyState</h2>
+<pre class="Syntax">IsDown := Device.<span class="func">GetKeyState</span>(KeyName)</pre>
+<p class="note"><strong>Note:</strong> Per-device state is supported on Linux through keysharp-input with an existing InputMonitoring grant. Native Windows and macOS sources do not supply it.</p>
+<p><em>KeyName</em> is a keyboard key or mouse button from the <a href="../KeyList.htm">key list</a>. Returns true while that key or button is physically held on this device, otherwise false. This method takes no Mode parameter and does not read controller, wheel or toggle state. Keypad names follow the NumLock and logical Shift state shared by all keyboards, as hotkeys do.</p>
+<p>An invalid name, including a controller or wheel name, raises a <a href="Error.htm#ValueError">ValueError</a>; a value which cannot be converted to a String raises a <a href="Error.htm#TypeError">TypeError</a>. An unsupported or unavailable source, an unknown or removed device, or a descriptor from an earlier script or input-service connection raises an <a href="Error.htm#OSError">OSError</a>. Reconnecting a device does not make its old descriptor usable again. There is no aggregate-state fallback. Use <a href="GetKeyState.htm">GetKeyState(KeyName, Mode)</a> for aggregate logical, physical or toggle state.</p>
+<p>Reading state does not request permission or install input hooks. A denied or expired grant raises OSError rather than reporting the key as up.</p>
 
 <h2 id="Remarks">Remarks</h2>
 <h3 id="Windows">Windows</h3>
