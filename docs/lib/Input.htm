@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Input Object | Keysharp</title>
+<meta name="description" content="Lists keyboard and mouse devices and describes their names and hardware identifiers." />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
+</head>
+<body><script>site.init();</script>
+
+<h1>Input Object</h1>
+<pre class="NoIndent">class Input extends Object</pre>
+<p>Describes one keyboard or mouse reported by the current input source. Instances come from <a href="#Devices">Input.Devices</a>.</p>
+<p>This class is exported by the <a href="../Modules.htm#KS">Ks module</a>:</p>
+<pre>#Import Ks { Input }</pre>
+
+<h2 id="Devices">Devices</h2>
+<pre class="Syntax">Devices := Input.<span class="func">Devices</span></pre>
+<p>A read-only property returning a normal <a href="Array.htm">Array</a> of <code>Input</code> objects for the current keyboards and mice. Each read returns a new list of new objects. A list already held by a script does not change when devices are connected or removed.</p>
+<p>An empty Array means that no keyboard or mouse was listed. An unavailable inventory, denied access or enumeration failure throws an <a href="Error.htm#OSError">OSError</a>. Array indexes are ordinal positions, unrelated to <a href="#Id">Id</a>. Use <a href="Array.htm#Filter">Array.Filter</a> to select devices by their properties; a selection can contain no devices, one device or several devices.</p>
+
+<h2 id="Properties">Device properties</h2>
+<p>All properties are read-only and contain the information completed when the descriptor was returned. Property reads do not query the device again. Missing text is an empty string; a missing number is 0. A descriptor keeps its values after the device disconnects.</p>
+<table class="info">
+  <tr><th>Property</th><th>Description</th></tr>
+  <tr id="Id"><td><code>Id</code></td><td>An opaque Integer identifying the device within its current input source, or 0 when unavailable. It is not an Array index or a permanent hardware identity. Values can change or be reused after reconnection, resume or a source restart. Identifiers from different sources need not be comparable.</td></tr>
+  <tr id="Kind"><td><code>Kind</code></td><td><code>"Keyboard"</code> or <code>"Mouse"</code>.</td></tr>
+  <tr id="Name"><td><code>Name</code></td><td>The name reported by the input source, when available. Names can repeat.</td></tr>
+  <tr id="VendorId"><td><code>VendorId</code></td><td>The numeric vendor identifier, or 0 when unavailable.</td></tr>
+  <tr id="ProductId"><td><code>ProductId</code></td><td>The numeric product identifier, or 0 when unavailable.</td></tr>
+  <tr id="HardwareId"><td><code>HardwareId</code></td><td>The input source's hardware identity string, or an empty string when unavailable. Its format and persistence depend on the source. It may identify a model or interface rather than one physical unit.</td></tr>
+</table>
+<p>A device can expose several interfaces or both kinds, so an entry is not necessarily one physical unit. Identical devices can share a name, vendor/product pair or hardware ID. No property is guaranteed to identify one unit permanently. Compare reported values when selecting a device; objects from separate reads are distinct descriptors.</p>
+
+<h2 id="Remarks">Remarks</h2>
+<h3 id="Windows">Windows</h3>
+<p>Lists the keyboard and mouse interfaces known to Windows Raw Input. Id contains the Raw Input device handle's value. Names and hardware identifiers come from system device metadata. VendorId and ProductId use native HID attributes when available; an ACPI identifier does not supply numeric USB vendor or product identifiers.</p>
+<h3 id="Linux">Linux</h3>
+<p>Id contains the keysharp-input device ID. Device information requires an available keysharp-input service and an existing Input Monitoring grant. Listing devices does not request a grant or initialize input forwarding. Client ABI 1.1 and a matching service can check an existing grant directly. With an older client or service, listing succeeds only if another authorized input operation has already given the current connection access to device information; otherwise it throws an OSError.</p>
+<h3 id="macOS">macOS</h3>
+<p>The implementation reads keyboard and mouse descriptions from IOKit HID services, using a supplied serial number as HardwareId. Id is 0. Runtime behavior on macOS is unverified.</p>
+
+<h2 id="Examples">Examples</h2>
+<div class="ex" id="ExDevices">
+<p><a class="ex_number" href="#ExDevices"></a> Lists the reported keyboards.</p>
+<pre>#ErrorStdOut
+#Warn All, StdOut
+#Import Ks { Input }
+
+for Device in Input.Devices.Filter((Device) =&gt; Device.Kind == "Keyboard")
+    OutputDebug Device.Name ": " Device.HardwareId</pre>
+</div>
+</body>
+</html>

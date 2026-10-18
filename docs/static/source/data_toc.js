@@ -45,6 +45,7 @@ tocData = [
       ["WinEvent","lib/WinEvent.htm"],
       ["WinFromPoint","lib/WinFromPoint.htm"],
       ["Clipboard","lib/Clipboard.htm"],
+      ["Input Devices","lib/Input.htm"],
       ["Audio","lib/Audio.htm"]
     ]],
     ["Runtime and Interop","",
