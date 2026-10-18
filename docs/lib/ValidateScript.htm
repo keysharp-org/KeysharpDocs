@@ -51,6 +51,7 @@ Result := <span class="func" id="CompileScript">CompileScript</span>(Code)</pre>
 
 <h2 id="Remarks">Remarks</h2>
 <p>Neither function runs the code: no hotkeys are registered and the auto-execute section does not run. CompileScript writes nothing to disk and does not restore packages, so a <a href="_Package.htm">#Package</a> the code names must already be available.</p>
+<p>When <a href="../Program.htm#cmd">daemon use</a> is enabled, CompileScript first tries an existing compatible daemon from a matching Keysharp installation, avoiding loading the compiler into the calling process. It never starts a daemon and compiles locally if none is available. ValidateScript always uses the parser in the calling process.</p>
 <p>A compiled script with a statically visible call to either function includes the component it needs; see <a href="../Program.htm#components">Optional Scripting Components</a>.</p>
 
 <h2 id="Examples">Examples</h2>

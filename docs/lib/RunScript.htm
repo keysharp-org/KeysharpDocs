@@ -14,7 +14,7 @@
 <h1>RunScript</h1>
 <p>Dynamically parses, compiles and runs source code.</p>
 <p>This function is exported by the <a href="../Modules.htm#KS">KS module</a>.</p>
-<p class="note"><strong>Note:</strong> Running source code requires the optional compiler component in the calling process; running an already-compiled script does not. See <a href="../Program.htm#components">Optional Scripting Components</a> and <a href="IsComponentAvailable.htm">IsComponentAvailable</a>.</p>
+<p class="note"><strong>Note:</strong> Running source code requires the optional compiler component; running an already-compiled script does not. See <a href="../Program.htm#components">Optional Scripting Components</a> and <a href="IsComponentAvailable.htm">IsComponentAvailable</a>.</p>
 <pre class="Syntax">Process := <span class="func">RunScript</span>(Code <span class="optional">, Async := false, Callback, Name := "*", Executable, Options</span>)</pre>
 
 <h2 id="Parameters">Parameters</h2>
@@ -49,6 +49,9 @@
 <h2 id="Error_Handling">Error Handling</h2>
 <p>An <a href="Error.htm">Error</a> is thrown if the compiler component is needed but not installed, or if <em>Code</em> fails to compile; its message contains the compiler's report.</p>
 <p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>Options</em> contains an invalid <code class="no-highlight">--define</code>, an <code class="no-highlight">--include</code> without a file or a second one, or any <code class="no-highlight">--define</code> or <code class="no-highlight">--include</code> when <em>Code</em> names an already-compiled script.</p>
+
+<h2 id="Remarks">Remarks</h2>
+<p>When <a href="../Program.htm#cmd">daemon use</a> is enabled, source compilation first tries an existing compatible daemon from a matching Keysharp installation. This avoids loading the compiler into the calling process. The function never starts a daemon and compiles locally if none is available or <a href="_Package.htm">packages</a> need restoring.</p>
 
 <h2 id="ScriptProcess">Process Object (ScriptProcess)</h2>
 <p>The object returned by RunScript encapsulates the child process and its redirected I/O. This object has the following methods and properties:</p>
