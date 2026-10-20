@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>#Startup - Early Initialization | Keysharp</title>
+<meta name="description" content="The #Startup directive evaluates an expression before capability checks, hotkey setup and the auto-execute section." />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
+</head>
+<body><script>site.init();</script>
+
+<h1>#Startup <span class="ver">[Keysharp]</span></h1>
+
+<p>Evaluates an expression once before capability checks, hotkey setup and the <a href="../Scripts.htm#auto">auto-execute section</a>.</p>
+
+<pre class="Syntax"><span class="func">#Startup</span> Expression</pre>
+
+<h2 id="Parameters">Parameters</h2>
+<dl>
+  <dt>Expression</dt>
+  <dd>
+    <p>An <a href="../Variables.htm#Expressions">expression</a> to evaluate. Its result is ignored. Call a function for multiple statements, or use <a href="../Scripts.htm#continuation-expr">expression continuation</a> to spread it over several lines.</p>
+  </dd>
+</dl>
+
+<h2 id="Remarks">Remarks</h2>
+<p>This directive is permitted only at module level, including in <a href="_Include.htm">included files</a> and <a href="_Import.htm">imported modules</a>.</p>
+<p><a href="_Package.htm">Packages</a> are loaded before startup expressions run. Expressions run in the same <a href="../Modules.htm#Execution">dependency order</a> as module auto-execution. Within each module, they run in source order, with included files treated as part of the including source.</p>
+<p>The expression uses its module's global scope. A function called by the expression uses the function's ordinary scope rules. Assignments in the auto-execute section have not run yet.</p>
+<p>Use this directive to initialize a library before callbacks can need it, such as a <a href="Clr.htm#KeyStateProvider">managed key-state provider</a>.</p>
+
+<h2 id="Error_Handling">Error Handling</h2>
+<p>An uncaught error stops startup. Subsequent startup expressions and the auto-execute section do not run. Handle expected errors with <a href="Try.htm">try</a> and <a href="Catch.htm">catch</a> inside a function.</p>
+
+<h2 id="Related">Related</h2>
+<p><a href="../Scripts.htm#auto">Auto-execute Section</a>, <a href="_Package.htm">#Package</a>, <a href="Clr.htm">Clr</a>, <a href="_Import.htm">#Import</a>, <a href="_Include.htm">#Include</a></p>
+
+<h2 id="Examples">Examples</h2>
+<div class="ex" id="ExExpression">
+<p><a class="ex_number" href="#ExExpression"></a> Evaluates a single expression before the auto-execute section.</p>
+<pre>#Startup OutputDebug("Preparing " A_ScriptName)
+
+OutputDebug("Auto-execute")</pre>
+</div>
+
+<div class="ex" id="ExFunction">
+<p><a class="ex_number" href="#ExFunction"></a> Calls a function for multiple initialization statements.</p>
+<pre>#Startup Initialize()
+
+Initialize() {
+    global Settings := Map("Timeout", 1000)
+    Settings["Retries"] := 3
+}
+
+OutputDebug("Timeout: " Settings["Timeout"])</pre>
+</div>
+
+</body>
+</html>

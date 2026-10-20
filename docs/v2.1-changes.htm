@@ -102,6 +102,7 @@
 <p>See also: <a href="#Default_Return">Default Return</a>, <a href="#blank-unset"><em>blank-unset</em></a></p>
 
 <h3 id="v21mode">v2.1 Mode</h3>
+<p><span class="ver">[v2.1-alpha.35+]</span>: <code>#Include &lt;A_B&gt;</code> checks for "A_B" before "A_B.ks" and "A_B.ahk", and does not check for "A.ahk". Refer to <a href="Scripts.htm#lib">Script Library Folders</a> for details.</p>
 <p><span class="ver">[v2.1-alpha.35+]</span>: AutoHotkey's Map rejects Float keys with TypeError; <a href="lib/Map.htm">Keysharp's Map</a> continues to accept them. <a href="lib/Array.htm">Array</a> rejects Float and nonnumeric indices with TypeError, including float numeric strings; integer strings remain accepted. The array checks apply to __Item, Get, Has, Delete, InsertAt and RemoveAt.</p>
 <p>These return <code>unset</code> under specific conditions instead of throwing an error:</p>
 <ul>

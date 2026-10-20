@@ -73,6 +73,7 @@ if (ih.Input = CtrlC)
 <h2 id="object">InputHook Object</h2>
 <p>The InputHook function returns an InputHook object, which has the following methods and properties.</p>
 <p>InputHook derives from <a href="EventHook.htm">EventHook</a>.</p>
+<p>Calling <code>InputHookObj.__New(Options, EndKeys, MatchList)</code> reconfigures the same object. Unspecified options retain their values, as do existing key flags, callbacks and running status. The call replaces the match list and character-mode end characters, and clears collected text. Cloning an InputHook raises a <a href="Error.htm#TypeError">TypeError</a>.</p>
 "InputHookObj" is used below as a placeholder for any InputHook object, as "InputHook" is the class itself.
 <ul class="indent">
   <li><a href="#Methods">Methods</a>:

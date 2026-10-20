@@ -87,6 +87,7 @@ Obj := ClassObj.<span class="func">Call</span>(Params*)</pre>
   <li>Return the new object.</li>
 </ul>
 <p>Call can be overridden within a class definition by defining a static method, such as <code>static Call()</code>. This allows classes to modify or prevent the construction of new instances.</p>
+<p>Calling <a href="RegExMatch.htm#MatchObject">RegExMatchInfo</a> or a subclass through the default Call method raises a <a href="Error.htm#ValueError">ValueError</a>. Match objects are created by <a href="RegExMatch.htm">RegExMatch</a>.</p>
 <p>This is a static method in the sense that it belongs to a class (such as Object), but at the same time it is an instance method of the class object, which is an instance of Class. The class Class itself has a <a href="#StaticCall">static Call method</a>. In other words, <code>Class()</code> or <code>Class.Call()</code> can be called to create a new class object at runtime.</p>
 </div>
 

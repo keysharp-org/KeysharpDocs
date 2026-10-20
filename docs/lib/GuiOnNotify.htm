@@ -61,6 +61,10 @@
 <p>To determine which notifications are available (if any), what type of structure they provide and how they interpret the return value, refer to the control's documentation. <a href="https://learn.microsoft.com/windows/win32/controls/individual-control-info">Control Library (Microsoft Docs)</a> contains links to each of the Windows common controls. The notification codes (numbers) can be found in the Windows SDK, or by searching the Internet.</p>
 <p>AutoHotkey uses the <em>idFrom</em> and <em>hwndFrom</em> fields to identify which control sent the notification, in order to dispatch it to the appropriate object. The <em>code</em> field contains the notification code. Since these must match up to <em>GuiCtrl</em> and <em>NotifyCode</em> used to register the callback, they are rarely useful to the script.</p>
 
+<h2 id="Remarks">Remarks</h2>
+<h3 id="Windows">Windows</h3>
+<p>While an <code>NM_CUSTOMDRAW</code> (-12) callback runs, the runtime defers processing queued window messages until it returns, including during calls to <a href="Sleep.htm">Sleep</a> or nested timer callbacks. Script timers and exit requests can still be processed.</p>
+
 <h2 id="Related">Related</h2>
 <p>These notes for <a href="GuiOnEvent.htm">OnEvent</a> also apply to OnNotify: <a href="GuiOnEvent.htm#Threads">Threads</a>, <a href="GuiOnEvent.htm#Destroying_the_GUI">Destroying the GUI</a>.</p>
 <p><a href="GuiOnCommand.htm">OnCommand</a> can be used for notifications which are sent as a WM_COMMAND message.</p>

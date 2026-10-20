@@ -5,7 +5,7 @@ Thank you for helping document Keysharp.
 ## Source of truth
 
 Documentation should describe observed Keysharp behavior. AutoHotkey
-v2.1-alpha.35 is the compatibility target and a valuable language reference,
+v2.1-alpha.36 is the compatibility target and a valuable language reference,
 but it is not evidence that a feature is already implemented on every Keysharp
 platform.
 
@@ -19,9 +19,7 @@ The capability matrix is pending a thorough review. Do not use it as evidence
 for a documentation claim unless the relevant entry has been independently
 verified against the current runtime, source or tests.
 
-See [`SOURCE_OF_TRUTH.md`](SOURCE_OF_TRUTH.md) for the evidence model and the
-generated source-to-documentation audit workflow. The audit establishes
-candidate script-visible names, not behavioral or platform support.
+See [AGENTS.md](AGENTS.md#source-of-truth) for the evidence order.
 
 If support is partial or unverified, say so explicitly. Prefer a narrowly
 scoped qualification near the relevant behavior over a broad claim that the
@@ -33,6 +31,25 @@ entire API which is unavailable on a supported platform. Reserve warnings for
 high-consequence traps. In `Remarks`, put general OS-dependent behavior under
 `Windows`, `Linux`, or `macOS` H3 headings rather than a generic `Platform
 Behavior` heading.
+
+## Source audit
+
+Regenerate the current platform's API inventories with:
+
+```powershell
+pwsh ./scripts/Update-SourceAudit.ps1 -KeysharpRepo ../Keysharp_clone
+```
+
+This builds `Keysharp.Core` without running tests. Use `-SkipKeysharpBuild`
+only when the existing assembly matches the source tree. Reports generated
+from a dirty source tree are provisional; do not edit generated reports.
+
+The inventories cover global names, declared class members and module exports.
+Members of classes nested within modules are not covered. A documentation
+locator does not prove correct behavior or platform support; `needs-review`
+means no locator was found. Confirm runtime visibility and intended public
+use before adding documentation. Fix unintended exposure in the runtime, and
+do not add locator exceptions merely to improve coverage.
 
 ## Preserve compatibility names
 

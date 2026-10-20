@@ -37,15 +37,16 @@
 
 <h2 id="EventDevice">The current event's device</h2>
 <pre class="Syntax">Device := A_EventInfo.Device</pre>
-<p>For Linux keyboard and mouse hotkeys, their <a href="_HotIf.htm">#HotIf</a> expressions and <a href="InputHook.htm">InputHook</a> callbacks, <a href="../Variables.htm#EventInfo">A_EventInfo.Device</a> is an Input descriptor when the event identifies a nonzero device. Generated input without a device identifier and native Windows/macOS hook events have no Device property.</p>
+<p>For native Linux input and <a href="Clr.htm#HookProvider">managed capture</a>, keyboard and mouse hotkeys, their <a href="_HotIf.htm">#HotIf</a> expressions and <a href="InputHook.htm">InputHook</a> callbacks expose <a href="../Variables.htm#EventInfo">A_EventInfo.Device</a> as an Input descriptor when the event identifies a nonzero device. Generated input without a device identifier and native Windows/macOS hook events have no Device property.</p>
 <p>The description is resolved when Device is read; reading Timestamp or IsAutoRepeat does not look up devices. Cached metadata from the event's original source remains available after device removal or source loss. If no metadata is known, the descriptor contains its captured Id and Kind, with other text fields empty and numbers 0.</p>
 
 <h2 id="GetKeyState">GetKeyState</h2>
 <pre class="Syntax">IsDown := Device.<span class="func">GetKeyState</span>(KeyName)</pre>
-<p class="note"><strong>Note:</strong> Per-device state is supported on Linux through keysharp-input with an existing InputMonitoring grant. Native Windows and macOS sources do not supply it.</p>
+<p class="note"><strong>Note:</strong> Per-device state is supplied through <a href="Clr.htm#HookProvider">managed capture</a>, or through native Linux keysharp-input with an existing InputMonitoring grant. Native Windows and macOS sources do not supply it. Managed capture on macOS is unverified.</p>
 <p><em>KeyName</em> is a keyboard key or mouse button from the <a href="../KeyList.htm">key list</a>. Returns true while that key or button is physically held on this device, otherwise false. This method takes no Mode parameter and does not read controller, wheel or toggle state. Keypad names follow the NumLock and logical Shift state shared by all keyboards, as hotkeys do.</p>
-<p>An invalid name, including a controller or wheel name, raises a <a href="Error.htm#ValueError">ValueError</a>; a value which cannot be converted to a String raises a <a href="Error.htm#TypeError">TypeError</a>. An unsupported or unavailable source, an unknown or removed device, or a descriptor from an earlier script or input-service connection raises an <a href="Error.htm#OSError">OSError</a>. Reconnecting a device does not make its old descriptor usable again. There is no aggregate-state fallback. Use <a href="GetKeyState.htm">GetKeyState(KeyName, Mode)</a> for aggregate logical, physical or toggle state.</p>
+<p>An invalid name, including a controller or wheel name, raises a <a href="Error.htm#ValueError">ValueError</a>; a value which cannot be converted to a String raises a <a href="Error.htm#TypeError">TypeError</a>. An unsupported source, unavailable state, an unknown or removed device, or a descriptor from an earlier script or input-service connection raises an <a href="Error.htm#OSError">OSError</a>. A source reset permanently invalidates that source's descriptors. There is no aggregate-state fallback. Use <a href="GetKeyState.htm">GetKeyState(KeyName, Mode)</a> for aggregate logical, physical or toggle state.</p>
 <p>Reading state does not request permission or install input hooks. A denied or expired grant raises OSError rather than reporting the key as up.</p>
+<p>Managed capture tracks physical state from reported events; state is unavailable until the first physical event for the device. A detected <a href="#HardwareId">HardwareId</a> change clears that state, but reuse of an Id cannot be detected when HardwareId is unchanged or has not yet been read. Resetting, losing or removing the capture provider invalidates its descriptors. Changing whether keyboards or mice are captured clears the affected state without invalidating descriptors. An aggregate <a href="Clr.htm#KeyStateProvider">key-state provider</a> does not supply per-device state.</p>
 
 <h2 id="OnDeviceChange">OnDeviceChange</h2>
 <pre class="Syntax">Hook := Input.<span class="func">OnDeviceChange</span>(Callback)</pre>
@@ -54,6 +55,7 @@
 <p><em>Hook</em> is the subscription, <em>Change</em> is <code class="no-highlight">"Added"</code>, <code class="no-highlight">"Removed"</code> or <code class="no-highlight">"Changed"</code>, and <em>Device</em> is an Input snapshot. A removed device retains its last-known metadata, but <a href="#GetKeyState">GetKeyState</a> cannot read its state.</p>
 <p>The current inventory is the starting point; devices already present do not produce initial Added callbacks. Notifications are coalesced and report differences between inventories, so a device connected and removed between inventories might not be reported.</p>
 <p>On Windows and macOS, arrival and removal trigger inventory refreshes; a change only to a device's name or other metadata does not. Such changes can produce Changed callbacks when a later refresh discovers them.</p>
+<p>With managed capture, native device notifications still trigger inventory refreshes and retain their platform and access requirements. Changes reported only by the provider do not trigger a refresh.</p>
 <p>Subscribing raises an <a href="Error.htm#OSError">OSError</a> when the native device-change source is unavailable or access is denied. On Linux, notifications require keysharp-input client ABI 1.1 or newer, a matching service and an existing InputMonitoring grant. Subscribing does not request permission or install keyboard or mouse input hooks.</p>
 
 <h2 id="Hooks">Hooks</h2>
@@ -67,12 +69,13 @@
 <p>The hook does not keep the script or its real thread running. A script which only waits for device changes calls <a href="Persistent.htm">Persistent</a>.</p>
 
 <h2 id="Remarks">Remarks</h2>
+<p>A <a href="Clr.htm#HookProvider">managed capture provider</a> can supply its own inventory and device IDs. Otherwise, Input.Devices lists native devices, whose descriptors cannot query the provider's state. An empty provider inventory does not fall back to native devices.</p>
 <h3 id="Windows">Windows</h3>
-<p>Lists the keyboard and mouse interfaces known to Windows Raw Input. Id contains the Raw Input device handle's value. Names and hardware identifiers come from system device metadata. VendorId and ProductId use native HID attributes when available; an ACPI identifier does not supply numeric USB vendor or product identifiers.</p>
+<p>Native enumeration lists the keyboard and mouse interfaces known to Windows Raw Input. Id contains the Raw Input device handle's value. Names and hardware identifiers come from system device metadata. VendorId and ProductId use native HID attributes when available; an ACPI identifier does not supply numeric USB vendor or product identifiers.</p>
 <h3 id="Linux">Linux</h3>
 <p>Id contains the keysharp-input device ID. Device information requires an available keysharp-input service and an existing Input Monitoring grant. Listing devices does not request a grant or initialize input forwarding. Client ABI 1.1 and a matching service can check an existing grant directly. With an older client or service, listing succeeds only if another authorized input operation has already given the current connection access to device information; otherwise it throws an OSError.</p>
 <h3 id="macOS">macOS</h3>
-<p>The implementation reads keyboard and mouse descriptions from IOKit HID services, using a supplied serial number as HardwareId. Id is 0. Runtime behavior on macOS is unverified.</p>
+<p>Native enumeration reads keyboard and mouse descriptions from IOKit HID services, using a supplied serial number as HardwareId. Id is 0. Runtime behavior on macOS is unverified.</p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExDevices">

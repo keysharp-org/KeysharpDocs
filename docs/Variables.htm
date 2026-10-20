@@ -495,7 +495,7 @@ sumfn := Sum</pre>
   </tr>
   <tr id="AhkVersion">
     <td>A_AhkVersion</td>
-    <td>Contains the AutoHotkey compatibility version targeted by the running Keysharp build, such as <code class="no-highlight">2.1-alpha.35</code>. It does not identify the Keysharp release; use <a href="#A_KsVersion">A_KsVersion</a> for that. See also: <a href="lib/_Requires.htm">#Requires</a> and <a href="lib/VerCompare.htm">VerCompare</a></td>
+    <td>Contains the AutoHotkey compatibility version targeted by the running Keysharp build, such as <code class="no-highlight">2.1-alpha.36</code>. It does not identify the Keysharp release; use <a href="#A_KsVersion">A_KsVersion</a> for that. See also: <a href="lib/_Requires.htm">#Requires</a> and <a href="lib/VerCompare.htm">VerCompare</a></td>
   </tr>
   <tr id="AhkPath">
     <td>A_AhkPath</td>
@@ -710,7 +710,7 @@ MsgBox ElapsedTime " milliseconds have elapsed."</pre>
   </tr>
   <tr id="IconHidden">
     <td>A_IconHidden</td>
-    <td>Gets or sets whether to hide the <a href="Program.htm#tray-icon">tray icon</a>. Possible values are 0 (visible) and 1 (hidden). For details, see <a href="lib/_NoTrayIcon.htm">#NoTrayIcon</a>.</td>
+    <td>Gets or sets whether to hide the <a href="Program.htm#tray-icon">tray icon</a>. Possible values are 0 (visible) and 1 (hidden). The initial value is set by the final <a href="lib/_NoTrayIcon.htm">#NoTrayIcon</a> or <a href="lib/_TrayIcon.htm">#TrayIcon</a> directive.</td>
   </tr>
   <tr id="IconTip">
     <td>A_IconTip</td>
@@ -843,7 +843,7 @@ MsgBox ElapsedTime " milliseconds have elapsed."</pre>
   </tr>
   <tr id="Language">
     <td>A_Language</td>
-    <td>The system's default language, which is one of <a href="misc/Languages.htm">these 4-digit codes</a>.</td>
+    <td>The system's default UI language as a four-digit hexadecimal string, such as <code>0409</code>. On Windows, this matches <a href="misc/Languages.htm">these language codes</a>. Linux and macOS derive the value from the system locale (unverified); custom and invariant locales may return <code>1000</code> and <code>007F</code>, respectively.</td>
   </tr>
   <tr id="ComputerName">
     <td>A_ComputerName</td>
@@ -993,7 +993,7 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
     <td><p>Contains additional information about the following events:</p>
       <ul>
         <li><a href="Hotkeys.htm#Wheel">Mouse wheel hotkeys</a> (WheelDown/Up/Left/Right)</li>
-        <li>On Linux, keyboard and mouse <a href="Hotkeys.htm">hotkeys</a>, their <a href="lib/_HotIf.htm">#HotIf</a> expressions and <a href="lib/InputHook.htm">InputHook</a> callbacks: the <a href="lib/Input.htm#EventDevice">Device</a> property describes the identified input source as an Input object, for use with <a href="lib/Input.htm#GetKeyState">Device.GetKeyState</a>. It is absent when the event has no nonzero device identifier.</li>
+        <li>For native Linux input and <a href="lib/Clr.htm#HookProvider">managed capture</a>, keyboard and mouse <a href="Hotkeys.htm">hotkeys</a>, their <a href="lib/_HotIf.htm">#HotIf</a> expressions and <a href="lib/InputHook.htm">InputHook</a> callbacks: the <a href="lib/Input.htm#EventDevice">Device</a> property describes the identified input source as an Input object, for use with <a href="lib/Input.htm#GetKeyState">Device.GetKeyState</a>. It is absent when the event has no nonzero device identifier.</li>
         <li><a href="lib/OnMessage.htm">OnMessage</a></li>
         <li><a href="lib/GuiOnMessage.htm">OnMessage (GUI)</a> <span class="ver">[v2.1-alpha.7+]</span></li>
         <li><a href="misc/RegExCallout.htm">Regular Expression Callouts</a></li>
@@ -1164,7 +1164,7 @@ VirtualHeight := <a href="lib/SysGet.htm">SysGet</a>(79)
   </tr>
   <tr id="A_NoTrayIcon">
     <td><span id="KS_A_NoTrayIcon">A_NoTrayIcon</span></td>
-    <td>Whether <code>#NoTrayIcon</code> hid the tray icon.</td>
+    <td>Read-only tray-hidden state, updated by <a href="#IconHidden">A_IconHidden</a>.</td>
   </tr>
   <tr id="A_NowMs">
     <td><span id="KS_A_NowMs">A_NowMs</span></td>

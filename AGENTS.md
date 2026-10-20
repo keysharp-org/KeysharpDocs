@@ -10,7 +10,7 @@ runs the resulting .NET assembly.
 
 This repository began as the AutoHotkeyDocs `alpha` branch with permission
 from the AutoHotkey team. Its current compatibility target is AutoHotkey
-v2.1-alpha.35. That target defines intended language semantics; it does not
+v2.1-alpha.36. That target defines intended language semantics; it does not
 prove that every feature is implemented on every Keysharp platform.
 
 Windows currently has the broadest coverage. Linux support varies between X11
@@ -39,18 +39,16 @@ Retain the independence and provenance statements in the site.
 - `Project.hhp` and `compile_chm.ahk` define the optional Windows CHM build.
 - `scripts/Test-Docs.ps1` checks required files, local links, titles, and
   branding invariants.
-- `SOURCE_OF_TRUTH.md` defines how claims are evidenced and how generated API
-  inventories must be interpreted.
 - `audits/` contains generated, internal source-to-documentation review
   queues. They are not public capability matrices.
 - `scripts/Update-SourceAudit.ps1` regenerates the host platform's global and
-  built-in class-member inventories from a compiled Keysharp runtime.
+  class-member inventories and module exports from a compiled Keysharp runtime;
+  see [Source audit](CONTRIBUTING.md#source-audit).
 - `AutoHotkeyChangeLog.htm` and `AutoHotkeyLicense.htm` are archived upstream
   pages. Do not present them as Keysharp release or license information.
 
 Also read `CONTRIBUTING.md` before semantic edits and `UPSTREAM.md` before
-porting an AutoHotkeyDocs change. Read `SOURCE_OF_TRUTH.md` before changing
-behavioral or platform claims.
+porting an AutoHotkeyDocs change.
 
 ## Source of truth
 
@@ -62,9 +60,8 @@ Use evidence in this order:
 1. A reproducible script run with the current Keysharp build on the named
    platform.
 2. Keysharp source and tests.
-3. `docs/reference.md` in the Keysharp repository. This is the maintained
-   source for current platform, implementation and compatibility notes while
-   its content is migrated into KeysharpDocs.
+3. `docs/reference.md` in the Keysharp repository, the maintained platform,
+   implementation and compatibility notes.
 4. `docs/capabilities.json` in the Keysharp repository, but only after the
    relevant row has been independently reviewed. The rendered
    `docs/capabilities.md` matrix is generated from this currently unreviewed

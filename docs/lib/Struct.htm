@@ -66,6 +66,7 @@ Obj := StructClass.<span class="func">Call</span>()</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>The address of a struct of the type defined by <em>StructClass</em>.</p>
+    <p>For a nonempty struct, addresses from 0 through 65535 are rejected. An empty struct accepts any address.</p>
   </dd>
 </dl>
 <h4 id="At_Return_Value">Return Value</h4>
@@ -73,6 +74,7 @@ Obj := StructClass.<span class="func">Call</span>()</pre>
 <h4 id="At_Remarks">Remarks</h4>
 <p><em>StructClass</em> must be a subclass of Struct.</p>
 <p>See <a href="../Structs.htm#Boxed_Pointer">Boxed Pointer</a> for further details.</p>
+<p>To create an object with a data pointer and enable its <code>__Delete</code> method, use <a href="ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a>.</p>
 </div>
 
 <h2 id="StaticProperties">Static Properties</h2>

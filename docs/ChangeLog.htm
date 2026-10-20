@@ -19,30 +19,34 @@
 <table class="info">
   <tr><th>Property</th><th>Value</th></tr>
   <tr><td>Keysharp version described here</td><td>0.0.0.18 (in development)</td></tr>
-  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.35</td></tr>
+  <tr><td>AutoHotkey compatibility target</td><td>v2.1-alpha.36</td></tr>
 </table>
 <p>See <a href="KeysharpDifferences.htm">Changes from AutoHotkey to Keysharp</a> for the differences, <a href="Platforms.htm">Platform Support</a> for per-platform availability, and the platform remarks on each affected reference page.</p>
 <p>The corresponding upstream language changes are described in <a href="v2.1-changes.htm">Changes from v2.0 to v2.1</a>.</p>
 
 <h2 id="v0.0.0.18">0.0.0.18 (in development)</h2>
-<p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.35">AutoHotkey v2.1-alpha.35</a>.</p>
+<p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.36">AutoHotkey v2.1-alpha.36</a>.</p>
 
 <h3 id="v0.0.0.18-breaking">Breaking Changes</h3>
 <ul>
   <li>Per-device input uses <a href="lib/Input.htm">Input objects</a>. Use <a href="Variables.htm#EventInfo">A_EventInfo.Device</a> in place of A_EventInfo.DeviceId, and <a href="lib/Input.htm#GetKeyState">Device.GetKeyState(KeyName)</a> in place of <code>GetKeyState(KeyName, DeviceId)</code>. The global function accepts only the L, P and T modes.</li>
   <li>In <a href="lib/_Requires.htm#CompatMode">v2.1 mode</a>, <a href="lib/Array.htm">Array</a> rejects non-integer indices with TypeError. Integer strings remain valid array indices. v2.0 mode retains Float truncation.</li>
-  <li>The Export modifier of <a href="lib/_Import.htm">#Import</a> cannot be used inside a function.</li>
+  <li>The Export modifier of <a href="lib/_Import.htm">#Import</a> cannot be used inside a function. An explicit import also conflicts with local variables and parameters declared in the same function.</li>
   <li><a href="Modules.htm#Search_Path">Module and library lookup</a> uses AhkLibPath instead of AhkImportPath, with relative entries based on the current module's root file. The module and main script directories always precede the additional import path; their Lib subdirectories always precede the additional include path. In v2.1 mode, <a href="lib/_Include.htm">#Include &lt;LibName&gt;</a> searches the source file's directory, accepts exact filenames and has no underscore fallback.</li>
   <li><a href="lib/Object.htm#DefineProp">DefineProp</a> validates its descriptor as AutoHotkey does: a descriptor naming more than one kind of property, such as Value with Pack, raises a ValueError; a Get, Set, Call or Type which is not an object is ignored instead of raising an error; and a Map's items are not read as descriptor properties.</li>
   <li><a href="lib/_Requires.htm#CompatMode">#Requires</a>: a module's compatibility mode comes from its first version directive outside functions, classes and #Include files, instead of the last one including those in #Include files. A directive applies to the function and class definitions after it, so a function above a script's first #Requires runs in v2.0 mode.</li>
   <li><code>Length</code> is defined only on <a href="lib/StructArray.htm">structured arrays</a> (<em>StructClass</em>.Array). Other structs have no inherited Length property, instead of one which raised a PropertyError when read.</li>
   <li><a href="lib/Audio.htm#Devices">Audio.Devices</a> is a property returning an Array of Audio objects. Replace <code>Audio.Devices(Kind)</code> with <code>Audio.Devices.Filter((Device) =&gt; Device.Kind == Kind)</code>. Replace <code>Audio.DefaultDevice(Kind)</code> with a filter also testing <code>Device.IsDefault</code>; the result is an Array. The <code>Audio.Device</code> type became <code>Audio</code>, including the objects returned by a resource's Device property.</li>
   <li><a href="lib/Monitor.htm#Devices">Monitor.Devices</a> replaces <code>Monitor.All</code>; use <a href="lib/MonitorGetCount.htm">MonitorGetCount()</a> for <code>Monitor.Count</code>. Replace <code>Monitor()</code> with <code>Monitor.Primary</code>, <code>Monitor(N)</code> with <code>Monitor.Devices[N]</code>, and <code>Monitor.FromId(Id)</code> with <code>Monitor.Devices.Filter((Device) =&gt; Device.Id == Id)</code>. Filtering returns an Array and preserves ambiguous matches. Refresh returns an empty string, preserving the snapshot, when the display is unavailable or its known identity cannot be verified.</li>
+  <li><a href="lib/Break.htm">Break</a> and <a href="lib/Continue.htm">Continue</a> require an enclosing loop in the same function. Invalid literal jump targets, including jumps out of <a href="lib/Finally.htm">Finally</a>, and duplicate labels are rejected when the script loads.</li>
+  <li>Use <code>break("outer")</code> instead of <code>break "outer"</code> for a quoted loop label; the same applies to <a href="lib/Continue.htm">Continue</a>. <a href="lib/Goto.htm">Goto(Name)</a> evaluates <em>Name</em> as an expression instead of treating it as a literal label.</li>
 </ul>
 
 <h3 id="v0.0.0.18-new">New</h3>
 <ul>
   <li><a href="lib/Input.htm#Devices">Input.Devices</a> returns snapshots describing the system's keyboards and mice, and <a href="lib/Input.htm#OnDeviceChange">Input.OnDeviceChange</a> subscribes to changes in that inventory. On Linux, <a href="lib/Input.htm#GetKeyState">Input.GetKeyState</a> reads one device's physical key or button state, and <a href="Variables.htm#EventInfo">A_EventInfo.Device</a> describes an identified input event's source.</li>
+  <li><a href="lib/ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a> creates an object with an external data pointer, skips its initializers and enables __Delete.</li>
+  <li><a href="lib/_Startup.htm">#Startup</a> evaluates an expression before capability checks, hotkey setup and the auto-execute section.</li>
   <li><a href="lib/Object.htm#DefinePropEnumerable">DefineProp's Enumerable</a> option hides a property from <a href="lib/Props.htm">Props</a>.</li>
   <li><a href="lib/NumGet.htm">NumGet</a> and <a href="lib/NumPut.htm">NumPut</a> accept a <a href="Structs.htm#numeric-types">numeric type class</a> such as <code>UInt32</code> as the type.</li>
   <li><a href="Structs.htm#classdef-union">Union blocks</a> define overlapping typed properties in a struct.</li>
@@ -53,7 +57,7 @@
 </ul>
 
 <h3 id="v0.0.0.18-fixes">Fixes and Performance</h3>
-<p><a href="lib/Any.htm#Base">Any.Prototype.Base</a>, and the Base of any other object which has none, reads as <em>blank-unset</em> (<code>""</code> in v2.0 mode), as in AutoHotkey. <code>a &amp; b::AltTabMenu</code> and similar <a href="Hotkeys.htm#alttab">Alt-Tab hotkeys</a> work without faulting the keyboard hook. Missing properties and no-value getters, items and calls end <a href="Variables.htm#maybe">optional chains</a> at <code>?.</code>; later accesses remain strict unless marked optional. Built-in <a href="lib/Enumerator.htm">enumerators</a> support adaptive output counts and enforce fixed counts, and Windows <a href="lib/For.htm#COM_Objects">COM enumerators</a> support callback objects. A script read from stdin (<code class="no-highlight">*</code>) is compiled by the <a href="Program.htm">compile daemon</a> like a script file, so it no longer pays a cold compile in the calling process, and its <a href="Variables.htm#ScriptName">A_ScriptName</a> is <code>*</code> rather than <code>pipestdin</code>, as in AutoHotkey.</p>
+<p><a href="lib/Any.htm#Base">Any.Prototype.Base</a> and other absent bases return <em>blank-unset</em>. <a href="Hotkeys.htm#alttab">Alt-Tab hotkeys</a> support custom combinations. Missing values at <code>?.</code> end <a href="Variables.htm#maybe">optional chains</a>. Built-in <a href="lib/Enumerator.htm">enumerators</a> validate output counts, and Windows <a href="lib/For.htm#COM_Objects">COM enumerators</a> accept callback objects. <a href="misc/Remap.htm">Remaps</a> use the startup keyboard layout and preserve held modifiers; wheel remaps send only on key-down. <a href="lib/IsLabel.htm">IsLabel</a> recognizes labels in the calling scope. Nested indexed compound assignments update the selected element. <a href="lib/_InputLevel.htm">#InputLevel</a> and related hotkey directives apply before auto-execution; <a href="Functions.htm#InitStatic">static variable initializers</a> run when first reached. Hotkey syntax and duplicate function names are validated at load time. Scripts read from stdin use the <a href="Program.htm">compile daemon</a> and report <code>*</code> as <a href="Variables.htm#ScriptName">A_ScriptName</a>. Compiling the same inputs produces identical assemblies.</p>
 
 <h2 id="v0.0.0.17">0.0.0.17</h2>
 <p>Compatibility target: <a href="https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.1-alpha.33">AutoHotkey v2.1-alpha.33</a>.</p>

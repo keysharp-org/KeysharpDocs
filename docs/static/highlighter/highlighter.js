@@ -180,7 +180,7 @@ function ctor_highlighter()
     /** Searches for declarations, formats them and replaces them with placeholders. */
     function declarations(innerHTML)
     {
-      innerHTML = innerHTML.replace(new RegExp(r.pre + '\\b(' + syn[5].join('|') + ')(?:(' + r.s + '+)(' + r.name + '.*))?' + r.suf, 'gim'), function(_, PRE, DEC, SPACE, VAL)
+      innerHTML = innerHTML.replace(new RegExp(r.pre + '\\b(' + syn[5].join('|') + ')(?:(' + r.s + '+)(' + r.name + '.*))?(?=(?=' + r.s + '*\\{)|' + r.suf + ')', 'gim'), function(_, PRE, DEC, SPACE, VAL)
       {
         var repl = wrap(DEC, 'dec', 5);
         if (VAL)
@@ -205,44 +205,22 @@ function ctor_highlighter()
         var link = index_data[syn[5].dict['class']][1];
         return PRE + ph('cfs', wrap(ACCESSOR, 'dec', link));
       });
-      // import declarations:
-      innerHTML = innerHTML.replace(new RegExp(r.pre + '\\b(import)(?:$|'
-        + '(' + r.s + '+)(' + r.name + '|(?:("|\').*?\\5)+)(?:(' + r.s + '+)(as)(' + r.s + '+)(' + r.name + '))?(?:(' + r.s + '*)(\\{[\\s\\S]+?\\}))?' + r.suf + '|'
-        + '(' + r.s + '+)(\\*|\\{[\\s\\S]+?\\})(' + r.s + '*)(from)(' + r.s + '+)(' + r.name + '|(?:("|\').*?\\9)+)' + r.suf
-        + ')', 'gim'), function(_, PRE, IMPORT,
-          SPACE11, VAL11, _, SPACE12, AS, SPACE13, VAL12, SPACE14, VAL13,
-          SPACE21, VAL21, SPACE22, FROM, SPACE23, VAL22, _)
-      {
-        var link = index_data[syn[5].dict['import']][1];
-        var repl = wrap(IMPORT, 'dec', link);
-        if (VAL11)
-        {
-          repl += SPACE11 + expressions(VAL11);
-          if (AS)
-            repl += SPACE12 + wrap(AS, 'dec', link) + SPACE13 + expressions(VAL12);
-          if (VAL13)
-            repl += SPACE14 + expressions(highlight_as(VAL13));
-        }
-        else if (FROM)
-          repl += SPACE21 + expressions(highlight_as(VAL21)) + SPACE22 + wrap(FROM, 'dec', link) + SPACE23 + expressions(VAL22);
-        return PRE + ph('dec', repl);
-
-        function highlight_as(str) {
-          return str.replace(/\bas\b/gi, function(m) { return ph('dec', wrap(m, 'dec', link)) });
-        }
-      });
       return innerHTML;
     }
     /** Searches for directives, formats them and replaces them with placeholders. */
     function directives(innerHTML)
     {
-      return innerHTML.replace(new RegExp(r.pre + '(' + syn[0].join('|') + ')\\b($|' + r.s + '|(?=' + r.cont + '))(.*?)' + r.suf, 'gim'), function(_, PRE, DIR, SEP, PARAMS)
+      return innerHTML.replace(new RegExp(r.pre + '(' + syn[0].join('|') + ')\\b($|' + r.s + '+|(?=' + r.cont + '))(.*?)' + r.suf, 'gim'), function(_, PRE, DIR, SEP, PARAMS)
       {
         var dir = DIR.toLowerCase();
         var types = index_data[syn[0].dict[dir]][3]; // parameter types
         PARAMS = param_list_to_array(PARAMS);
         PARAMS = merge_excess_params(PARAMS, types);
         PARAMS = param_array_to_list(PARAMS, types);
+        if (dir == '#import')
+          PARAMS = PARAMS.replace(/^export\b/i, function(m) {
+            return ph('dec', wrap(m, 'dec', null));
+          });
         return PRE + ph('dir', wrap(DIR, 'dir', 0) + SEP + PARAMS);
       });
     }

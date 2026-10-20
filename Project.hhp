@@ -44,6 +44,7 @@ docs\lib\_App.htm
 docs\lib\_TrayIcon.htm
 docs\lib\_CSharp.htm
 docs\lib\_Package.htm
+docs\lib\_Startup.htm
 docs\lib\Collect.htm
 docs\lib\IsComponentAvailable.htm
 docs\lib\Hex.htm
@@ -60,6 +61,7 @@ docs\lib\KeysharpDirectives.htm
 docs\lib\Lock.htm
 docs\lib\Mail.htm
 docs\lib\Overlay.htm
+docs\lib\ObjCreateWithDataPtr.htm
 docs\lib\ValidateScript.htm
 docs\lib\RealThread.htm
 docs\lib\RegExCs.htm

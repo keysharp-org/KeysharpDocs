@@ -42,7 +42,11 @@
 <p>Type: <a href="../Concepts.htm#boolean">Integer (boolean)</a></p>
 <p>This function returns 0 (false) if the function timed out or 1 (true) otherwise.</p>
 
+<h2 id="Error_Handling">Error Handling</h2>
+<p>Unexpected managed exceptions from a registered <a href="Clr.htm#KeyStateProvider">managed key-state provider</a> raise an <a href="Error.htm#OSError">OSError</a>.</p>
+
 <h2 id="Remarks">Remarks</h2>
+<p>Each keyboard or mouse-button state query uses the currently registered <a href="Clr.htm#KeyStateProvider">managed key-state provider</a>, if any. Unhandled queries use the native behavior described below. Controller buttons always use native services.</p>
 <p>The physical state of a key or mouse button will usually be the same as the logical state unless the keyboard and/or mouse hooks are installed, in which case it will accurately reflect whether or not the user is physically holding down the key. You can determine if your script is using the hooks via the <a href="KeyHistory.htm">KeyHistory</a> function or menu item. You can force either or both of the hooks to be installed by adding the <a href="InstallKeybdHook.htm">InstallKeybdHook</a> and <a href="InstallMouseHook.htm">InstallMouseHook</a> functions to the script.</p>
 <p>While the function is in a waiting state, new <a href="../misc/Threads.htm">threads</a> can be launched via <a href="../Hotkeys.htm">hotkey</a>, <a href="Menu.htm">custom menu item</a>, or <a href="SetTimer.htm">timer</a>.</p>
 <p>To wait for two or more keys to be released, use KeyWait consecutively. For example:</p>
