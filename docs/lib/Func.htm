@@ -131,6 +131,7 @@ FuncObj.<span class="func">Call</span>(Param1, Param2, ...)</pre>
 <div class="methodShort" id="IsBuiltIn"><h3>IsBuiltIn</h3>
 <p>Gets 1 (true) if the function is <a href="../Functions.htm#BuiltIn">built-in</a>, otherwise 0 (false).</p>
 <pre class="Syntax">Boolean := FuncObj.<span class="func">IsBuiltIn</span></pre>
+<p>A <a href="../misc/Functor.htm#BoundFunc">BoundFunc</a> always returns 0, even when its target is built-in and no arguments were bound.</p>
 </div>
 
 <div class="methodShort" id="IsVariadic"><h3>IsVariadic</h3>
