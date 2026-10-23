@@ -105,7 +105,7 @@
 <p>A compiled executable normally runs its embedded script. Pass <code class="no-highlight">--script</code> and a source-script path to run that script in place of the embedded one; remaining arguments are passed to the selected script.</p>
 
 <h2 id="tray-icon">Running Scripts and the Tray</h2>
-<p>On supported desktop platforms, a persistent script can expose a notification-area icon and menu. Functions such as <a href="lib/Pause.htm">Pause</a>, <a href="lib/Suspend.htm">Suspend</a>, <a href="lib/Reload.htm">Reload</a>, and <a href="lib/ExitApp.htm">ExitApp</a> control the running script.</p>
+<p>On supported desktop platforms, a persistent script can expose a notification-area icon and menu. The icon appears 300 milliseconds after the auto-execute section starts, so a script which ends sooner shows none; <a href="lib/TraySetIcon.htm">TraySetIcon</a>, <a href="lib/TrayTip.htm">TrayTip</a>, <a href="lib/Suspend.htm">Suspend</a>, <a href="Variables.htm#IconTip">A_IconTip</a> and <a href="Variables.htm#IconHidden">A_IconHidden</a> show it at once. Functions such as <a href="lib/Pause.htm">Pause</a>, <a href="lib/Suspend.htm">Suspend</a>, <a href="lib/Reload.htm">Reload</a>, and <a href="lib/ExitApp.htm">ExitApp</a> control the running script.</p>
 <p>The standard menu includes Help, Window Spy, Reload Script, Edit Script, Suspend Hotkeys, Pause Script and Exit. On Windows, Help opens the Keysharp project repository; on Linux and macOS, it opens the issue tracker. On Linux and macOS it also includes an Accessibility Spy item.</p>
 
 <h2 id="main-window">The Script Main Window</h2>
