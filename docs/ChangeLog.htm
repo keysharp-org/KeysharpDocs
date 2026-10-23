@@ -40,6 +40,7 @@
   <li><a href="lib/Monitor.htm#Devices">Monitor.Devices</a> replaces <code>Monitor.All</code>; use <a href="lib/MonitorGetCount.htm">MonitorGetCount()</a> for <code>Monitor.Count</code>. Replace <code>Monitor()</code> with <code>Monitor.Primary</code>, <code>Monitor(N)</code> with <code>Monitor.Devices[N]</code>, and <code>Monitor.FromId(Id)</code> with <code>Monitor.Devices.Filter((Device) =&gt; Device.Id == Id)</code>. Filtering returns an Array and preserves ambiguous matches. Refresh returns an empty string, preserving the snapshot, when the display is unavailable or its known identity cannot be verified.</li>
   <li><a href="lib/Break.htm">Break</a> and <a href="lib/Continue.htm">Continue</a> require an enclosing loop in the same function. Invalid literal jump targets, including jumps out of <a href="lib/Finally.htm">Finally</a>, and duplicate labels are rejected when the script loads.</li>
   <li>Use <code>break("outer")</code> instead of <code>break "outer"</code> for a quoted loop label; the same applies to <a href="lib/Continue.htm">Continue</a>. <a href="lib/Goto.htm">Goto(Name)</a> evaluates <em>Name</em> as an expression instead of treating it as a literal label.</li>
+  <li>On Windows, a running <code>.cks</code> is locked: close the script before <a href="Program.htm#cmd">compiling</a> or copying over it.</li>
 </ul>
 
 <h3 id="v0.0.0.18-new">New</h3>
