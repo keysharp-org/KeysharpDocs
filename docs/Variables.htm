@@ -460,6 +460,7 @@ sumfn := Sum</pre>
     <td>A_ScriptName</td>
     <td>
       <p>Gets or sets the default title for <a href="lib/MsgBox.htm">MsgBox</a>, <a href="lib/InputBox.htm">InputBox</a>, <a href="lib/FileSelect.htm">FileSelect</a>, <a href="lib/DirSelect.htm">DirSelect</a> and <a href="lib/Gui.htm">Gui</a>. If not set by the script, it defaults to the file name of the current script, without its path, e.g. MyScript.ahk.</p>
+      <p>Assign a custom title with <code>A_ScriptName := "My Application"</code>. This affects subsequent dialogs and newly created GUI windows which use the default title. It does not rename the script file or change <a href="#ScriptDir">A_ScriptDir</a>, <a href="#ScriptFullPath">A_ScriptFullPath</a> or the default <a href="#IconTip">tray tooltip</a>.</p>
       <p>If the script text is <a href="Scripts.htm#stdin">read from stdin</a> rather than from file, this variable contains an asterisk (*).</p>
       <p>If the script is <a href="Scripts.htm#ahk2exe">compiled</a> or <a href="Program.htm#embedded-scripts">embedded</a>, this is the name of the current executable file.</p>
     </td>
