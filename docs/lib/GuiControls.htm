@@ -213,6 +213,7 @@ MyGui.Show("h70")</pre>
     <p><strong>Class</strong><em>Name</em>: Specify for <em>Name</em> the Win32 class name of the desired control. For example, <code class="no-highlight">ClassComboBoxEx32</code> which adds a <a href="https://learn.microsoft.com/windows/win32/controls/comboboxex-control-reference">ComboBoxEx control</a>, or <code class="no-highlight">ClassScintilla</code> which adds a <a href="https://scintilla.org/">Scintilla control</a> (note that the SciLexer.dll library must be loaded beforehand).</p>
     <p><strong>W</strong><em>n</em>: Sets the width of the control. For example, specifying <code class="no-highlight">w400</code> would make the control 400 pixels wide. If omitted, the default is 30 times the current font size.</p>
     <p><strong>R</strong><em>n</em> or <strong>H</strong><em>n</em>: Sets the height of the control. For example, specifying <code class="no-highlight">r7</code> would make room for 7 rows inside the control, while <code class="no-highlight">h400</code> would set the total height of the control to 400 pixels. If both R and H are omitted, the default is 5 rows.</p>
+    <p>Custom controls do not have the WS_CLIPSIBLINGS style by default. Include <code class="no-highlight">+0x04000000</code> in <em>Options</em> to enable it.</p>
   </dd>
   <dt>Text</dt>
   <dd>

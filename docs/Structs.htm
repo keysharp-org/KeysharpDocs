@@ -34,6 +34,7 @@
 }</pre>
 <p>A struct class can be instantiated the normal way, by calling it:</p>
 <pre>im := LVINSERTMARK()</pre>
+<p>The inherited <a href="lib/Struct.htm#__New">__New</a> constructor also accepts one value per typed field: <code>pt := POINT(10, 20)</code> initializes both coordinates.</p>
 <p>As structs often come from external sources, an address can be converted to a reference to a struct by calling the <a href="lib/Struct.htm#At">At</a> method.</p>
 <p>Fields defined by a subclass are always placed after fields defined by the base class. For example, when class StructB extends StructA, the layout is the same as if StructB extends Object but begins with a nested StructA. However, inherited properties are accessed directly, not through a nested struct.</p>
 <p><a href="lib/_StructPack.htm">#StructPack</a> can be used to override the default alignment of fields within the struct.</p>

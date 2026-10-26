@@ -96,7 +96,7 @@ MyGui := Gui.<span class="func">Call</span>(<span class="optional">Options, Titl
   <dt>Title</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>If blank, it defaults to <a href="../Variables.htm#ScriptName">A_ScriptName</a>. In the current implementation, an omitted Title creates an untitled window; AutoHotkey instead uses A_ScriptName. Otherwise, specify the window title. To clear the title after construction, set <a href="#Title">Title</a> to an empty string.</p>
+    <p>If omitted, it defaults to <a href="../Variables.htm#ScriptName">A_ScriptName</a>. Otherwise, specify the window title.</p>
   </dd>
   <dt id="EventObj">EventObj</dt>
   <dd>
@@ -436,8 +436,7 @@ MyGui.Show()</pre>
 MyGui.Opt("+Owner")  <em>; Make the GUI owned by the <a href="../Variables.htm#ScriptHwnd">script's main window</a> to prevent display of a taskbar button.</em></pre>
     <p><code class="no-highlight">+Owner</code> can be immediately followed by the <a href="../misc/WinTitle.htm#ahk_id">HWND</a> of any top-level window.</p>
     <p>To prevent the user from interacting with the owner while one of its owned window is visible, disable the owner via <code>MyGui.Opt("+Disabled")</code>. Later (when the time comes to cancel or destroy the owned window), re-enable the owner via <code>MyGui.Opt("-Disabled")</code>. Do this prior to cancel/destroy so that the owner will be reactivated automatically.</p>
-    <p id="Parent"><strong>Parent:</strong> In AutoHotkey, <code class="no-highlight">+Parent</code> followed by a <a href="../misc/WinTitle.htm#ahk_id">HWND</a> places the GUI inside that window or control, and <code class="no-highlight">-Parent</code> makes it a top-level window. In Keysharp, +Parent currently behaves as <a href="#Owner">+Owner</a>, and -Parent has no effect.</p>
-    <p>Known limitations:</p>
+    <p id="Parent"><strong>Parent:</strong> Use <code class="no-highlight">+Parent</code> immediately followed by the <a href="../misc/WinTitle.htm#ahk_id">HWND</a> of any window or control to use it as the parent of this window. To convert the GUI back into a top-level window, use <code class="no-highlight">-Parent</code>. This option works even after the window is created. On Linux and macOS, <code class="no-highlight">+Parent</code> and <code class="no-highlight">-Parent</code> act as <a href="#Owner">+Owner</a> and -Owner. Known limitations:</p>
     <ul>
       <li><a href="../Program.htm#Installer_uiAccess">Running with UI access</a> prevents the <code class="no-highlight">+Parent</code> option from working on an existing window if the new parent is always-on-top and the child window is not.</li>
       <li>Navigating into and out of the child GUI with the Tab key requires the <code class="no-highlight">+E0x00010000</code> option (WS_EX_CONTROLPARENT).</li>
@@ -593,7 +592,7 @@ MyGui.Show()</pre>
     <p><strong>NoActivate:</strong> Unminimizes or unmaximizes the window, if necessary. The window is also shown without activating it.</p>
     <p><strong>NA:</strong> Shows the window without activating it. If the window is minimized, it will stay that way but will probably rise higher in the z-order (which is the order seen in the alt-tab selector). If the window was previously hidden, this will probably cause it to appear on top of the active window even though the active window is not deactivated.</p>
     <p><strong>Hide:</strong> Hides the window and activates the one beneath it. This is identical in function to <a href="#Hide">Gui.Hide</a> except that it allows a hidden window to be moved or resized without showing it. For example: <code>MyGui.Show("Hide x55 y66 w300 h200")</code>.</p>
-    <p>A later Show call can resize an omitted W or H dimension to fit the controls. Specify both dimensions when the existing size must be preserved.</p>
+    <p>W and H apply only to the current Show call. On later calls, an omitted dimension keeps its current size, including after <code>Show("Hide")</code>, <a href="#Move">Gui.Move</a>, or a native resize. Use <a href="#AutoSize">AutoSize</a> to resize the window to fit its controls again.</p>
   </dd>
 </dl>
 </div>
@@ -1255,7 +1254,7 @@ ShowRefCycleGui(*) {
     ; reference cycle (using the same name prevents accidental capture).
     ; However, Hide() doesn't break the *other* reference cycles.</em>
     g.OnEvent("Escape", (g, *) =&gt; g.Hide())
-    <em>; Capturing the variable can work out in our favour.</em>
+    <em>; Capturing the variable can work out in our favor.</em>
     g.OnEvent("Close", (*) =&gt; g := unset)
     g.Show("w300 h200")
     <em>; __Delete is not called due to the reference cycle:

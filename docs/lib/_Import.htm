@@ -26,6 +26,7 @@
   <dd>
     <p>A module name, path or resource specifier. It must be either a valid <a href="../Concepts.htm#names">identifier</a> or a <a href="../Language.htm#strings">literal string</a>, but either syntax can be used when importing a module defined by <a href="_Module.htm">#Module</a> or a file.</p>
     <p>Paths can be absolute or relative to any of the <a href="../Modules.htm#Search_Path">search directories</a>.</p>
+    <p>On Windows, an explicit local named-pipe path (<code class="no-highlight">\\.\pipe\Name</code>) loads module source from the pipe.</p>
     <p>To load an <a href="../Program.htm#embedded-scripts">embedded script</a> as a module, specify an asterisk followed by the resource name. For example: <code>"*RESNAME"</code>.</p>
     <p><span class="ver">[v2.1-alpha.21+]</span>: To import a <a href="_Module.htm">sub-module</a> from a different group, use a path-qualified name of the form "Path:ModuleName". <em>Path</em> should identify the main module of the group, which is either the script itself or a file imported by #Import.</p>
     <p>Omit <em>Path</em> to select a module in the current group, as in <code>":ModuleName"</code>. The name <code>__Init</code> selects the group's initial module; <code>__Main</code> selects the main script module.</p>

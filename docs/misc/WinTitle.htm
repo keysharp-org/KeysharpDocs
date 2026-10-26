@@ -16,7 +16,7 @@
 
 <h2 id="toc">Table of Contents</h2>
 <ul>
-  <li><a href="#WinTitle">Window Title &amp; Matching Behaviour</a></li>
+  <li><a href="#WinTitle">Window Title &amp; Matching Behavior</a></li>
   <li><a href="#ActiveWindow">A (Active Window)</a></li>
   <li><a href="#ahk_">ahk_ Criteria</a>
     <ul>
@@ -35,7 +35,7 @@
 </ul>
 
 <a id="Matching"></a>
-<h2 id="WinTitle">Window Title &amp; Matching Behaviour</h2>
+<h2 id="WinTitle">Window Title &amp; Matching Behavior</h2>
 <p>Specify any string for <var>WinTitle</var> to identify a window by its title. The title of a window is often visible as text in a title bar at the top of the window. If invisible or only partially visible, the full window title can be revealed via <a href="../lib/WinGetTitle.htm">WinGetTitle</a> or <a href="../Program.htm#Window_Spy">Window Spy</a>.</p>
 <p>The following example activates the calculator:</p>
 <pre>WinActivate "Calculator"</pre>
@@ -179,7 +179,7 @@ else
 }</pre>
 
 <h2 id="Performance">Performance</h2>
-<p class="note"><strong>Note:</strong> The following details are for the purpose of guiding optimizations, and are not to be taken as guarantees of future behaviour.</p>
+<p class="note"><strong>Note:</strong> The following details are for the purpose of guiding optimizations, and are not to be taken as guarantees of future behavior.</p>
 <p>With some exceptions, a window is generally located by enumerating all top-level windows and evaluating the criteria specified by <var>WinTitle</var> and other parameters against each candidate window. This process generally does not cause a perceptible delay, but can affect the performance of scripts. The following factors affect the cost of enumeration:</p>
 <ul>
   <li>The number of top-level windows currently in existence, regardless of other factors. This is inherent to the <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-enumwindows">EnumWindows</a> function, which most likely creates an internal list of windows in Z order before beginning enumeration.</li>

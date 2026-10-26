@@ -23,6 +23,7 @@ Result := <span class="func" id="CompileScript">CompileScript</span>(Code)</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>Either the path of a script file or the script source itself. If a file of that name exists it is checked, otherwise the value is checked as source.</p>
+    <p>On Windows, a local named-pipe path (<code class="no-highlight">\\.\pipe\Name</code>) reads the source to check from the pipe.</p>
   </dd>
 </dl>
 

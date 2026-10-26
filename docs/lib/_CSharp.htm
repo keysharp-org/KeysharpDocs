@@ -33,6 +33,7 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>Reads the C# from a file instead of from a block.</p>
+    <p>On Windows, an explicit local named-pipe path (<code class="no-highlight">\\.\pipe\Name</code>) reads the C# source from the pipe.</p>
     <p>A relative path is searched for along the <a href="../Modules.htm#Search_Path">module search path</a>, beginning with the directory of the file containing the directive. <code class="no-highlight">%A_ScriptDir%</code>-style path variables expand here as they do in an #Include path.</p>
     <p>The path is used as written; no extension is appended. The file contains members for the directive's scope, not a standalone namespace or containing class. This parameter is not an expression.</p>
   </dd>

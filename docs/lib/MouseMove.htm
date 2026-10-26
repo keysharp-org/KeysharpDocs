@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>MouseMove - Syntax &amp; Usage | Keysharp</title>
-<meta name="description" content="The MouseMove function moves the mouse cursor." />
+<meta name="description" content="The MouseMove function moves the mouse cursor or sends native relative input deltas." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="../static/theme.css" rel="stylesheet" />
@@ -13,7 +13,7 @@
 
 <h1>MouseMove</h1>
 
-<p>Moves the mouse cursor.</p>
+<p>Moves the mouse cursor or sends native relative input deltas.</p>
 
 <pre class="Syntax"><span class="func">MouseMove</span> X, Y <span class="optional">, Speed, Relative</span></pre>
 <h2 id="Parameters">Parameters</h2>
@@ -23,32 +23,47 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>The X and Y coordinates to move the mouse to. Coordinates are relative to the active window's client area unless <a href="CoordMode.htm">CoordMode</a> was used to change that.</p>
+    <p>With <em>Relative</em> set to <code>"D"</code>, these are native input deltas; <a href="CoordMode.htm">CoordMode</a> has no effect.</p>
   </dd>
 
   <dt>Speed</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>If omitted, the default speed (as set by <a href="SetDefaultMouseSpeed.htm">SetDefaultMouseSpeed</a> or 2 otherwise) will be used. Otherwise, specify the speed to move the mouse in the range 0 (fastest) to 100 (slowest). A speed of 0 will move the mouse instantly.</p>
+    <p><em>Speed</em> is ignored when <em>Relative</em> is <code>"D"</code> or <code>"Delta"</code>; one instantaneous movement report is sent.</p>
     <p><em>Speed</em> is ignored for the modes <a href="SendMode.htm#Input">SendInput</a> and <a href="SendMode.htm#Play">SendPlay</a>; they move the mouse instantaneously (though <a href="SetMouseDelay.htm">SetMouseDelay</a> has a mode that applies to SendPlay). To visually move the mouse more slowly -- such as a script that performs a demonstration for an audience -- use <code><a href="Send.htm#Click">SendEvent "{Click 100 200}"</a></code> or <code><a href="SendMode.htm">SendMode</a> "Event"</code> (optionally in conjuction with <a href="BlockInput.htm">BlockInput</a>).</p>
   </dd>
 
   <dt>Relative</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
-    <p>If blank or omitted, the X and Y coordinates will be used for absolute positioning. Otherwise, specify the following letter:</p>
-    <p><strong>R:</strong> The X and Y coordinates will be treated as offsets from the current mouse position. In other words, the cursor will be moved from its current position by X pixels to the right (left if negative) and Y pixels down (up if negative).</p>
+    <p>If blank or omitted, the X and Y coordinates will be used for absolute positioning. Otherwise, specify one of the following options. Only the first letter is used, and it is case-insensitive.</p>
+    <p><strong>R or Relative:</strong> The X and Y coordinates will be treated as offsets from the current mouse position. In other words, the cursor will be moved from its current position by X pixels to the right (left if negative) and Y pixels down (up if negative).</p>
+    <p id="Delta"><strong>D or Delta:</strong> Sends X and Y directly as native relative input deltas, with positive values for right and down. This Keysharp extension is intended for applications which consume relative motion, such as a game's camera controls. The deltas are independent of the cursor's position. Do not combine it with <code>R</code>.</p>
+    <p>With native sending, Delta units depend on the platform: Windows uses mickeys, Linux uses relative device counts through <code>keysharp-input</code>, and macOS uses Quartz event deltas. In Play mode, a registered <a href="Clr.htm#SenderProvider">sender provider</a> receives X and Y unchanged as signed relative input counts. These do not imply a fixed number of pixels, physical distance or camera angle. Pointer acceleration and application sensitivity can affect the result. Acceptance by a particular application, including games which use raw input, must be verified; synthetic input is not guaranteed to be equivalent to hardware input.</p>
   </dd>
 
 </dl>
 
+<h2 id="Error_Handling">Error Handling</h2>
+<p>Delta mode supports <a href="SendMode.htm#Event">Event</a> and <a href="SendMode.htm#Input">Input</a> sending, and <a href="SendMode.htm#Play">Play</a> through a registered <a href="Clr.htm#SenderProvider">sender provider</a>. Play without a sender provider raises an <a href="Error.htm">UnsupportedError</a>, including when <a href="SendMode.htm#InputThenPlay">InputThenPlay</a> falls back to Play. The usual input-control permissions still apply.</p>
+
 <h2 id="Remarks">Remarks</h2>
 <p>This function uses the sending method set by <a href="SendMode.htm">SendMode</a>.</p>
+<p>With a <a href="Clr.htm#SenderProvider">sender provider</a> in Play mode, <code>R</code> remains a pixel offset and is converted to an absolute destination. <code>D</code> reaches the provider as relative input counts without absolute-position flags.</p>
 <p>The <a href="SendMode.htm#Play">SendPlay mode</a> is able to successfully generate mouse events  in a broader variety of games than the other modes. In addition, some applications and games may have trouble  tracking the mouse if it moves too quickly. The <em>Speed</em> parameter or <a href="SetDefaultMouseSpeed.htm">SetDefaultMouseSpeed</a> can be used to reduce the speed (in <a href="SendMode.htm#Event">SendEvent mode</a> only).</p>
 <p>The <a href="BlockInput.htm">BlockInput</a> function can be used to prevent any physical mouse activity by the user from disrupting the simulated mouse events produced by the mouse functions. However, this is generally not needed for the modes <a href="SendMode.htm#Input">SendInput</a> and <a href="SendMode.htm#Play">SendPlay</a> because they automatically postpone the user's physical mouse activity until afterward.</p>
 <p>There is an automatic delay after every movement of the mouse (except for <a href="SendMode.htm#Input">SendInput mode</a>). Use <a href="SetMouseDelay.htm">SetMouseDelay</a> to change the length of the delay.</p>
 <p>The following is an alternate way to move the mouse cursor that may work better in certain multi-monitor configurations:</p>
 <pre><a href="DllCall.htm">DllCall</a>("SetCursorPos", "int", 100, "int", 400)  <em>; The first number is the X-coordinate and the second is the Y (relative to the screen).</em></pre>
 <p>On a related note, the mouse cursor can be temporarily hidden via the <a href="DllCall.htm#ExHideCursor">hide-cursor example</a>.</p>
+
+<h3 id="Linux">Linux</h3>
+<p>With native sending, relative (<code>R</code>) movement can use compositor-relative units or native device counts, depending on the active backend. Native Delta (<code>D</code>) mode sends device counts through <code>keysharp-input</code> and requires that service and InputControl permission. Delta-mode delivery to applications has not been verified on Linux. See <a href="../Platforms.htm#Linux">Linux Platform Support</a> for installation and permissions.</p>
+
+<h3 id="macOS">macOS</h3>
+<p>Mouse input requires Accessibility permission. With native sending, Delta mode preserves the requested Quartz event deltas even when the cursor position is clamped at a desktop boundary. Delta-mode delivery to applications has not been verified on macOS. See <a href="../Platforms.htm#macOS_Permissions">macOS Permissions</a>.</p>
+
 <h2 id="Related">Related</h2>
 <p><a href="CoordMode.htm">CoordMode</a>, <a href="SendMode.htm">SendMode</a>, <a href="SetDefaultMouseSpeed.htm">SetDefaultMouseSpeed</a>, <a href="SetMouseDelay.htm">SetMouseDelay</a>, <a href="Click.htm">Click</a>, <a href="MouseClick.htm">MouseClick</a>, <a href="MouseClickDrag.htm">MouseClickDrag</a>, <a href="MouseGetPos.htm">MouseGetPos</a>, <a href="BlockInput.htm">BlockInput</a></p>
 <h2 id="Examples">Examples</h2>
@@ -60,6 +75,12 @@
 <div class="ex" id="ExAdvanced">
 <p><a class="ex_number" href="#ExAdvanced"></a> Moves the mouse cursor slowly (speed 50 vs. 2) by 20 pixels to the right and 30 pixels down from its current location.</p>
 <pre>MouseMove 20, 30, 50, "R"</pre>
+</div>
+
+<div class="ex" id="ExDelta">
+<p><a class="ex_number" href="#ExDelta"></a> Sends one relative motion report with 20 units to the right and 5 units up. On Linux this requires <code>keysharp-input</code> and InputControl permission; on macOS it requires Accessibility permission. The effect depends on the target application and its sensitivity.</p>
+<pre>SendMode "Input"
+MouseMove 20, -5, 0, "D"</pre>
 </div>
 
 </body>

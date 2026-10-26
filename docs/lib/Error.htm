@@ -202,12 +202,10 @@ throw ValueError("This value is not 42", -1, 41)
       <li id="PropertyError"><strong>PropertyError</strong></li>
       <li id="MethodError"><strong>MethodError</strong></li>
     </ul></li>
-    <li id="UnsetItemError"><strong>UnsetItemError</strong></li>
+    <li id="UnsetItemError"><strong>UnsetItemError:</strong> Also raised when <a href="Clr.htm">Clr</a> or <a href="_CSharp.htm">#CSharp</a> code throws a .NET <code>KeyNotFoundException</code>.</li>
   </ul></li>
   <li id="ValueError"><strong>ValueError:</strong> An unexpected value was used as input for a function, property assignment, or some other operation. Usually <strong>Message</strong> indicates which expectation was broken, and <strong>Extra</strong> contains a string representing the errant value.<ul>
-    <li id="IndexError"><strong>IndexError:</strong> The index parameter of an object's <a href="../Objects.htm#__Item">__Item property</a> was invalid or out of range.<ul>
-      <li id="KeyError"><strong>KeyError:</strong> <a href="Clr.htm">Clr</a> or <a href="_CSharp.htm">#CSharp</a> code threw a .NET <code>KeyNotFoundException</code>. This subclass is a Keysharp addition.</li>
-    </ul></li>
+    <li id="IndexError"><strong>IndexError:</strong> The index parameter of an object's <a href="../Objects.htm#__Item">__Item property</a> was invalid or out of range.</li>
   </ul></li>
   <li id="ZeroDivisionError"><strong>ZeroDivisionError:</strong> Division by zero was attempted in an expression or with the Mod function.</li>
 </ul>

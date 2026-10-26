@@ -30,6 +30,7 @@ docs\static\source\data_search.js
 docs\static\source\data_toc.js
 docs\static\source\data_index.js
 docs\static\source\data_deprecate.js
+docs\static\source\data_syntax.js
 docs\static\source\data_docs.js
 docs\KeysharpDifferences.htm
 docs\Platforms.htm

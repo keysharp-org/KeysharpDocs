@@ -31,7 +31,7 @@ ul.list_of_p li { margin: 1em 0; }
 <p>See <a href="ObjList.htm">Built-in Classes</a> for a list of standard object types. There are two fundamental types:</p>
 <ul>
   <li><strong>AutoHotkey objects</strong> are instances of the <a href="lib/Object.htm">Object</a> class. These support ad hoc properties, and have methods for discovering which properties exist. <a href="lib/Array.htm">Array</a>, <a href="lib/Map.htm">Map</a> and all user defined and built-in classes are derived from Object.</li>
-  <li><strong>COM objects</strong> such as those created by <a href="lib/ComObject.htm">ComObject</a>. These are implemented by external libraries, so often differ in behaviour to AutoHotkey objects. ComObject typically represents a COM or "Automation" object implementing the <a href="https://learn.microsoft.com/windows/win32/api/oaidl/nn-oaidl-idispatch">IDispatch interface</a>, but is also used to <a href="lib/ComValue.htm">wrap values of specific types</a> to be passed to COM objects and functions.</li>
+  <li><strong>COM objects</strong> such as those created by <a href="lib/ComObject.htm">ComObject</a>. These are implemented by external libraries, so often differ in behavior to AutoHotkey objects. ComObject typically represents a COM or "Automation" object implementing the <a href="https://learn.microsoft.com/windows/win32/api/oaidl/nn-oaidl-idispatch">IDispatch interface</a>, but is also used to <a href="lib/ComValue.htm">wrap values of specific types</a> to be passed to COM objects and functions.</li>
 </ul>
 
 <h2 id="toc">Table of Contents</h2>
@@ -137,11 +137,13 @@ For value in MyArray
 <pre>ReturnValue := MyObject.Method(Parameters)</pre>
 <p>Call a property/method where the name is determined by evaluating an expression or variable:</p>
 <pre>ReturnValue := MyObject.%Expression%(Parameters)</pre>
+<p>If a property getter returns <a href="Language.htm#unset">unset</a> when its result must be called, as in <code>MyObject.Property()</code>, an <a href="lib/Error.htm#UnsetError">UnsetError</a> is raised with the message <code class="no-highlight">No value was returned.</code> and the property name in <em>Extra</em>.</p>
 <p>Sometimes parameters are accepted when retrieving or assigning properties:</p>
 <pre>Value := MyObject.Property[Parameters]
 MyObject.Property[Parameters] := Value</pre>
 <p>If a property getter returns <a href="Language.htm#unset">unset</a> when its result must be indexed, as in <code>MyObject.Property[Index]</code>, an <a href="lib/Error.htm#UnsetError">UnsetError</a> is raised with the message <code class="no-highlight">No value was returned.</code> and the property name in <em>Extra</em>. This applies to both retrieval and assignment, including a retrieval followed by <code>??</code>.</p>
 <p>An object may also support indexing: <code>MyArray[Index]</code> actually invokes the <a href="#__Item">__Item</a> property of <code>MyArray</code>, passing <code>Index</code> as a parameter.</p>
+<p>Indexing a declared or built-in method, such as <code>MyObject.Method[Index]</code>, indexes the method's function object. This normally raises <a href="lib/Error.htm#PropertyError">PropertyError</a>, because function objects have no __Item property.</p>
 
 <h3 id="object-literal">Object Literal</h3>
 <p>An object literal can be used within an <a href="Language.htm#expressions">expression</a> to create an improvised object. An object literal consists of a pair of braces (<code>{}</code>) enclosing a list of comma-delimited name-value pairs. Each pair consists of a literal (unquoted) <a href="Concepts.htm#names">property name</a> and a value (sub-expression) separated by a colon (<code>:</code>).  For example:</p>
@@ -350,9 +352,9 @@ class NestedClass
 }
 </pre>
 <p>Nesting a class does not imply any particular relationship to the outer class. The nested class is not instantiated automatically, nor do instances of the nested class have any connection with an instance of the outer class, unless the script explicitly makes that connection.</p>
-<p>Each nested class definition produces a dynamic property with <em>get</em> and <em>call</em> accessor functions instead of a simple value property. This is to support the following behaviour (where class X contains the nested class Y):</p>
+<p>Each nested class definition produces a dynamic property with <em>get</em> and <em>call</em> accessor functions instead of a simple value property. This is to support the following behavior (where class X contains the nested class Y):</p>
 <ul>
-<li><code>X.Y()</code> does not pass X to <code>X.Y.Call</code> and ultimately <code class="no-highlight">__New</code>, which would otherwise happen because this is the normal behaviour for function objects called as methods (which is how the nested class is being used here).</li>
+<li><code>X.Y()</code> does not pass X to <code>X.Y.Call</code> and ultimately <code class="no-highlight">__New</code>, which would otherwise happen because this is the normal behavior for function objects called as methods (which is how the nested class is being used here).</li>
 <li><code>X.Y := 1</code> is an error by default (the property is read-only).</li>
 <li>Referring to or calling the class for the first time causes it to be initialized.</li>
 </ul>

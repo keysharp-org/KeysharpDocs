@@ -37,6 +37,7 @@
   </li>
   <li><a href="#Methods">Methods</a>:
     <ul>
+      <li><a href="#__New">__New</a>: Initializes typed fields from positional values.</li>
       <li><a href="#__Ref">__Ref</a>: Retrieves a nested struct or virtual reference to a property.</li>
     </ul>
   </li>
@@ -52,9 +53,10 @@
 
 <div class="methodShort" id="Call"><h3>Call</h3>
 <p>Creates a new Struct.</p>
-<pre class="Syntax">Obj := StructClass()
-Obj := StructClass.<span class="func">Call</span>()</pre>
+<pre class="Syntax">Obj := StructClass(<span class="optional">FieldValues*</span>)
+Obj := StructClass.<span class="func">Call</span>(<span class="optional">FieldValues*</span>)</pre>
 <p><em>StructClass</em> must be a subclass of Struct. Subclasses can be created by a <a href="../Structs.htm#classdef">struct definition</a> or <a href="../Structs.htm#defprop">at runtime</a>.</p>
+<p>Arguments are passed to <a href="#__New">__New</a>.</p>
 </div>
 
 <div class="methodShort" id="At"><h3>At</h3>
@@ -72,7 +74,7 @@ Obj := StructClass.<span class="func">Call</span>()</pre>
 <h4 id="At_Return_Value">Return Value</h4>
 <p>Type: <a href="../Concepts.htm#objects">Object</a></p>
 <h4 id="At_Remarks">Remarks</h4>
-<p><em>StructClass</em> must be a subclass of Struct.</p>
+<p><em>StructClass</em> can be Struct itself or a subclass.</p>
 <p>See <a href="../Structs.htm#Boxed_Pointer">Boxed Pointer</a> for further details.</p>
 <p>To create an object with a data pointer and enable its <code>__Delete</code> method, use <a href="ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a>.</p>
 </div>
@@ -112,6 +114,21 @@ ArrayClass := StructClass.<span class="func">__Item</span>[Length]</pre>
 </div>
 
 <h2 id="Methods">Methods</h2>
+
+<div class="methodShort" id="__New"><h3>__New</h3>
+<p>Initializes typed fields from positional values.</p>
+<pre class="Syntax">Obj.<span class="func">__New</span>(<span class="optional">FieldValues*</span>)</pre>
+<h4 id="__New_Parameters">Parameters</h4>
+<dl>
+  <dt>FieldValues</dt>
+  <dd>
+    <p>Values for every typed field in declaration order, including inherited fields first. If omitted, fields remain unchanged; otherwise, the count must match exactly. Each value is converted to its field's type.</p>
+  </dd>
+</dl>
+<h4 id="__New_Remarks">Remarks</h4>
+<p>Called automatically after field initializers; a subclass can override it. Assignments run in reverse declaration order, so earlier overlapping fields are assigned last. A conversion error stops initialization and leaves already assigned fields changed.</p>
+<p><code>Int32(42)</code> initializes a stored number; <code>POINT.Ptr(Address)</code> initializes an address. Array elements do not count as typed fields.</p>
+</div>
 
 <div class="methodShort" id="__Ref"><h3>__Ref</h3>
 <p>Retrieves a nested struct or <a href="../Functions.htm#virtual-references">virtual reference</a> to a property.</p>

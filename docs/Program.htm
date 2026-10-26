@@ -62,6 +62,8 @@
 <pre class="no-highlight">keysharp hello.ks</pre>
 <p>Quote paths containing spaces. Arguments after the script path are made available to the script through <a href="Variables.htm#Args"><code>A_Args</code></a>.</p>
 <pre class="no-highlight">Keysharp.exe "C:\My Scripts\hello.ks" first "second argument"</pre>
+<p>On Windows, the script path and the <code class="no-highlight">--include</code> path can name a local pipe (<code class="no-highlight">\\.\pipe\Name</code>) containing script source. <a href="Variables.htm#ScriptFullPath">A_ScriptFullPath</a> retains a main script's pipe path. Keyview and the error dialog's editing action require editable disk files and reject named-pipe paths.</p>
+<p>Compile-daemon retries, including retries for package restoration, can reopen the source path. A pipe server must supply the source again when a retry occurs.</p>
 <p>Started with no script at all, Keysharp looks for one named after its own executable — <code class="no-highlight">Keysharp.ahk</code>, then <code class="no-highlight">Keysharp.ks</code>, then <code class="no-highlight">Keysharp.cks</code> — first in the working directory and then beside the executable. Release packages include the <a href="#dash">Dash</a> as <code class="no-highlight">Keysharp.cks</code> at the install root, so a bare launch opens it unless a matching script of your own is found first.</p>
 
 <h2 id="cmd">Command-Line Options</h2>

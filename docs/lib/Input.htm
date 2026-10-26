@@ -23,26 +23,30 @@
 <p>An empty Array means that no keyboard or mouse was listed. An unavailable inventory, denied access or enumeration failure throws an <a href="Error.htm#OSError">OSError</a>. Array indexes are ordinal positions, unrelated to <a href="#Id">Id</a>. Use <a href="Array.htm#Filter">Array.Filter</a> to select devices by their properties; a selection can contain no devices, one device or several devices.</p>
 
 <h2 id="Properties">Device properties</h2>
-<p>All properties are read-only and contain the information completed when the descriptor was returned. Property reads do not query the device again. Missing text is an empty string; a missing number is 0. A descriptor keeps its values after the device disconnects.</p>
+<p>All properties are read-only and contain the information completed when the descriptor was returned. Property reads do not query the device again. Unavailable metadata is an empty string in <a href="../v2.1-changes.htm#CompatMode">v2.0 mode</a> and unset in v2.1 mode. A reported numeric zero or false remains a value. A descriptor keeps its values after the device disconnects.</p>
 <table class="info">
   <tr><th>Property</th><th>Description</th></tr>
-  <tr id="Id"><td><code>Id</code></td><td>An opaque Integer identifying the device within its current input source, or 0 when unavailable. It is not an Array index or a permanent hardware identity. Values can change or be reused after reconnection, resume or a source restart. Identifiers from different sources need not be comparable.</td></tr>
+  <tr id="Id"><td><code>Id</code></td><td>An opaque Integer identifying the device within its current input source. It is not an Array index or a permanent hardware identity. Values can change or be reused after reconnection, resume or a source restart. Identifiers from different sources need not be comparable.</td></tr>
   <tr id="Kind"><td><code>Kind</code></td><td><code>"Keyboard"</code> or <code>"Mouse"</code>.</td></tr>
   <tr id="Name"><td><code>Name</code></td><td>The name reported by the input source, when available. Names can repeat.</td></tr>
-  <tr id="VendorId"><td><code>VendorId</code></td><td>The numeric vendor identifier, or 0 when unavailable.</td></tr>
-  <tr id="ProductId"><td><code>ProductId</code></td><td>The numeric product identifier, or 0 when unavailable.</td></tr>
-  <tr id="HardwareId"><td><code>HardwareId</code></td><td>The input source's hardware identity string, or an empty string when unavailable. Its format and persistence depend on the source. It may identify a model or interface rather than one physical unit.</td></tr>
+  <tr id="VendorId"><td><code>VendorId</code></td><td>The numeric vendor identifier.</td></tr>
+  <tr id="ProductId"><td><code>ProductId</code></td><td>The numeric product identifier.</td></tr>
+  <tr id="HardwareId"><td><code>HardwareId</code></td><td>The input source's hardware identity string. Its format and persistence depend on the source. It may identify a model or interface rather than one physical unit.</td></tr>
+  <tr id="Manufacturer"><td><code>Manufacturer</code></td><td>The reported manufacturer text. Native Linux enumeration does not supply it.</td></tr>
+  <tr id="Connection"><td><code>Connection</code></td><td>The reported bus or transport, such as <code>USB</code> or <code>Bluetooth</code>. Native Windows enumeration does not supply it.</td></tr>
+  <tr id="Location"><td><code>Location</code></td><td>An opaque platform location string. Do not interpret it as a portable path.</td></tr>
+  <tr id="IsInternal"><td><code>IsInternal</code></td><td>Whether the source reports the device as built in. Native Windows and Linux enumeration do not supply it.</td></tr>
 </table>
 <p>A device can expose several interfaces or both kinds, so an entry is not necessarily one physical unit. Identical devices can share a name, vendor/product pair or hardware ID. No property is guaranteed to identify one unit permanently. Compare reported values when selecting a device; objects from separate reads are distinct descriptors.</p>
 
 <h2 id="EventDevice">The current event's device</h2>
 <pre class="Syntax">Device := A_EventInfo.Device</pre>
 <p>For native Linux input and <a href="Clr.htm#HookProvider">managed capture</a>, keyboard and mouse hotkeys, their <a href="_HotIf.htm">#HotIf</a> expressions and <a href="InputHook.htm">InputHook</a> callbacks expose <a href="../Variables.htm#EventInfo">A_EventInfo.Device</a> as an Input descriptor when the event identifies a nonzero device. Generated input without a device identifier and native Windows/macOS hook events have no Device property.</p>
-<p>The description is resolved when Device is read; reading Timestamp or IsAutoRepeat does not look up devices. Cached metadata from the event's original source remains available after device removal or source loss. If no metadata is known, the descriptor contains its captured Id and Kind, with other text fields empty and numbers 0.</p>
+<p>The description is resolved when Device is read; reading Timestamp or IsAutoRepeat does not look up devices. Cached metadata from the event's original source remains available after device removal or source loss. If no metadata is known, the descriptor contains its captured Id and Kind, with other metadata <a href="#Properties">unavailable</a>.</p>
 
 <h2 id="GetKeyState">GetKeyState</h2>
 <pre class="Syntax">IsDown := Device.<span class="func">GetKeyState</span>(KeyName)</pre>
-<p class="note"><strong>Note:</strong> Per-device state is supplied through <a href="Clr.htm#HookProvider">managed capture</a>, or through native Linux keysharp-input with an existing InputMonitoring grant. Native Windows and macOS sources do not supply it. Managed capture on macOS is unverified.</p>
+<p class="note"><strong>Note:</strong> Per-device state is supplied through <a href="Clr.htm#HookProvider">managed capture</a>, or through native Linux keysharp-input with an existing InputMonitoring grant. Native Windows and macOS sources do not supply it. Third-party driver and hardware capture on macOS remain unverified.</p>
 <p><em>KeyName</em> is a keyboard key or mouse button from the <a href="../KeyList.htm">key list</a>. Returns true while that key or button is physically held on this device, otherwise false. This method takes no Mode parameter and does not read controller, wheel or toggle state. Keypad names follow the NumLock and logical Shift state shared by all keyboards, as hotkeys do.</p>
 <p>An invalid name, including a controller or wheel name, raises a <a href="Error.htm#ValueError">ValueError</a>; a value which cannot be converted to a String raises a <a href="Error.htm#TypeError">TypeError</a>. An unsupported source, unavailable state, an unknown or removed device, or a descriptor from an earlier script or input-service connection raises an <a href="Error.htm#OSError">OSError</a>. A source reset permanently invalidates that source's descriptors. There is no aggregate-state fallback. Use <a href="GetKeyState.htm">GetKeyState(KeyName, Mode)</a> for aggregate logical, physical or toggle state.</p>
 <p>Reading state does not request permission or install input hooks. A denied or expired grant raises OSError rather than reporting the key as up.</p>
@@ -75,7 +79,7 @@
 <h3 id="Linux">Linux</h3>
 <p>Id contains the keysharp-input device ID. Device information requires an available keysharp-input service and an existing Input Monitoring grant. Listing devices does not request a grant or initialize input forwarding. Client ABI 1.1 and a matching service can check an existing grant directly. With an older client or service, listing succeeds only if another authorized input operation has already given the current connection access to device information; otherwise it throws an OSError.</p>
 <h3 id="macOS">macOS</h3>
-<p>Native enumeration reads keyboard and mouse descriptions from IOKit HID services, using a supplied serial number as HardwareId. Id is 0. Runtime behavior on macOS is unverified.</p>
+<p>Native enumeration reads keyboard and mouse descriptions from IOKit HID services, using a supplied serial number as HardwareId. When available, Id is the registry entry ID interpreted as a signed 64-bit Integer and is valid for that registry entry's lifetime.</p>
 
 <h2 id="Examples">Examples</h2>
 <div class="ex" id="ExDevices">
