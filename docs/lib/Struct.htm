@@ -16,6 +16,7 @@
 
 <p>Struct is the base class for all <a href="../Structs.htm">structs</a>.</p>
 <p>Unlike <a href="Object.htm">Object</a>, a struct's properties are limited to those defined by its base object (the <a href="#Prototype">Prototype</a> of the struct's class). These are typically typed properties declared in a <a href="../Structs.htm#classdef">struct definition</a>, but can include dynamic properties, methods and read-only value properties.</p>
+<p>A struct instance cannot own properties. <a href="Object.htm#DefineProp">DefineProp</a>, <a href="Object.htm#GetCapacity">ObjGetCapacity</a>, <a href="Object.htm#SetCapacity">ObjSetCapacity</a>, <a href="Object.htm#HasOwnProp">ObjHasOwnProp</a>, <a href="Object.htm#OwnPropCount">ObjOwnPropCount</a> and <a href="Object.htm#OwnProps">ObjOwnProps</a> raise a <a href="Error.htm#TypeError">TypeError</a> when given a struct instance. Define members on the struct's prototype instead.</p>
 <p>"Obj" is used below as a placeholder for any instance of the Struct class.</p>
 <p>Instances of Struct are indirectly based on <code>Struct.Prototype</code>, which is based on <code>Any.Prototype</code>. In addition to the methods and properties inherited from <a href="Any.htm">Any</a>, Structs have the following predefined methods and properties.</p>
 
@@ -23,8 +24,8 @@
 <ul class="indent">
   <li><a href="#StaticMethods">Static Methods</a>:
     <ul>
-      <li><a href="#Call">Call</a>: Creates a new Object.</li>
-      <li><a href="#At">At</a>: Creates a <a href="../Structs.htm#Boxed_Pointer">boxed pointer</a>.</li>
+      <li><a href="#Call">Call</a>: Creates a new Struct.</li>
+      <li><a href="#At">At</a>: Creates a boxed pointer.</li>
     </ul>
   </li>
   <li><a href="#StaticProperties">Static Properties</a>:
@@ -36,12 +37,12 @@
   </li>
   <li><a href="#Methods">Methods</a>:
     <ul>
+      <li><a href="#__New">__New</a>: Initializes typed fields from positional values.</li>
       <li><a href="#__Ref">__Ref</a>: Retrieves a nested struct or virtual reference to a property.</li>
     </ul>
   </li>
   <li><a href="#Properties">Properties</a>:
     <ul>
-      <li><a href="#Length">Length</a>: Gets the number of elements in a structured array.</li>
       <li><a href="#Ptr">Ptr</a>: Gets the address of the struct.</li>
       <li><a href="#Size">Size</a>: Gets the size of the struct in bytes.</li>
     </ul>
@@ -52,9 +53,10 @@
 
 <div class="methodShort" id="Call"><h3>Call</h3>
 <p>Creates a new Struct.</p>
-<pre class="Syntax">Obj := StructClass()
-Obj := StructClass.<span class="func">Call</span>()</pre>
+<pre class="Syntax">Obj := StructClass(<span class="optional">FieldValues*</span>)
+Obj := StructClass.<span class="func">Call</span>(<span class="optional">FieldValues*</span>)</pre>
 <p><em>StructClass</em> must be a subclass of Struct. Subclasses can be created by a <a href="../Structs.htm#classdef">struct definition</a> or <a href="../Structs.htm#defprop">at runtime</a>.</p>
+<p>Arguments are passed to <a href="#__New">__New</a>.</p>
 </div>
 
 <div class="methodShort" id="At"><h3>At</h3>
@@ -66,13 +68,15 @@ Obj := StructClass.<span class="func">Call</span>()</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>The address of a struct of the type defined by <em>StructClass</em>.</p>
+    <p>For a nonempty struct, addresses from 0 through 65535 are rejected. An empty struct accepts any address.</p>
   </dd>
 </dl>
 <h4 id="At_Return_Value">Return Value</h4>
 <p>Type: <a href="../Concepts.htm#objects">Object</a></p>
 <h4 id="At_Remarks">Remarks</h4>
-<p><em>StructClass</em> must be a subclass of Struct.</p>
+<p><em>StructClass</em> can be Struct itself or a subclass.</p>
 <p>See <a href="../Structs.htm#Boxed_Pointer">Boxed Pointer</a> for further details.</p>
+<p>To create an object with a data pointer and enable its <code>__Delete</code> method, use <a href="ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a>.</p>
 </div>
 
 <h2 id="StaticProperties">Static Properties</h2>
@@ -111,8 +115,23 @@ ArrayClass := StructClass.<span class="func">__Item</span>[Length]</pre>
 
 <h2 id="Methods">Methods</h2>
 
+<div class="methodShort" id="__New"><h3>__New</h3>
+<p>Initializes typed fields from positional values.</p>
+<pre class="Syntax">Obj.<span class="func">__New</span>(<span class="optional">FieldValues*</span>)</pre>
+<h4 id="__New_Parameters">Parameters</h4>
+<dl>
+  <dt>FieldValues</dt>
+  <dd>
+    <p>Values for every typed field in declaration order, including inherited fields first. If omitted, fields remain unchanged; otherwise, the count must match exactly. Each value is converted to its field's type.</p>
+  </dd>
+</dl>
+<h4 id="__New_Remarks">Remarks</h4>
+<p>Called automatically after field initializers; a subclass can override it. Assignments run in reverse declaration order, so earlier overlapping fields are assigned last. A conversion error stops initialization and leaves already assigned fields changed.</p>
+<p><code>Int32(42)</code> initializes a stored number; <code>POINT.Ptr(Address)</code> initializes an address. Array elements do not count as typed fields.</p>
+</div>
+
 <div class="methodShort" id="__Ref"><h3>__Ref</h3>
-<p>Retrieves a nested struct or <a href="../Functions.htm#virtual-reference">virtual reference</a> to a property.</p>
+<p>Retrieves a nested struct or <a href="../Functions.htm#virtual-references">virtual reference</a> to a property.</p>
 <pre class="Syntax">Obj.<span class="func">__Ref</span>(Name)</pre>
 <h4 id="__Ref_Parameters">Parameters</h4>
 <dl>
@@ -128,17 +147,10 @@ ArrayClass := StructClass.<span class="func">__Item</span>[Length]</pre>
 <p>If the property is a <a href="../Structs.htm#pointers">pointer type</a> or not a nested struct, a <a href="PropRef.htm">PropRef</a> is created and returned.</p>
 <h4 id="__Ref_Remarks">Remarks</h4>
 <p>This method is normally called indirectly via the <a href="../Variables.htm#ref">reference operator</a>. For example, <code>&amp;Obj.Prop</code> is equivalent to <code>Obj.__Ref('Prop')</code>.</p>
-<p>A <a href="../Functions.htm#virtual-reference">virtual reference</a> can be passed to a <a href="../Functions.htm#ByRef">ByRef parameter</a> in place of a variable reference.</p>
+<p>A <a href="../Functions.htm#virtual-references">virtual reference</a> can be passed to a <a href="../Functions.htm#ByRef">ByRef parameter</a> in place of a variable reference.</p>
 </div>
 
 <h2 id="Properties">Properties</h2>
-
-<div class="methodShort" id="Length"><h3>Length</h3>
-<p>Gets the number of elements in a structured array.</p>
-<pre class="Syntax">ElementCount := Obj.<span class="func">Length</span></pre>
-<p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
-<p>This property applies to instances of fixed-size array classes such as <code>Int32[4]</code>. Accessing it on a struct which is not a structured array throws a PropertyError.</p>
-</div>
 
 <div class="methodShort" id="Ptr"><h3>Ptr</h3>
 <p>Gets the address of the struct.</p>

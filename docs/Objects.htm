@@ -31,7 +31,7 @@ ul.list_of_p li { margin: 1em 0; }
 <p>See <a href="ObjList.htm">Built-in Classes</a> for a list of standard object types. There are two fundamental types:</p>
 <ul>
   <li><strong>AutoHotkey objects</strong> are instances of the <a href="lib/Object.htm">Object</a> class. These support ad hoc properties, and have methods for discovering which properties exist. <a href="lib/Array.htm">Array</a>, <a href="lib/Map.htm">Map</a> and all user defined and built-in classes are derived from Object.</li>
-  <li><strong>COM objects</strong> such as those created by <a href="lib/ComObject.htm">ComObject</a>. These are implemented by external libraries, so often differ in behaviour to AutoHotkey objects. ComObject typically represents a COM or "Automation" object implementing the <a href="https://learn.microsoft.com/windows/win32/api/oaidl/nn-oaidl-idispatch">IDispatch interface</a>, but is also used to <a href="lib/ComValue.htm">wrap values of specific types</a> to be passed to COM objects and functions.</li>
+  <li><strong>COM objects</strong> such as those created by <a href="lib/ComObject.htm">ComObject</a>. These are implemented by external libraries, so often differ in behavior to AutoHotkey objects. ComObject typically represents a COM or "Automation" object implementing the <a href="https://learn.microsoft.com/windows/win32/api/oaidl/nn-oaidl-idispatch">IDispatch interface</a>, but is also used to <a href="lib/ComValue.htm">wrap values of specific types</a> to be passed to COM objects and functions.</li>
 </ul>
 
 <h2 id="toc">Table of Contents</h2>
@@ -137,10 +137,13 @@ For value in MyArray
 <pre>ReturnValue := MyObject.Method(Parameters)</pre>
 <p>Call a property/method where the name is determined by evaluating an expression or variable:</p>
 <pre>ReturnValue := MyObject.%Expression%(Parameters)</pre>
+<p>If a property getter returns <a href="Language.htm#unset">unset</a> when its result must be called, as in <code>MyObject.Property()</code>, an <a href="lib/Error.htm#UnsetError">UnsetError</a> is raised with the message <code class="no-highlight">No value was returned.</code> and the property name in <em>Extra</em>.</p>
 <p>Sometimes parameters are accepted when retrieving or assigning properties:</p>
 <pre>Value := MyObject.Property[Parameters]
 MyObject.Property[Parameters] := Value</pre>
+<p>If a property getter returns <a href="Language.htm#unset">unset</a> when its result must be indexed, as in <code>MyObject.Property[Index]</code>, an <a href="lib/Error.htm#UnsetError">UnsetError</a> is raised with the message <code class="no-highlight">No value was returned.</code> and the property name in <em>Extra</em>. This applies to both retrieval and assignment, including a retrieval followed by <code>??</code>.</p>
 <p>An object may also support indexing: <code>MyArray[Index]</code> actually invokes the <a href="#__Item">__Item</a> property of <code>MyArray</code>, passing <code>Index</code> as a parameter.</p>
+<p>Indexing a declared or built-in method, such as <code>MyObject.Method[Index]</code>, indexes the method's function object. This normally raises <a href="lib/Error.htm#PropertyError">PropertyError</a>, because function objects have no __Item property.</p>
 
 <h3 id="object-literal">Object Literal</h3>
 <p>An object literal can be used within an <a href="Language.htm#expressions">expression</a> to create an improvised object. An object literal consists of a pair of braces (<code>{}</code>) enclosing a list of comma-delimited name-value pairs. Each pair consists of a literal (unquoted) <a href="Concepts.htm#names">property name</a> and a value (sub-expression) separated by a colon (<code>:</code>).  For example:</p>
@@ -349,9 +352,9 @@ class NestedClass
 }
 </pre>
 <p>Nesting a class does not imply any particular relationship to the outer class. The nested class is not instantiated automatically, nor do instances of the nested class have any connection with an instance of the outer class, unless the script explicitly makes that connection.</p>
-<p>Each nested class definition produces a dynamic property with <em>get</em> and <em>call</em> accessor functions instead of a simple value property. This is to support the following behaviour (where class X contains the nested class Y):</p>
+<p>Each nested class definition produces a dynamic property with <em>get</em> and <em>call</em> accessor functions instead of a simple value property. This is to support the following behavior (where class X contains the nested class Y):</p>
 <ul>
-<li><code>X.Y()</code> does not pass X to <code>X.Y.Call</code> and ultimately <code class="no-highlight">__New</code>, which would otherwise happen because this is the normal behaviour for function objects called as methods (which is how the nested class is being used here).</li>
+<li><code>X.Y()</code> does not pass X to <code>X.Y.Call</code> and ultimately <code class="no-highlight">__New</code>, which would otherwise happen because this is the normal behavior for function objects called as methods (which is how the nested class is being used here).</li>
 <li><code>X.Y := 1</code> is an error by default (the property is read-only).</li>
 <li>Referring to or calling the class for the first time causes it to be initialized.</li>
 </ul>
@@ -435,7 +438,7 @@ C := -Example()     <em>; -10</em></pre>
 <p>Static properties can be defined by preceding the property name with the separate keyword <code>static</code>. In that case, <code>this</code> refers to the class itself or a subclass.</p>
 <p>The return value of <em>set</em> is ignored. For example, <code>val := obj.Property := 42</code> always assigns <code>val := 42</code> regardless of what the property does, unless it throws an exception or exits the thread.</p>
 <p>Each class can define one or both halves of a property. If a class overrides a property, it can use <code><a href="#Custom_Classes_super">super.Property</a></code> to access the property defined by its base class. If <em>Get</em> or <em>Set</em> is not defined, it can be inherited from a base object. If <em>Get</em> is undefined, the property can return a value inherited from a base. If <em>Set</em> is undefined in this and all base objects (or is obscured by an inherited value property), attempting to set the property causes an exception to be thrown.</p>
-<p>A property definition with both <em>get</em> and <em>set</em> actually creates two separate functions, which do not share local or static variables or nested functions. As with methods, each function has a hidden parameter named <code>this</code>, and <em>set</em> has a second hidden parameter named <code>value</code>. Any explicitly defined parameters come after those.</p>
+<p>A property definition with both <em>get</em> and <em>set</em> actually creates two separate functions, which do not share local or static variables or nested functions. As with methods, each function has a hidden parameter named <code>this</code>. The hidden <code>value</code> parameter of <em>set</em> comes after any explicitly defined index parameters. AutoHotkey places <code>value</code> immediately after <code>this</code>; this difference affects calls to accessor functions obtained with <a href="lib/Object.htm#GetOwnPropDesc">GetOwnPropDesc</a>.</p>
 <p>While a property definition defines the <em>get</em> and <em>set</em> accessor functions for a property in the same way as <a href="lib/Object.htm#DefineProp">DefineProp</a>, a method definition defines the <em>call</em> accessor function. Any class may contain a property definition and a method definition with the same name. If a property without a <em>call</em> accessor function (a method) is called, <em>get</em> is invoked with no parameters and the result is then called as a method.</p>
 
 <h4 id="Custom_Classes_property_short">Fat Arrow Properties</h4>
@@ -616,13 +619,13 @@ MsgBox "".test  <em>; 1</em>
 
 <h3 id="ObjPtr">Pointers to Objects</h3>
 <p class="note"><strong>Note:</strong> The object-pointer conversion functions are available only on Windows.</p>
-<p><code>ObjPtr(Object)</code> returns an IUnknown <a href="lib/ComValue.htm">ComValue</a> whose <code>Ptr</code> property contains the pointer. <code>ObjPtrAddRef(Object)</code> instead returns the raw integer pointer and adds a native COM reference.</p>
-<pre>wrapped := ObjPtr(myObject)
+<p><code>ObjPtr(Object)</code> returns an Integer containing the object's IUnknown address without adding a reference, so this borrowed pointer is valid only while the object is kept alive by other means. <code>ObjPtrAddRef(Object)</code> returns an Integer address and adds a native COM reference, which must be released with <code>ObjRelease</code>.</p>
+<pre>borrowed := ObjPtr(myObject)
 address := ObjPtrAddRef(myObject)
 try DllCall("NativeFunction", "Ptr", address)
 finally ObjRelease(address)</pre>
 <p>See <a href="lib/ObjAddRef.htm">ObjAddRef and ObjRelease</a>.</p>
-<p id="ObjFromPtr"><code>ObjFromPtr(Address)</code> converts an IUnknown pointer back to a managed object or wrapped COM object and consumes the supplied COM reference where applicable. <code>ObjFromPtrAddRef(Address)</code> converts it while retaining an additional reference.</p>
+<p id="ObjFromPtr"><code>ObjFromPtr(Address)</code> converts an IUnknown pointer back to a managed object or wrapped COM object. A returned COM wrapper takes ownership of the supplied counted reference; a managed object is returned directly without consuming a native reference. <code>ObjFromPtrAddRef(Address)</code> also returns a managed object directly, but a returned COM wrapper acquires an additional native reference. The caller retains responsibility for any counted reference supplied to ObjFromPtrAddRef.</p>
 
 </body>
 </html>

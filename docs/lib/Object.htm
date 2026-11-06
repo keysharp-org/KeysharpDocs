@@ -71,7 +71,7 @@ Obj := Object.<span class="func">Call</span>()</pre>
 <p>Each property or method owned by the object is copied into the clone. Object <em>references</em> are copied (like with a normal assignment), not the objects themselves; in other words, if a property contains a reference to an object, the clone will contain a reference to the same object.</p>
 <p>Dynamic properties are copied, not invoked.</p>
 <p>The clone has the same base object as the original object.</p>
-<p>A TypeError is thrown if <em>Obj</em> is derived from an unsupported built-in type. This implementation of Clone supports Object, Class and Error objects. See also: <a href="Array.htm#Clone">Clone (Array)</a>, <a href="Map.htm#Clone">Clone (Map)</a>.</p>
+<p>A <a href="Error.htm#TypeError">TypeError</a> is thrown if <em>Obj</em> was created by <a href="ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a> or is of a built-in type which holds a native resource, such as a <a href="File.htm">File</a>, <a href="Http.htm">Http</a> session or <a href="RunScript.htm#ScriptProcess">ScriptProcess</a>, as in AutoHotkey. A <a href="Buffer.htm#Clone">Buffer</a> or <a href="StringBuffer.htm#Clone">StringBuffer</a> is cloned with a copy of its memory. See also: <a href="Array.htm#Clone">Clone (Array)</a>, <a href="Map.htm#Clone">Clone (Map)</a>.</p>
 </div>
 
 <div class="methodShort" id="DefineProp"><h3>DefineProp</h3>
@@ -90,7 +90,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
     <p>Type: <a href="../Concepts.htm#objects">Object</a></p>
     <p>To define or modify a dynamic property, specify an object with one or more of the following own properties:</p>
     <p><strong>Get:</strong> The <a href="../misc/Functor.htm">function object</a> to call when the property's value is retrieved.</p>
-    <p><strong>Set:</strong> The <a href="../misc/Functor.htm">function object</a> to call when the property is assigned a value. Its second parameter is the value being assigned.</p>
+    <p><strong>Set:</strong> The <a href="../misc/Functor.htm">function object</a> to call when the property is assigned a value. The value being assigned follows any index parameters, as described below.</p>
     <p><strong>Call:</strong> The <a href="../misc/Functor.htm">function object</a> to call when the property is called.</p>
     <p>To define a value property, specify an object with the following own property:</p>
     <p><strong>Value:</strong> Any value to assign to the property.</p>
@@ -98,11 +98,15 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
     <p><strong>Type</strong> <span class="ver">[v2.1-alpha.30+]</span>: The struct class identifying the type of the property to define. <em>Obj</em> must be a Prototype. This and the properties above are mutually-exclusive. See <a href="../Structs.htm">Structures</a> for general information and <a href="../Structs.htm#defprop">Using DefineProp</a> for an example.</p>
     <p id="DefinePropPack"><strong>Pack</strong> <span class="ver">[v2.1-alpha.19+]</span>: One of the following integers specifying the maximum alignment requirement for the property: 0, 1, 2, 4 or 8. This affects the alignment of the property and overall struct only if non-zero and less than the type's default alignment requirement, or if non-zero and <em>Type</em> is an integer. When defining a property in a class definition, the most recent <a href="_StructPack.htm">#StructPack</a> directive sets the value for <em>Pack</em>.</p>
     <p id="DefinePropOffset"><strong>Offset</strong> <span class="ver">[v2.1-alpha.24+]</span>: The offset of the struct field. To use the same offset as a previously defined property, specify its name. Otherwise specify the offset in bytes.</p>
+    <p>When a property is being created or redefined, the following own property may also be present:</p>
+    <p id="DefinePropEnumerable"><strong>Enumerable</strong> <span class="ver">[v2.1-alpha.34+]</span>: If false (0), the property is hidden from enumeration by <a href="Props.htm">Props</a>.</p>
   </dd>
 </dl>
 <h4 id="DefineProp_Return_Value">Return Value</h4>
 <p>Type: <a href="../Concepts.htm#objects">Object</a></p>
 <p>This method returns the target object.</p>
+<h4 id="DefineProp_Error_Handling">Error Handling</h4>
+<p>A <a href="Error.htm#ValueError">ValueError</a> is thrown if <em>Descriptor</em> does not describe exactly one kind of property: <em>Value</em> alone, <em>Type</em> with optional <em>Pack</em> and <em>Offset</em>, or any of <em>Get</em>, <em>Set</em> and <em>Call</em>. A <em>Get</em>, <em>Set</em>, <em>Call</em> or <em>Type</em> which is not an object is treated as absent.</p>
 <h4 id="DefineProp_Remarks">Remarks</h4>
 <p>Defining a value property overwrites any existing value or accessor functions.</p>
 <p>Defining a dynamic property overwrites any existing value, but retains any existing accessor functions which aren't specified by the descriptor.</p>
@@ -113,8 +117,9 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
   <li>If no <em>Call</em> is defined or inherited, <em>Get</em> may be called to retrieve a function object, which is then called.</li>
   <li>If no <em>Get</em> is defined or inherited but there is a <em>Call</em> accessor function, the function itself becomes the property's value (read-only).</li>
 </ul>
-<p>As with methods, the first parameter of <em>Get</em>, <em>Set</em> or <em>Call</em> is <code>this</code> (the target object). For <em>Set</em>, the second parameter is <code>value</code> (the value being assigned). These parameters are defined automatically by method and property definitions within a class, but must be defined explicitly if using normal functions. Any other parameters passed by the caller are appended to the parameter list.</p>
+<p>As with methods, the first parameter of <em>Get</em>, <em>Set</em> or <em>Call</em> is <code>this</code> (the target object). For <em>Set</em>, <code>value</code> (the value being assigned) follows any index parameters: <code>(this, indices..., value)</code>. AutoHotkey passes <code>(this, value, indices...)</code>. These parameters are defined automatically by method and property definitions within a class, but must be defined explicitly if using normal functions.</p>
 <p>The <a href="Func.htm#MaxParams">MaxParams</a> and <a href="Func.htm#IsVariadic">IsVariadic</a> properties of the function objects are evaluated to determine whether the property may accept parameters. If MaxParams is 1 for <em>Get</em> or 2 for <em>Set</em> and IsVariadic is false or undefined, the property cannot accept parameters; they are instead forwarded to the <a href="../Objects.htm#__Item">__Item</a> property of the object returned by <em>get</em>.</p>
+<p>This also applies to callable objects supplied as accessors. An unset final result can use <code>??</code> or <code>IsSet</code>. When indices are forwarded to a parameterless getter's result, that getter must return a value; an unset result raises <code>UnsetError</code> even with <code>??</code>. An indexed read of a missing property raises <code>PropertyError</code>.</p>
 <p><span class="ver">[v2.1-alpha.22+]</span>: DefineProp is predefined as a function. Unlike the method, it can be used directly with Prototype objects which do not derive from Object, such as for <a href="../Structs.htm#classdef">struct</a> subclasses.</p>
 </div>
 
@@ -148,7 +153,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <h4 id="GetOwnPropDesc_Return_Value">Return Value</h4>
 <p>Type: <a href="../Concepts.htm#objects">Object</a></p>
 <p>For a dynamic property, the return value is a new object with an own property for each accessor function: <em>Get</em>, <em>Set</em>, <em>Call</em>. Each property is present only if the corresponding accessor function is defined in <em>Obj</em> itself. For a value property, the return value is a new object with a property named <em>Value</em>. In such cases, <code>Obj.GetOwnPropDesc(Name).Value == Obj.%Name%</code>.</p>
-<p><span class="ver">[v2.1-alpha.3+]</span>: For a <a href="../Structs.htm">typed property</a>, the return value is a new object with the own properties <code class="no-highlight">Type</code> and <code class="no-highlight">Offset</code>. <em>Offset</em> is the zero-based offset of the property in bytes, relative to the start of the object's structured data. <span class="ver">[v2.1-alpha.24+]</span>: <em>Type</em> is a class object.</p>
+<p><span class="ver">[v2.1-alpha.3+]</span>: For a <a href="../Structs.htm">typed property</a>, the return value is a new object with the own properties <em>Type</em> and <em>Offset</em>. <em>Offset</em> is the zero-based offset of the property in bytes, relative to the start of the object's structured data. <span class="ver">[v2.1-alpha.24+]</span>: <em>Type</em> is a class object.</p>
 <p class="note"><strong>Note:</strong> Typed properties can only be owned by a Prototype.</p>
 <p>Modifying the returned object has no effect on <em>Obj</em> unless <a href="#DefineProp">DefineProp</a> is called.</p>
 <p>The script can determine whether a property is dynamic by checking <code>not desc.HasProp("Value")</code>, where <em>desc</em> is the return value of GetOwnPropDesc.</p>
@@ -205,7 +210,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 </div>
 
 <div class="methodShort" id="__Ref"><h3>__Ref <span class="ver">[v2.1-alpha.10+]</span></h3>
-<p>Retrieves a nested struct or <a href="../Functions.htm#virtual-reference">virtual reference</a> to a property.</p>
+<p>Retrieves a nested struct or <a href="../Functions.htm#virtual-references">virtual reference</a> to a property.</p>
 <pre class="Syntax">Obj.<span class="func">__Ref</span>(Name)</pre>
 <h4 id="__Ref_Parameters">Parameters</h4>
 <dl>
@@ -221,7 +226,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <p>If the property is a <a href="../Structs.htm#pointers">pointer type</a> or not a nested struct, a <a href="PropRef.htm">PropRef</a> is created and returned.</p>
 <h4 id="__Ref_Remarks">Remarks</h4>
 <p>This method is normally called indirectly via the <a href="../Variables.htm#ref">reference operator</a>. For example, <code>&amp;Obj.Prop</code> is equivalent to <code>Obj.__Ref('Prop')</code>.</p>
-<p>A <a href="../Functions.htm#virtual-reference">virtual reference</a> can be passed to a <a href="../Functions.htm#ByRef">ByRef parameter</a> in place of a variable reference.</p>
+<p>A <a href="../Functions.htm#virtual-references">virtual reference</a> can be passed to a <a href="../Functions.htm#ByRef">ByRef parameter</a> in place of a variable reference.</p>
 </div>
 
 <h2 id="Properties">Properties</h2>
@@ -239,10 +244,11 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 </div>
 
 <h2 id="Functions">Functions</h2>
+<p>The own-property functions <code>ObjGetCapacity</code>, <code>ObjSetCapacity</code>, <code>ObjHasOwnProp</code>, <code>ObjOwnPropCount</code> and <code>ObjOwnProps</code> require an object which can own properties. A <a href="Struct.htm">Struct</a> instance raises a <a href="Error.htm#TypeError">TypeError</a>.</p>
 <h3 id="SetBase">ObjSetBase</h3>
 <p>Sets an object's <a href="../Objects.htm#delegation">base object</a>.</p>
 <pre class="Syntax"><span class="func">ObjSetBase</span>(Obj, BaseObj)</pre>
-<p>No <a href="../Objects.htm#Meta_Functions">meta-functions</a> or <a href="../Objects.htm#Custom_Classes_property">property functions</a> are called. Overriding the <a href="#Base">Base</a> property does not affect the behaviour of this function.</p>
+<p>No <a href="../Objects.htm#Meta_Functions">meta-functions</a> or <a href="../Objects.htm#Custom_Classes_property">property functions</a> are called. Overriding the <a href="#Base">Base</a> property does not affect the behavior of this function.</p>
 <p>An exception is thrown if <em>Obj</em> or <em>BaseObj</em> is of an incorrect type.</p>
 <p>See also: <a href="Any.htm#GetBase">ObjGetBase</a>, <a href="#Base">Base property</a></p>
 
@@ -275,6 +281,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <h3 id="GetDataPtr">ObjGetDataPtr <span class="ver">[v2.1-alpha.3+]</span></h3>
 <p>Returns the address of the object's <a href="../Structs.htm">structured data</a> (typed properties defined by the script).</p>
 <pre class="Syntax">Ptr := <span class="func">ObjGetDataPtr</span>(Obj)</pre>
+<p>For an ordinary object created by <a href="ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a>, this returns its attached data pointer.</p>
 <p>An exception is thrown if <em>Obj</em> is of an incorrect type.</p>
 
 <h3 id="GetDataSize">ObjGetDataSize <span class="ver">[v2.1-alpha.3+]</span></h3>
@@ -284,9 +291,8 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <p>An exception is thrown if <em>Obj</em> is of an incorrect type.</p>
 
 <h3 id="SetDataPtr">ObjSetDataPtr <span class="ver">[v2.1-alpha.3+]</span></h3>
-<p class="warning"><strong>Warning:</strong> This function is likely to be removed. Consider alternatives, such as <a href="Struct.htm#At">Struct.At</a>.</p>
 <p>Sets the address of the object's <a href="../Structs.htm">structured data</a> (typed properties defined by the script).</p>
-<p><span class="ver">[v2.1-alpha.27+]</span>: Only <a href="../Structs.htm#Boxed_Pointer">boxed pointers</a> have the capacity to redirect typed properties to an external address. This function fails for all other objects.</p>
+<p>A <a href="../Structs.htm#Boxed_Pointer">boxed pointer</a> created by <a href="Struct.htm#At">Struct.At</a> or an object created by <a href="ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a> can redirect its data pointer to an external address. This function fails for other objects.</p>
 <pre class="Syntax"><span class="func">ObjSetDataPtr</span>(Obj, Ptr)</pre>
 <h4 class="func_section" id="SetDataPtr_Parameters">Parameters</h4>
 <dl>
@@ -300,7 +306,7 @@ Obj := <span class="func">DefineProp</span>(Obj, Name, Descriptor) <em>; <span c
 <p>The script may use <a href="#GetDataPtr">ObjGetDataPtr</a> to retrieve <em>Ptr</em>.</p>
 <p>ObjSetDataPtr does not affect nested objects, as they each have their own data pointer (which points into the outer object's original data).</p>
 <h4 class="func_section" id="SetDataPtr_Error_Handling">Error Handling</h4>
-<p>An exception is thrown if <em>Obj</em> is not a boxed pointer or is otherwise of an incorrect type.</p>
+<p>An exception is thrown if <em>Obj</em> is neither a boxed pointer nor an object created by ObjCreateWithDataPtr, or is otherwise of an incorrect type.</p>
 
 </body>
 </html>

@@ -128,7 +128,7 @@
   </tr>
   <tr>
     <td><a href="ComObjFlags.htm">ComObjFlags</a></td>
-    <td>Retrieves or changes flags which control a COM wrapper object's behaviour.</td>
+    <td>Retrieves or changes flags which control a COM wrapper object's behavior.</td>
   </tr>
   <tr>
     <td><a href="ComObjFromPtr.htm">ComObjFromPtr</a></td>
@@ -642,7 +642,7 @@
   </tr>
   <tr>
     <td><a href="_Import.htm">#Import</a></td>
-    <td>Imports a <a href="../Modules.htm">module</a>, or imports names from a module.</td>
+    <td>Imports a <a href="../Modules.htm">module</a> and optionally imports names from a module.</td>
   </tr>
   <tr>
     <td><a href="IniDelete.htm">IniDelete</a></td>
@@ -690,7 +690,7 @@
   </tr>
   <tr>
     <td><a href="IsSet.htm">IsSet / IsSetRef</a></td>
-    <td>Returns a non-zero number if the specified variable has been assigned a value.</td>
+    <td>Returns a non-zero number if the specified variable or expression has a value (is not <a href="../Concepts.htm#unset">unset</a>).</td>
   </tr>
   <tr>
     <td><a href="KeyHistory.htm">KeyHistory</a></td>
@@ -766,7 +766,7 @@
   </tr>
   <tr>
     <td><a href="MenuFromHandle.htm">MenuFromHandle</a></td>
-    <td>Retrieves the <a href="Menu.htm">Menu or MenuBar object</a> corresponding to a Win32 menu handle.</td>
+    <td>Retrieves the <a href="Menu.htm">Menu or MenuBar object</a> which has the specified handle.</td>
   </tr>
   <tr>
     <td><a href="MenuSelect.htm">MenuSelect</a></td>
@@ -841,8 +841,8 @@
     <td>Creates a <a href="../misc/Functor.htm#BoundFunc">BoundFunc object</a> which calls a method of a given object.</td>
   </tr>
   <tr>
-    <td><a href="ObjFree.htm">ObjFree</a></td>
-    <td>Releases memory associated with a pointer returned by <a href="StrPtr.htm">StrPtr</a>.</td>
+    <td><a href="ObjCreateWithDataPtr.htm">ObjCreateWithDataPtr</a></td>
+    <td>Creates an object with an internal data pointer.</td>
   </tr>
   <tr>
     <td><a href="../Objects.htm#ObjFromPtr">ObjFromPtr / ObjFromPtrAddRef</a></td>
@@ -970,7 +970,7 @@
   </tr>
   <tr>
     <td><a href="PropRef.htm">PropRef</a></td>
-    <td>Creates a <a href="../Functions.htm#virtual-reference">virtual reference</a> to a property of an object.</td>
+    <td>Creates a <a href="../Functions.htm#virtual-references">virtual reference</a> to a property of an object.</td>
   </tr>
   <tr>
     <td><a href="Props.htm">Props</a></td>
@@ -1305,7 +1305,7 @@
   </tr>
   <tr>
     <td><a href="WinGetAlwaysOnTop.htm">WinGetAlwaysOnTop</a></td>
-    <td>Returns a non-zero value if the specified window is always-on-top.</td>
+    <td>Returns a non-zero number if the specified window is always-on-top.</td>
   </tr>
   <tr>
     <td><a href="WinGetClass.htm">WinGetClass</a></td>
@@ -1329,7 +1329,7 @@
   </tr>
   <tr>
     <td><a href="WinGetEnabled.htm">WinGetEnabled</a></td>
-    <td>Returns a non-zero value if the specified window is enabled.</td>
+    <td>Returns a non-zero number if the specified window is enabled.</td>
   </tr>
   <tr>
     <td><a href="WinGetID.htm">WinGetID</a></td>
@@ -1530,6 +1530,10 @@
   <tr>
     <td><a href="_SingleInstance.htm">#SingleInstance</a></td>
     <td>Determines whether a script is allowed to run again when it is already running.</td>
+  </tr>
+  <tr>
+    <td><a href="_Startup.htm">#Startup</a></td>
+    <td>Evaluates an expression before capability checks, hotkey setup and the auto-execute section.</td>
   </tr>
   <tr>
     <td><a href="_StructPack.htm">#StructPack</a></td>

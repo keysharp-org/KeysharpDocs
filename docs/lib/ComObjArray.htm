@@ -47,7 +47,7 @@
     <li><code id="MaxIndex">.MaxIndex(n)</code>: Returns the upper bound of the <i>n</i>th dimension. If <i>n</i> is omitted, it defaults to 1.</li>
     <li><code id="MinIndex">.MinIndex(n)</code>: Returns the lower bound of the <i>n</i>th dimension. If <i>n</i> is omitted, it defaults to 1.</li>
     <li><code id="Clone">.Clone()</code>: Returns a copy of the array.</li>
-    <li><code id="__Enum">.__Enum()</code>: Not typically called by script; allows <a href="For.htm">for-loops</a> to be used with SafeArrays.</li>
+    <li><code id="__Enum">.__Enum(NumberOfVars)</code>: Returns an <a href="Enumerator.htm">enumerator</a> for use with <a href="For.htm">for-loops</a>. If <em>NumberOfVars</em> is omitted, it defaults to 2 (index and value). A value below 2 selects value mode. The enumerator requires two output argument slots in index/value mode and one in value mode.</li>
 </ul>
 
 <h2 id="Properties">Properties</h2>
@@ -79,7 +79,7 @@ if ComObjType(obj) &amp; 0x2000
 if ComObjType(obj) = 0x2008
     MsgBox "obj is a ComObjArray of strings"</pre>
 <p>Arrays with up to 8 dimensions are supported.</p>
-<p>Since SafeArrays are not designed to support multiple references, when one SafeArray is assigned to an element of another SafeArray, a separate copy is created. However, this only occurs if the wrapper object has the F_OWNVALUE flag, which indicates it is responsible for destroying the array. This flag can be removed by using <a href="ComObjFlags.htm">ComObjFlags</a>.</p>
+<p>Since SafeArrays are not designed to support multiple references, when one SafeArray is assigned to an element of another SafeArray, a separate copy is created. In AutoHotkey, this depends on the wrapper's F_OWNVALUE flag. In Keysharp, the array is copied regardless of that flag, so clearing it with <a href="ComObjFlags.htm">ComObjFlags</a> does not share the original array.</p>
 <p>When a function or method called by a COM client returns a SafeArray with the F_OWNVALUE flag, a copy is created and returned instead, as the original SafeArray is automatically destroyed.</p>
 
 <h2 id="Related">Related</h2>

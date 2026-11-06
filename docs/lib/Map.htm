@@ -16,7 +16,7 @@
 <pre class="NoIndent">class Map extends Object</pre>
 
 <p>A <strong>Map</strong> object associates or <em>maps</em> one set of values, called <em>keys</em>, to another set of values. A key and the value it is mapped to are known as a key-value pair. A map can contain any number of key-value pairs, but each key must be unique.</p>
-<p>A key may be any <a href="../Concepts.htm#numbers">Integer</a>, <a href="../Objects.htm">object</a> reference or null-terminated <a href="../Concepts.htm#strings">String</a>. Comparison of string keys is case-sensitive, while objects are compared by reference/address. <a href="../Concepts.htm#numbers">Float</a> keys are automatically converted to String.</p>
+<p>A key may be any <a href="../Concepts.htm#numbers">Integer or Float</a>, <a href="../Objects.htm">object</a> reference or null-terminated <a href="../Concepts.htm#strings">String</a>. Comparison of string keys is case-sensitive, while objects are compared by reference/address. Float keys remain Float keys in both <a href="../v2.1-changes.htm#CompatMode">compatibility modes</a>, distinct from Integer and String keys: <code>1</code>, <code>1.0</code> and <code>"1.0"</code> can identify separate entries. AutoHotkey converts Float keys to String in v2.0 mode and rejects them with TypeError in v2.1-alpha.35's v2.1 mode.</p>
 <p>The simplest use of a map is to retrieve or set a key-value pair via the implicit <a href="#__Item">__Item</a> property, by simply writing the key between brackets following the map object. For example:</p>
 <pre>clrs := Map()
 clrs["Red"] := "ff0000"
@@ -91,8 +91,8 @@ MapObj := Map.<span class="func">Call</span>(Key1, Value1, Key2, Value2, ...)</p
 <dl>
   <dt>Key</dt>
   <dd>
-    <p>Type: <a href="../Concepts.htm#numbers">Integer</a>, <a href="../Concepts.htm#objects">Object</a> or <a href="../Concepts.htm#strings">String</a></p>
-    <p>Any single key. If the map does not contain this key, an <a href="Error.htm#UnsetError">UnsetItemError</a> is thrown (except in v2.1 mode).</p>
+    <p>Type: <a href="../Concepts.htm#numbers">Integer or Float</a>, <a href="../Concepts.htm#objects">Object</a> or <a href="../Concepts.htm#strings">String</a></p>
+    <p>Any single key. If the map does not contain this key, an <a href="Error.htm#UnsetError">UnsetItemError</a> is thrown (except in <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>).</p>
   </dd>
 </dl>
 <h4 id="Delete_Return_Value">Return Value</h4>
@@ -132,12 +132,14 @@ MapObj := Map.<span class="func">Call</span>(Key1, Value1, Key2, Value2, ...)</p
 <div class="methodShort" id="ToString"><h3>ToString</h3>
 <p>Returns a string representation of the map.</p>
 <pre class="Syntax">Text := MapObj.<span class="func">ToString</span>()</pre>
-<p>The result encloses the key-value pairs in braces, separates pairs with a comma and space, and separates each key from its value with a colon. String keys and values are enclosed in double quotes. <code>String(MapObj)</code> returns the same result.</p>
+<p>The result encloses the key-value pairs in square brackets, separates pairs with a comma and space, and separates each key from its value with a colon, as in <code>["one": 1, 2: "two"]</code>. Keys and values are formatted as <a href="Array.htm#ToString">Array.ToString</a> formats elements. <code>String(MapObj)</code> returns the same result.</p>
 </div>
 
 <div class="methodShort" id="__Enum"><h3>__Enum</h3>
 <p>Enumerates key-value pairs.</p>
 <pre class="Syntax">For Key <span class="optional">, Value</span> in MapObj</pre>
+<pre class="Syntax">Enum := MapObj.<span class="func">__Enum</span>(<span class="optional">NumberOfVars</span>)</pre>
+<p>If <em>NumberOfVars</em> is omitted or 0, one output variable receives the key, and two receive the key and value. Specifying 1 or 2 fixes the mode and argument count.</p>
 <p>Returns a new <a href="Enumerator.htm">enumerator</a>. This method is typically not called directly. Instead, the map object is passed directly to a <a href="For.htm">for-loop</a>, which calls __Enum once and then calls the enumerator once for each iteration of the loop. Each call to the enumerator returns the next key and/or value. The for-loop's variables correspond to the enumerator's parameters, which are:</p>
 <dl>
   <dt>Key</dt>
@@ -151,7 +153,7 @@ MapObj := Map.<span class="func">Call</span>(Key1, Value1, Key2, Value2, ...)</p
     <p>The value.</p>
   </dd>
 </dl>
-<p>The Map is copied and sorted before enumeration, so modifying it during enumeration does not have the same effect as in AutoHotkey. Use <a href="HashMap.htm">HashMap</a> when sorted enumeration is unnecessary.</p>
+<p>The Map is sorted before enumeration. An enumerator can retain a snapshot of its items, so changes to keys or values during enumeration may not be reflected as they are in AutoHotkey. Use <a href="HashMap.htm">HashMap</a> when sorted enumeration is unnecessary.</p>
 </div>
 
 <div class="methodShort" id="__New"><h3>__New</h3>
@@ -181,7 +183,7 @@ MapObj := Map.<span class="func">Call</span>(Key1, Value1, Key2, Value2, ...)</p
 <p><em>CurrentSetting</em> is <em>NewSetting</em> if assigned, otherwise On by default (but note that this property only retrieves the string variant of the current setting).</p>
 <p><em>NewSetting</em> is one of the following <a href="../Concepts.htm#strings">strings</a> or <a href="../Concepts.htm#boolean">integers (boolean)</a>:</p>
 <p><strong>On</strong> or <strong>1</strong> (true): Key lookups are case-sensitive. This is the default setting.</p>
-<p><strong>Off</strong> or <strong>0</strong> (false): Key lookups are not case-sensitive, i.e. the letters A-Z are considered identical to their lowercase counterparts.</p>
+<p><strong>Off</strong> or <strong>0</strong> (false): Key lookups are not case-sensitive, i.e. the letters A-Z are considered identical to their lowercase counterparts. Unicode case pairs, such as &Auml; and &auml;, also identify the same key; AutoHotkey folds only ASCII letters in this mode.</p>
 <p><strong>Locale:</strong> Key lookups are not case-sensitive according to the rules of the current user's locale. For example, most English and Western European locales treat not only the letters A-Z as identical to their lowercase counterparts, but also non-ASCII letters like &Auml; and &Uuml; as identical to theirs. <em>Locale</em> is 1 to 8 times slower than <em>Off</em> depending on the nature of the strings being compared.</p>
 <p>Attempting to assign to this property causes an exception to be thrown if the Map is not empty.</p>
 </div>
@@ -200,7 +202,7 @@ Value := MapObj.<span class="func">__Item</span>[Key]</pre>
 MapObj.<span class="func">__Item</span>[Key] := Value</pre>
 <p>When retrieving a value, <em>Key</em> must be a unique value previously associated with another value. An <a href="Error.htm#UnsetError">UnsetItemError</a> is thrown if <em>Key</em> has no associated value within the map, unless a <a href="#Default">Default</a> property is defined, in which case its value is returned.</p>
 <p><span class="ver">[v2.1-alpha.29+]</span>: In <a href="../v2.1-changes.htm#CompatMode">v2.1 mode</a>, the return value is <code>unset</code> if there is no value to return. This may result in the caller throwing an <a href="Error.htm#UnsetError">UnsetError</a>.</p>
-<p>When assigning a value, <em>Key</em> can be any value to associate with <em>Value</em>; in other words, the <em>key</em> used to later access <em>Value</em>. <a href="../Concepts.htm#numbers">Float</a> keys are automatically converted to String.</p>
+<p>When assigning a value, <em>Key</em> can be any value to associate with <em>Value</em>; in other words, the <em>key</em> used to later access <em>Value</em>. <a href="../Concepts.htm#numbers">Float</a> keys retain their type in both compatibility modes.</p>
 <p>The property name __Item is typically omitted, as shown above, but is used when overriding the property.</p>
 </div>
 

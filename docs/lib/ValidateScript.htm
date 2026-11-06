@@ -5,11 +5,11 @@
 <meta name="description" content="The ValidateScript and CompileScript functions check script source or a script file without running it, and report its errors and warnings." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="../static/theme.css" rel="stylesheet" type="text/css" />
-<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="../static/content.js" type="text/javascript"></script>
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>ValidateScript and CompileScript</h1>
 <p>Check script code without running it, and report its errors and warnings.</p>
@@ -23,6 +23,7 @@ Result := <span class="func" id="CompileScript">CompileScript</span>(Code)</pre>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>Either the path of a script file or the script source itself. If a file of that name exists it is checked, otherwise the value is checked as source.</p>
+    <p>On Windows, a local named-pipe path (<code class="no-highlight">\\.\pipe\Name</code>) reads the source to check from the pipe.</p>
   </dd>
 </dl>
 
@@ -36,7 +37,7 @@ Result := <span class="func" id="CompileScript">CompileScript</span>(Code)</pre>
   <tr><td><code>Warnings</code></td><td>An Array of warning messages. Always empty for ValidateScript.</td></tr>
 </table>
 <p>A ValidateScript message is prefixed with its location where that is known: the file when <em>Code</em> names one, then the line and column, as in <code class="no-highlight">C:\Scripts\other.ks:3:7: message</code>.</p>
-<p>CompileScript splits the compiler's own report into lines, one line per element, so its Arrays also contain the report's heading lines, such as <code class="no-highlight">The following errors occurred:</code>. When compilation fails, <code>Errors</code> can also contain the report's warning lines, and when the C# generated from the script is what fails to compile, it also contains that generated code.</p>
+<p>CompileScript splits the compiler's own report into lines, one line per element, so its Arrays also contain the report's heading lines, such as <code class="no-highlight">The following errors occurred:</code>. When compilation fails, <code>Errors</code> can also contain the report's warning lines.</p>
 
 <h2 id="Choosing">Which to Use</h2>
 <table class="info">
@@ -51,6 +52,7 @@ Result := <span class="func" id="CompileScript">CompileScript</span>(Code)</pre>
 
 <h2 id="Remarks">Remarks</h2>
 <p>Neither function runs the code: no hotkeys are registered and the auto-execute section does not run. CompileScript writes nothing to disk and does not restore packages, so a <a href="_Package.htm">#Package</a> the code names must already be available.</p>
+<p>When <a href="../Program.htm#cmd">daemon use</a> is enabled, CompileScript first tries an existing compatible daemon from a matching Keysharp installation, avoiding loading the compiler into the calling process. It never starts a daemon and compiles locally if none is available. ValidateScript always uses the parser in the calling process.</p>
 <p>A compiled script with a statically visible call to either function includes the component it needs; see <a href="../Program.htm#components">Optional Scripting Components</a>.</p>
 
 <h2 id="Examples">Examples</h2>

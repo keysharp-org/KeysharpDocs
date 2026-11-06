@@ -5,11 +5,11 @@
 <meta name="description" content="Platform support, desktop backend requirements and permissions for Keysharp on Windows, Linux and macOS." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="static/theme.css" rel="stylesheet" type="text/css" />
-<link href="static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="static/content.js" type="text/javascript"></script>
+<link href="static/theme.css" rel="stylesheet" />
+<link href="static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>Platform Support</h1>
 
@@ -19,18 +19,23 @@
 
 <p>Windows has the broadest AutoHotkey v2 compatibility.</p>
 <p>GUI controls can differ in default size, Z-order and label rendering, and a GUI can appear blank before it has first been shown.</p>
-<p>Registry functions are available only on Windows. The COM functions are available on all three platforms, but only Windows drives real COM: see <a href="#Linux_DBus">Interprocess automation with ComObject</a> on Linux and <a href="#macOS_AppleEvents">its macOS counterpart</a>.</p>
+<p>Registry functions and native COM pointers are available only on Windows. <a href="lib/ComObject.htm">ComObject</a> uses Windows COM, <a href="#Linux_DBus">D-Bus on Linux</a>, or <a href="#macOS_AppleEvents">Apple Events on macOS</a>. The Apple Events backend remains unverified.</p>
 
 <h2 id="Linux">Linux</h2>
 
-<p>The <a href="howto/Install.htm#Linux">Linux setup script</a> installs Keysharp and two independent native components. <code class="no-highlight">keysharp-input</code> provides keyboard and mouse hooks, synthesis, blocking and idle queries through evdev/uinput. <code class="no-highlight">keysharp-desktop</code> provides window automation, capture, cursor queries and movement, monitor geometry and keyboard-map queries. These components serve both X11 and Wayland; operations also depend on the active desktop backend.</p>
+<p>On Ubuntu 24.04, Ubuntu 26.04, and derivatives using those bases, including Pop!_OS 24.04, prefer the <a href="howto/Install.htm#Linux_PPA">Launchpad PPA</a> for installation and updates. Debian, Pop!_OS 22.04, and other supported distributions use the <a href="howto/Install.htm#Linux_Release">release installer</a>. Both routes can install Keysharp and two independent native components. <code class="no-highlight">keysharp-input</code> provides keyboard and mouse hooks, synthesis, blocking and idle queries through evdev/uinput. <code class="no-highlight">keysharp-desktop</code> provides window automation, capture, cursor queries and movement, monitor geometry and keyboard-map queries. These components serve both X11 and Wayland; operations also depend on the active desktop backend.</p>
+<pre class="no-highlight">sudo apt install software-properties-common
+sudo add-apt-repository ppa:descolada/keysharp
+sudo apt update
+sudo apt install keysharp</pre>
+<p>Both native components require ABI 1.0 or a compatible newer 1.x minor, with <code class="no-highlight">libkeysharp_input.so.1</code> and <code class="no-highlight">libkeysharp_desktop.so.1</code>. Upgrade older 0.x components before using this release.</p>
 <p>Keysharp can run without these components, but their operations are unavailable. Input device access requires an active local logind session on seat0. Keyboard and relative-pointer hooks do not provide a complete touchpad gesture interface.</p>
 
 <table class="info">
   <tr><th>Desktop backend</th><th>Window and capture support</th><th>Requirements and limits</th></tr>
   <tr>
     <td><strong>X11</strong></td>
-    <td>Window queries and control, polled window events, area and window capture, cursor and keyboard-map queries.</td>
+    <td>Window queries and control, push window events, area and window capture, cursor and keyboard-map queries.</td>
     <td>Uses the X server through <code class="no-highlight">keysharp-desktop</code>. Window operations and capture require the same broker consent as on Wayland.</td>
   </tr>
   <tr>
@@ -51,7 +56,7 @@
   <tr>
     <td><strong>Other Wayland compositors</strong><br>Sway, Hyprland, COSMIC, Wayfire, labwc and others</td>
     <td>Protocol-dependent window listing, state, activation, cursor operations and capture.</td>
-    <td>Foreign-toplevel protocols do not all supply geometry, state or process IDs. Move/resize and other unsupported operations are unavailable. Portal capture requires a screenshot that can be mapped to the desktop coordinates; unsupported layouts or capture modes remain unavailable.</td>
+    <td>Foreign-toplevel protocols do not all supply geometry, state or process IDs. Hyprland adds geometry, process IDs, move/resize and push window events through its IPC. Other foreign-toplevel backends may omit these operations. Portal capture requires a screenshot that can be mapped to the desktop coordinates; unsupported layouts or capture modes remain unavailable.</td>
   </tr>
 </table>
 <p>Run <code class="no-highlight">keysharp-desktop probe</code> as your graphical user to inspect the active backend. The <a href="https://github.com/keysharp-org/keysharp-desktop/blob/main/docs/platforms.md">desktop component's support table</a> describes the individual operations.</p>
@@ -63,7 +68,7 @@
 <p>A user-owned desktop authority is also available. Its consent records can be modified by programs running as that user and do not authorize the system input service. See <a href="howto/Install.htm#Linux_User">installing without root</a>.</p>
 
 <h3 id="Linux_Controls">Controls and accessibility automation</h3>
-<p>Controls created by the script support toolkit-based control functions. X11 also exposes native child windows, title, focus and targeted input operations through the desktop component, but it does not expose the full Windows control model. Wayland foreign controls require application accessibility support.</p>
+<p>Controls created by the script support toolkit-based control functions, including <a href="lib/ControlSend.htm">ControlSend and ControlSendText</a>. Those functions raise an <a href="lib/Error.htm#UnsupportedError">UnsupportedError</a> for another program's window or control on X11 and Wayland. X11 also exposes native child windows, title and focus operations through the desktop component, but it does not expose the full Windows control model.</p>
 <p>For cross-process inspection and automation, use <a href="https://github.com/keysharp-org/Keysharp/blob/master/Keysharp/Scripts/AtSpi.ks"><code>AtSpi.ks</code></a>. Running it directly opens AtSpiViewer; the library also provides APIs similar to Windows accessibility and UI Automation libraries.</p>
 
 <h3 id="Linux_DBus">Interprocess automation with ComObject</h3>
@@ -82,7 +87,7 @@
   <tr><td>Cursor confinement</td><td>Partial</td><td><code>ClipCursor</code> suppresses out-of-bounds movement.</td></tr>
   <tr><td>GUI windows</td><td>Available</td><td>Some controls differ from Windows.</td></tr>
   <tr><td>Window management</td><td>Partial</td><td>Monitoring also requires Screen Recording.</td></tr>
-  <tr><td>COM APIs</td><td>Available</td><td><a href="lib/ComObject.htm">ComObject</a> addresses Apple Events. See <a href="#macOS_AppleEvents">Interprocess automation with ComObject</a>.</td></tr>
+  <tr><td>COM APIs</td><td>Unverified</td><td><a href="lib/ComObject.htm">ComObject</a> addresses Apple Events. The backend is implemented but has not been verified on macOS hardware. See <a href="#macOS_AppleEvents">Interprocess automation with ComObject</a>.</td></tr>
 </table>
 
 <h3 id="macOS_AppleEvents">Interprocess automation with ComObject</h3>

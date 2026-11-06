@@ -37,11 +37,10 @@
     <p>Type: <a href="../Concepts.htm#strings">String</a> or <a href="../misc/Functor.htm">Function Object</a></p>
     <p>If blank or omitted, <em>NeedleRegEx</em> will be replaced with blank (empty), meaning it will be omitted from the return value. Otherwise, specify a replacement string or in <span class="ver">[v2.1-alpha.1+]</span> a callback function.</p>
     <hr>
-    <p>Specify the string to be substituted for each match, which is plain text (not a regular expression).</p>
+    <p>Specify the string to be substituted for each match, which is plain text (not a regular expression). <span class="ver">[v2.1-alpha.10+]</span>: This may contain binary zero.</p>
     <p id="BackRef">This parameter may include backreferences like $1, which brings in the substring from <em>Haystack</em> that matched the first <a href="../misc/RegEx-QuickRef.htm#subpat">subpattern</a>. The simplest backreferences are $0 through $9, where $0 is the substring that matched the entire pattern, $1 is the substring that matched the first subpattern, $2 is the second, and so on. For backreferences greater than 9 (and optionally those less than or equal to 9), enclose the number in braces; e.g. ${10}, ${11}, and so on. For <a href="RegExMatch.htm#NamedSubPat">named subpatterns</a>, enclose the name in braces; e.g. ${SubpatternName}. To specify a literal $, use $$ (this is the only character that needs such special treatment; backslashes are never needed to escape anything).</p>
     <p>To convert the case of a subpattern, follow the $ with one of the following characters: U or u (uppercase), L or l (lowercase), T or t (title case, in which the first letter of each word is capitalized but all others are made lowercase). For example, both $U1 and $U{1} transcribe an uppercase version of the first subpattern.</p>
     <p>Nonexistent backreferences and those that did not match anything in <em>Haystack</em> -- such as one of the subpatterns in <span class="regex">(abc)|(xyz)</span> -- are transcribed as empty strings.</p>
-    <p><span class="ver">[v2.1-alpha.10+]</span>: The replacement string may contain binary zero.</p>
     <hr>
     <p><span class="ver">[v2.1-alpha.1+]</span>: Specify the function to call for each match in the string.</p>
     <p>The callback accepts one parameter and can be <a href="../Functions.htm#intro">defined</a> as follows:</p>
@@ -68,7 +67,7 @@
     <p>Type: <a href="../Concepts.htm#numbers">Integer</a></p>
     <p>If omitted, it defaults to 1 (the beginning of <em>Haystack</em>). Otherwise, specify 2 to start at the second character, 3 to start at the third, and so on. If <em>StartingPos</em> is beyond the length of <em>Haystack</em>, the search starts at the empty string that lies at the end of <em>Haystack</em> (which typically results in no replacements).</p>
     <p>Specify a negative <em>StartingPos</em> to start at that position from the right. For example, -1 starts at the last character and -2 starts at the next-to-last character. If <em>StartingPos</em> tries to go beyond the left end of <em>Haystack</em>, all of <em>Haystack</em> is searched.</p>
-    <p>Specify 0 to start at the end of <em>Haystack</em>; i.e. the position to the right of the last character. This can be used with zero-width assertions such as <code class="no-highlight">(?&lt;=a)</code>.</p>
+    <p>Specify 0 to start at the beginning of <em>Haystack</em>. AutoHotkey interprets 0 as the position to the right of the last character; use <code>StrLen(Haystack) + 1</code> to select that position.</p>
     <p>Regardless of the value of <em>StartingPos</em>, the return value is always a complete copy of <em>Haystack</em> -- the only difference is that more of its left side might be unaltered compared to what would have happened with a <em>StartingPos</em> of 1.</p>
   </dd>
 
@@ -92,8 +91,9 @@
 <p>To replace simple substrings, use <a href="StrReplace.htm">StrReplace</a> because it is faster than RegExReplace.</p>
 <p>If you know what the maximum number of replacements will be, specifying that for the <em>Limit</em> parameter improves performance because the search can be stopped early (this might also reduce the memory load on the system during the operation). For example, if you know there can be only one match near the beginning of a large string, specify a limit of 1.</p>
 <p>To improve performance, the 100 most recently used regular expressions are kept cached in memory (in compiled form).</p>
-<p>The <a href="../misc/RegEx-QuickRef.htm#Study">study option (S)</a> can sometimes improve the performance of a regular expression that is used many times (such as in a loop).</p>
+<p>Every pattern is compiled for speed; the <a href="../misc/RegEx-QuickRef.htm#Study">study option (S)</a> has no further effect.</p>
 <h2 id="Remarks">Remarks</h2>
+<p>After an empty match, a CRLF pair is treated as one newline when advancing the search. AutoHotkey can advance between the CR and LF when the pattern specifies no newline option, so replacements at empty matches can differ.</p>
 <p>Most characters like abc123 can be used literally inside a regular expression. However, any of the characters in the set <code class="no-highlight">\.*?+[{|()^$</code> must be preceded by a backslash to be seen as literal. For example, <span class="regex">\.</span> is a literal period and <span class="regex">\\</span> is a literal backslash. Escaping can be avoided by using \Q...\E. For example: <span class="regex">\QLiteral Text\E</span>.</p>
 <p>Within a regular expression, special characters such as tab and newline can be escaped with either an accent (`) or a backslash (\). For example, <span class="regex">`t</span> is the same as <span class="regex">\t</span> except when the <a href="../misc/RegEx-QuickRef.htm#opt_x">x option</a> is used.</p>
 <p>To learn the basics of regular expressions (or refresh your memory of pattern syntax), see the <a href="../misc/RegEx-QuickRef.htm">RegEx Quick Reference</a>.</p>

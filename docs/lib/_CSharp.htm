@@ -6,11 +6,11 @@
 <meta name="ahk:equiv-v1" content="index.htm" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="../static/theme.css" rel="stylesheet" type="text/css" />
-<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="../static/content.js" type="text/javascript"></script>
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>#CSharp <span class="ver">[Keysharp]</span></h1>
 
@@ -33,6 +33,7 @@
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>Reads the C# from a file instead of from a block.</p>
+    <p>On Windows, an explicit local named-pipe path (<code class="no-highlight">\\.\pipe\Name</code>) reads the C# source from the pipe.</p>
     <p>A relative path is searched for along the <a href="../Modules.htm#Search_Path">module search path</a>, beginning with the directory of the file containing the directive. <code class="no-highlight">%A_ScriptDir%</code>-style path variables expand here as they do in an #Include path.</p>
     <p>The path is used as written; no extension is appended. The file contains members for the directive's scope, not a standalone namespace or containing class. This parameter is not an expression.</p>
   </dd>
@@ -40,13 +41,15 @@
   <dt id="Library">Library</dt>
   <dd>
     <p>Type: Name</p>
-    <p>Reads <code class="no-highlight">Library.cs</code> using the same Lib-folder search order and underscore fallback as <a href="_Include.htm">#Include &lt;Library&gt;</a>.</p>
+    <p>Reads <code class="no-highlight">Library.cs</code> using the <a href="../Scripts.htm#lib">library directories</a>, including AhkLibPath. It uses a .cs suffix and repeated last-underscore fallback in either compatibility mode.</p>
     <p>For example, <code class="no-highlight">#CSharp &lt;Math_Add&gt;</code> searches for <code class="no-highlight">Math_Add.cs</code> in every Lib folder, then for <code class="no-highlight">Math.cs</code>. Variable references are not allowed.</p>
   </dd>
 </dl>
 
 <h2 id="Visibility">What the script can see</h2>
-<p>At module scope, a <code class="no-highlight">public static</code> method becomes a script function within its declaring module, while public static fields and properties enter the module's variable store. Anything that is not <code class="no-highlight">public</code> is a C# helper which the script cannot call. A module-scope <code class="no-highlight">public</code> method which is not <code class="no-highlight">static</code> is rejected because a module has no instance.</p>
+<p>At module scope, a <code class="no-highlight">public static</code> method becomes a script function within its declaring module, while public static fields and properties enter the module's variable store. Anything that is not <code class="no-highlight">public</code> is a C# helper which the script cannot call. A module-scope <code class="no-highlight">public</code> method which is not <code class="no-highlight">static</code> is rejected because module imports expose static members.</p>
+<p>Public static fields and properties can be named directly, dynamically or through an explicit import from their module. Imported aliases retain the original member's conversion, wrapping and public accessor rules. Inline C# can also read and write imported script variables by the alias name in lowercase.</p>
+<p><code class="no-highlight">[UserDeclaredName("Name")]</code> supplies a public member's script name for direct access, dynamic access and imports. C# continues to use the declared member name. Renamed fields, properties, functions and types retain the original storage or identity, including through chained imports. The name can be a C# constant expression, including a <code class="no-highlight">const</code> value or <code class="no-highlight">nameof</code>. Using aliases can name the attribute, and constants can come from a referenced <a href="_Package.htm">package</a>.</p>
 <p>An explicit <code class="no-highlight">{ Name }</code> import can request any public static module method. Add <code class="no-highlight">[Export]</code> to include one in wildcard imports. The attribute is valid only on public static methods at module scope.</p>
 <p>In a class-body block, public methods and public property accessors are script-visible. A private or protected accessor remains a C# helper, and an <code class="no-highlight">init</code> accessor is read-only after construction. A field is never script-visible, but it may hold C#-side state shared by that class's blocks.</p>
 
@@ -185,6 +188,7 @@ try
     Boom(5)
 catch IndexError
     MsgBox "caught"</pre>
+<p>The error is reported as if raised by a built-in function named after the member, and its <a href="Error.htm#Message">Message</a> names the exception, as in <em>Boom threw IndexOutOfRangeException: Index was outside the bounds of the array.</em></p>
 
 <h2 id="Performance">Performance</h2>
 <p>A call into inline C# costs as much as any other function call; only the body runs faster. Put the whole loop inside the C#: a million calls into a one-line helper is slower than staying in script code.</p>

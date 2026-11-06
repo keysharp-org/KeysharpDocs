@@ -24,12 +24,6 @@
       <li><a href="#Call">Call</a>: Retrieves the next item or items in an enumeration.</li>
     </ul>
   </li>
-  <li><a href="#Properties">Properties</a>:
-    <ul>
-      <li><a href="#Count">Count</a>: Gets the number of values supplied on each iteration.</li>
-      <li><a href="#Source">Source</a>: Gets the object being enumerated.</li>
-    </ul>
-  </li>
   <li><a href="#Related">Related</a></li>
 </ul>
 
@@ -51,24 +45,10 @@
 <p>Type: <a href="../Concepts.htm#boolean">Integer (boolean)</a></p>
 <p>This method returns 1 (true) if successful or 0 (false) if there were no items remaining.</p>
 <h4 id="Next_Remarks">Remarks</h4>
+<p>A built-in collection enumerator in mode 1 or 2 requires exactly that many argument slots, checked before enumeration advances. Pass <code>unset</code> to discard an output: <code>Enum(&amp;Index, unset)</code>. These fixed argument counts are stricter than AutoHotkey's. Custom callback enumerators define their own parameters.</p>
 <p>A simple function definition can be used to create an enumerator; in that case, the Call method is implied.</p>
 <p>When defining your own enumerator, the number of parameters should match the number of variables expected to be passed to the for-loop (before the "in" keyword). This is usually either 1 or 2, but a for-loop can accept up to 19 variables. To allow the method to accept a varying number of variables, declare <a href="../Functions.htm#optional">optional parameters</a>.</p>
 <p>An exception is thrown when the for-loop attempts to call the method if there are more variables than parameters (too many parameters passed, too few defined) or fewer variables than mandatory parameters.</p>
-</div>
-
-<h2 id="Properties">Properties</h2>
-<p>These properties are Keysharp extensions.</p>
-
-<div class="methodShort" id="Count"><h3>Count</h3>
-<p>Gets the number of values the enumerator supplies on each iteration, which is 1 or 2.</p>
-<pre class="Syntax">Number := Enum.<span class="func">Count</span></pre>
-<p>This is the value the <a href="For.htm">for-loop</a> passed to <a href="../Objects.htm#__Enum">__Enum</a> when it requested the enumerator, so a wrapper enumerator can see how many variables its caller intends to assign.</p>
-</div>
-
-<div class="methodShort" id="Source"><h3>Source</h3>
-<p>Gets the object being enumerated.</p>
-<pre class="Syntax">Obj := Enum.<span class="func">Source</span></pre>
-<p>For a built-in enumerator this is the <a href="Array.htm">Array</a>, <a href="Map.htm">Map</a> or other object which produced it.</p>
 </div>
 
 <h2 id="Related">Related</h2>

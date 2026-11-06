@@ -36,6 +36,7 @@
 }</pre>
 <p>In the above, the braces serve to define a <a href="Functions.htm">function body</a> for the hotkey. The opening brace may also be specified on the same line as the double-colon to support the <a href="lib/Block.htm#otb">OTB (One True Brace) style</a>. However, if a hotkey needs to execute only a single line, that line can be listed to the right of the double-colon. In other words, the braces are implicit:</p>
 <pre>#n::Run "notepad"</pre>
+<p>Spaces and tabs are allowed before the <code>::</code> separator, including after <code>Up</code> and in custom combinations such as <code>F13 &amp; F14 ::</code>. <code>Up</code> must be a complete suffix: <code>Upx</code> and <code>Up extra</code> are invalid.</p>
 <p id="ThisHotkey">When a hotkey is triggered, the name of the hotkey is passed as its first parameter named <code>ThisHotkey</code> (which excludes the trailing colons). For example:</p>
 <pre>#n::MsgBox ThisHotkey  <em>; Reports #n</em></pre>
 <p>With few exceptions, this is similar to the built-in variable <a href="Variables.htm#ThisHotkey">A_ThisHotkey</a>. The parameter name can be changed by using a <a href="#Function">named function</a>.</p>
@@ -180,7 +181,7 @@ Numpad0 &amp; Numpad2::Run "Notepad"</pre>
 <p><strong>The prefix key loses its native function:</strong> In the above example, Numpad0 becomes a <em>prefix key</em>; but this also causes Numpad0 to lose its original/native function when it is pressed by itself. To avoid this, a script may configure Numpad0 to perform a new action such as one of the following:</p>
 <pre>Numpad0::WinMaximize "A"   <em>; Maximize the active/foreground window.</em>
 Numpad0::Send "{Numpad0}"  <em>; Make the <i>release</i> of Numpad0 produce a Numpad0 keystroke. See comment below.</em></pre>
-<p><strong>Fire on release:</strong> The presence of one of the above custom combination hotkeys causes the <em>release</em> of Numpad0 to perform the indicated action, but only if you did not press any other keys while Numpad0 was being held down.  This behaviour can be avoided by applying the <a href="#Tilde">tilde prefix</a> to either hotkey.</p>
+<p><strong>Fire on release:</strong> The presence of one of the above custom combination hotkeys causes the <em>release</em> of Numpad0 to perform the indicated action, but only if you did not press any other keys while Numpad0 was being held down.  This behavior can be avoided by applying the <a href="#Tilde">tilde prefix</a> to either hotkey.</p>
 <p id="combo_mods"><strong>Modifiers:</strong> Unlike a normal hotkey, custom combinations act as though they have the <a href="#wildcard">wildcard (*)</a> modifier by default. For example, <code>1 &amp; 2::</code> will activate even if <kbd>Ctrl</kbd> or <kbd>Alt</kbd> is held down when <kbd>1</kbd> and <kbd>2</kbd> are pressed, whereas <code>^1::</code> would be activated only by <kbd>Ctrl</kbd>+<kbd>1</kbd> and not <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>.</p>
 <p>Combinations of three or more keys are not supported. Combinations which your keyboard hardware supports can usually be detected by using <a href="lib/_HotIf.htm">#HotIf</a> and <a href="lib/GetKeyState.htm">GetKeyState</a>, but the results may be inconsistent. For example:</p>
 <pre><em>; Press AppsKey and Alt in any order, then slash (/).</em>
@@ -209,10 +210,10 @@ RControl &amp; Enter::ShiftAltTab  <em>; Without even having to release right-co
 <pre>MButton &amp; WheelDown::MsgBox "You turned the mouse wheel down while holding down the middle button."
 ^!WheelUp::MsgBox "You rotated the wheel up while holding down Control+Alt."</pre>
 <p id="HWheel">If the mouse supports it, horizontal scrolling can be detected via the key names WheelLeft and WheelRight. Some mice have a single wheel which can be scrolled up and down or tilted left and right. Generally in those cases, WheelLeft or WheelRight signals are sent repeatedly while the wheel is held to one side, to simulate continuous scrolling. This typically causes the hotkeys to execute repeatedly.</p>
-<p>The built-in variable <strong>A_EventInfo</strong> contains the amount by which the wheel was turned, which is typically 120. However, A_EventInfo can be greater or less than 120 under the following circumstances:</p>
+<p>For hook hotkeys, the built-in variable <a href="Variables.htm#EventInfo">A_EventInfo</a> is a metadata object. Its <strong>Extra</strong> property contains the signed amount by which the wheel was turned, whose absolute value is typically 120. AutoHotkey returns the amount directly in A_EventInfo. The absolute value can be greater or less than 120 under the following circumstances:</p>
 <ul>
-  <li>If the mouse hardware reports distances of less than one notch, A_EventInfo may be less than 120;</li>
-  <li>If the wheel is being turned quickly (depending on the type of mouse), A_EventInfo may be greater than 120. A hotkey like the following can help analyze your mouse: <code>~WheelDown::ToolTip A_EventInfo</code></li>
+  <li>If the mouse hardware reports distances of less than one notch, the amount may be less than 120;</li>
+  <li>If the wheel is being turned quickly (depending on the type of mouse), the amount may be greater than 120. A hotkey like the following can help analyze your mouse: <code>~WheelDown::ToolTip A_EventInfo.Extra</code></li>
 </ul>
 <p>Some of the most useful hotkeys for the mouse wheel involve alternate modes of scrolling a window's text. For example, the following pair of hotkeys scrolls horizontally instead of vertically when you turn the wheel while holding down the left <kbd>Ctrl</kbd>:</p>
 <pre>~LControl &amp; WheelUp::  <em>; Scroll left.</em>

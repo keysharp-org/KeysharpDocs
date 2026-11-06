@@ -69,12 +69,14 @@ jobs:
           for name in \
             "keysharp-$VERSION-win-x64.msi" \
             "keysharp-$VERSION-win-x64.zip" \
+            "keysharp-$VERSION-win-arm64.msi" \
+            "keysharp-$VERSION-win-arm64.zip" \
             "keysharp-$VERSION-osx-arm64.dmg" \
             "keysharp-$VERSION-osx-x64.dmg" \
             "keysharp-$VERSION-osx-arm64.pkg" \
             "keysharp-$VERSION-osx-x64.pkg" \
-            "keysharp-$VERSION-linux-x64.deb" \
-            "keysharp-$VERSION-linux-arm64.deb" \
+            "keysharp_${VERSION}_amd64.deb" \
+            "keysharp_${VERSION}_arm64.deb" \
             "keysharp-$VERSION-linux-x64.tar.gz" \
             "keysharp-$VERSION-linux-arm64.tar.gz" ; do
             if ! printf '%s\n' "$assets" | grep -Fxq "$name"; then

@@ -45,6 +45,7 @@ tocData = [
       ["WinEvent","lib/WinEvent.htm"],
       ["WinFromPoint","lib/WinFromPoint.htm"],
       ["Clipboard","lib/Clipboard.htm"],
+      ["Input Devices","lib/Input.htm"],
       ["Audio","lib/Audio.htm"]
     ]],
     ["Runtime and Interop","",
@@ -54,10 +55,10 @@ tocData = [
       ["Await","lib/Await.htm"],
       ["Lock","lib/Lock.htm"],
       ["Collect","lib/Collect.htm"],
-      ["ObjFree","lib/ObjFree.htm"],
       ["IsComponentAvailable","lib/IsComponentAvailable.htm"],
       ["ValidateScript / CompileScript","lib/ValidateScript.htm"],
       ["Clr Interop","lib/Clr.htm"],
+      ["#Startup","lib/_Startup.htm"],
       ["#Package","lib/_Package.htm"],
       ["#CSharp","lib/_CSharp.htm"]
     ]],
@@ -290,7 +291,8 @@ tocData = [
   ["Modules","Modules.htm",
   [
     ["#Module","lib/_Module.htm"],
-    ["#Import","lib/_Import.htm"]
+    ["#Import","lib/_Import.htm"],
+    ["Module.__Ref","Modules.htm#__Ref"]
   ]],
   ["Monitor","lib/Monitor.htm",
   [
@@ -367,6 +369,7 @@ tocData = [
     ["IsLabel","lib/IsLabel.htm"],
     ["IsObject","lib/IsObject.htm"],
     ["IsSet / IsSetRef","lib/IsSet.htm"],
+    ["ObjCreateWithDataPtr","lib/ObjCreateWithDataPtr.htm"],
     ["ListLines","lib/ListLines.htm"],
     ["ListVars","lib/ListVars.htm"],
     ["OutputDebug","lib/OutputDebug.htm"],
@@ -586,6 +589,7 @@ tocData = [
     ["#Package","lib/_Package.htm"],
     ["#Requires","lib/_Requires.htm"],
     ["#SingleInstance","lib/_SingleInstance.htm"],
+    ["#Startup","lib/_Startup.htm"],
     ["#StructPack","lib/_StructPack.htm"],
     ["#SuspendExempt","lib/_SuspendExempt.htm"],
     ["#TrayIcon","lib/_TrayIcon.htm"],

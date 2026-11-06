@@ -5,11 +5,11 @@
 <meta name="description" content="The core differences between Keysharp and the AutoHotkey v2 compatibility target, and an index of the detailed contracts." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="static/theme.css" rel="stylesheet" type="text/css" />
-<link href="static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="static/content.js" type="text/javascript"></script>
+<link href="static/theme.css" rel="stylesheet" />
+<link href="static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>Changes from AutoHotkey to Keysharp</h1>
 
@@ -50,7 +50,7 @@
 <p>On Linux and macOS, window styles, control messages and other Win32-level GUI facilities are unavailable or approximated; <a href="lib/GuiControls.htm">GUI Control Types</a> and <a href="lib/GuiOnEvent.htm">GUI Events</a> record where.</p>
 
 <h3 id="Managed">A managed object model</h3>
-<p>Objects are .NET objects. <a href="Objects.htm#Lifetime">Object lifetime and finalization</a> follow the garbage collector instead of reference counting, so <code>__Delete</code> runs when the collector reclaims the object rather than when the last reference goes away, and the <a href="lib/ObjAddRef.htm">reference-counting functions</a> reflect the managed runtime.</p>
+<p>Objects are .NET objects. <a href="Objects.htm#Lifetime">Object lifetime and finalization</a> follow the garbage collector instead of reference counting, so <code>__Delete</code> runs when the collector reclaims the object rather than when the last reference goes away. The <a href="lib/ObjAddRef.htm">reference-counting functions</a> manage native COM references on Windows, including those of a script object's COM wrapper.</p>
 <p>The same applies wherever a script reaches outside itself for memory: <a href="lib/DllCall.htm">DllCall</a>, <a href="lib/CallbackCreate.htm">CallbackCreate</a>, <a href="lib/StrPtr.htm">StrPtr</a> and <a href="Objects.htm#ObjPtr">ObjPtr</a> operate on managed values, and <a href="lib/StringBuffer.htm">StringBuffer</a> is the writable string-memory type to pass to native code. For calling .NET directly, <a href="lib/Clr.htm">Clr</a> is available.</p>
 
 <h3 id="Language">Language additions</h3>
@@ -65,8 +65,10 @@
 
 <h3 id="Runtime">Runtime and Language</h3>
 <ul>
-  <li><a href="Variables.htm#IncDec">Increment/decrement</a>, <a href="Variables.htm#AssignOp">concatenation assignment</a>, <a href="Concepts.htm#numbers">numeric literals</a>, <a href="Concepts.htm#unset">unset values</a> and <a href="Variables.htm#deref">dynamic dereferencing</a> have documented implementation differences.</li>
+  <li><a href="Variables.htm#IncDec">Increment/decrement</a>, <a href="Variables.htm#concat">concatenation</a>, <a href="Variables.htm#AssignOp">concatenation assignment</a>, <a href="Concepts.htm#numbers">numeric literals</a>, <a href="Concepts.htm#unset">unset values</a> and <a href="Variables.htm#deref">dynamic dereferencing</a> have documented implementation differences.</li>
   <li><a href="Functions.htm#ByRef">Reference parameters</a> accept additional target forms.</li>
+  <li><a href="lib/Map.htm">Map</a> accepts Float keys in both compatibility modes and preserves their type, so <code>1</code>, <code>1.0</code> and <code>"1.0"</code> can identify separate entries. AutoHotkey converts Float keys to String in v2.0 mode and rejects them in v2.1-alpha.35's v2.1 mode.</li>
+  <li><a href="lib/StrCompare.htm">Case-insensitive comparisons</a> retain Unicode folding, and <a href="Variables.htm#EventInfo">A_EventInfo</a> provides an object for input hook events.</li>
 </ul>
 
 <h3 id="Interop">Memory and Interop</h3>

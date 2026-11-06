@@ -32,8 +32,8 @@
 <p>This function returns 1 (true) if the specified label exists within the current scope, otherwise 0 (false).</p>
 
 <h2 id="Remarks">Remarks</h2>
-<p>This function is useful to avoid runtime errors when specifying a dynamic label for <a href="Goto.htm">Goto</a>.</p>
-<p>When called from inside a function, only that function's labels are searched. Global labels are not valid targets for a local goto.</p>
+<p>This function checks whether a dynamic target for <a href="Goto.htm">Goto</a> exists. It does not check whether the jump can reach that label.</p>
+<p>When called from inside a function, only that function's labels are searched. Outside any function, the auto-execute section's labels are searched. Global labels are not valid targets for a local goto.</p>
 
 <h2 id="Related">Related</h2>
 <p><a href="../misc/Labels.htm">Labels</a></p>

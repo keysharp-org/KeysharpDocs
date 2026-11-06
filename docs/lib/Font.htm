@@ -5,11 +5,11 @@
 <meta name="description" content="A font as a value object, carrying what Gui.SetFont takes, plus the platform's standard UI, emoji and monospace families." />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="../static/theme.css" rel="stylesheet" type="text/css" />
-<link href="../static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="../static/content.js" type="text/javascript"></script>
+<link href="../static/theme.css" rel="stylesheet" />
+<link href="../static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="../static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 
 <h1>Font Object</h1>
 <pre class="NoIndent">class Font extends Object</pre>
@@ -68,7 +68,7 @@
   <tr id="GuiDefault"><td><code>Font.GuiDefault</code></td><td>The font a new <a href="Gui.htm">Gui</a> starts with. This can differ from UiDefault.</td></tr>
   <tr id="FamilyList"><td><code>Font.Families</code></td><td>An <a href="Array.htm">Array</a> of the family names installed on the system, sorted alphabetically.</td></tr>
 </table>
-<p class="note"><strong>Note:</strong> On Linux and macOS the system cannot be asked for its interface font until the first window exists, so <code>Font.UiDefault</code> falls back to the platform's usual family before then.</p>
+<p>On Linux, an unavailable GTK theme font resolves to the installed family selected by Pango.</p>
 
 <p>These Font objects set size and styles only when the toolkit can resolve them, and never set text color.</p>
 <h2 id="Exists">Exists</h2>

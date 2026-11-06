@@ -6,11 +6,11 @@
 <meta name="ahk:equiv-v1" content="AHKL_ChangeLog.htm" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link href="static/theme.css" rel="stylesheet" type="text/css" />
-<link href="static/dark.css" rel="stylesheet" type="text/css" media="(prefers-color-scheme: dark)" id="dark_css" />
-<script src="static/content.js" type="text/javascript"></script>
+<link href="static/theme.css" rel="stylesheet" />
+<link href="static/dark.css" rel="stylesheet" media="(prefers-color-scheme: dark)" id="dark_css" />
+<script src="static/content.js" id="content_js"></script>
 </head>
-<body>
+<body><script>site.init();</script>
 <h1>Changes &amp; New Features</h1>
 <p>For an overview of changes in major and minor releases, see the following:</p>
 <ul>
@@ -19,23 +19,80 @@
 </ul>
 <p>For full technical details of changes, refer to <a href="https://github.com/AutoHotkey/AutoHotkey">GitHub</a>.</p>
 
+<h2 id="v2.1-alpha.36">2.1-alpha.36 - October 18, 2026</h2>
+<p>Added ObjCreateWithDataPtr.</p>
+<p><strong>Changes applicable only to alpha users:</strong></p>
+<p>Fixed a directory listed in AhkLibPath being ignored if the previous directory didn't exist.</p>
+<p>Fixed detection of invalid constructor calls such as RegExMatchInfo().</p>
+<p>Fixed #Import to raise an error if there is a conflicting non-static local variable.</p>
+
+<h2 id="v2.1-alpha.35">2.1-alpha.35 - October 11, 2026</h2>
+<p>Changed Map to throw TypeError for Float keys in v2.1 mode.</p>
+<p>Changed Array to throw TypeError for bad index types in v2.1 mode.</p>
+<p>Changed search logic for #Include &lt;MyLib&gt; and #Import; refer to <a href="Scripts.htm#lib">Script Library Folders</a> and <a href="Modules.htm#Search_Path">Search Path</a>.</p>
+<p><strong>Changes applicable only to alpha users:</strong></p>
+<p>Fixed #Import to disallow the Export keyword inside functions.</p>
+
+<h2 id="v2.1-alpha.34">2.1-alpha.34 - October 9, 2026</h2>
+<p>Improved the reliability of FileSetTime with respect to restricted permissions and file locks. [PR #358 by miaminlk] </p>
+<p>Removed message filtering for TreeView controls and FileSelect dialogs. This reverts a bug-fix added in <a href="https://www.autohotkey.com/docs/v1/ChangeLogHelp.htm#v1.0.44.11">v1.0.44.11</a>, which worked around an issue on OS versions which are no longer supported, but caused the same issue with DirSelect on newer OS versions. This has no known effect on FileSelect on any supported OS.</p>
+<p>Added numeric type class support to NumPut/NumGet.</p>
+<p>Added support for <a href="Structs.htm#classdef-union">anonymous unions</a>.</p>
+<p>Added support for hiding properties from <a href="lib/Props.htm">Props</a> and the debugger by including <code>Enumerable: false</code> in the <a href="lib/Object.htm#DefineProp">DefineProp</a> descriptor.</p>
+<p><strong>Changes applicable only to alpha users:</strong></p>
+<p>Changed #Requires inside a function or #Include file to never affect the current module's compatibility mode for global code.</p>
+<p>Changed Clone to throw TypeError if typed properties exist, instead of producing a broken object.</p>
+<p>Changed typed properties and DllCall to let a <em>StructClass</em>.Array "decay" to a <em>StructClass</em>.Ptr.</p>
+<p>Fixed some inconsistencies with <em>NumericClass</em>.Ptr versus other structs.</p>
+<p>Changed <code>a.%b?% ?? c</code> to be consistent with <code>%r?% ?? c</code>. It now short-circuits instead of invoking the default property.</p>
+<p>Improved validation of DefineProp's Descriptor parameter.</p>
+
+<h2 id="v2.0.30">2.0.30 - October 9, 2026</h2>
+<p>Fixed Gui.Move moving the window incorrectly if it has an owner. [PR #359 by iPhilip]</p>
+<p>Fixed <code>a &amp; b::AltTabMenu</code> and similar crashing the program when activated [broken by v2.0.20].</p>
+
+<h2 id="v2.0.29">2.0.29 - October 3, 2026</h2>
+<p>Fixed OnMessage crashing if more than 65536 monitors are registered.</p>
+
+<h2 id="v2.1-alpha.33">2.1-alpha.33 - October 3, 2026</h2>
+<p><strong>Changes applicable only to alpha users:</strong></p>
+<p>Added the capability to use #Import inside a function.</p>
+<p>Added __Ref method to Module, to support <code>&amp;MyMod.MyVar</code>.</p>
+<p>Fixed <code>a.b[c]</code> crash when <code>a.b</code> returns unset.</p>
+<p>Fixed ObjSetCapacity and related to throw if target is Struct.</p>
+<p>Fixed EditGetLine, ControlChooseIndex and ControlDeleteItem on 32-bit.</p>
+<p>Fixed <code>DlCall(..., Struct.Ptr, unset)</code> on 32-bit.</p>
+<p>Fixed Struct.Array DllCall parameter types on 32-bit.</p>
+<p>Fixed CallbackCreate with 64-bit numeric parameter types on 32-bit.</p>
+
 <h2 id="v2.1-alpha.32">2.1-alpha.32 - September 12, 2026</h2>
 <p>Added the <a href="lib/Gui.htm#FontHandle">FontHandle property (Gui)</a>.</p>
-<p>Fixed Gui.Move to not DPI-scale X or Y.</p>
 <p><strong>Changes applicable only to alpha users:</strong></p>
 <p>Fixed crash when Until is used at the end of a module.</p>
 <p>Fixed simple <code>a := b</code> assignments where b is a virtual reference.</p>
 
+<h2 id="v2.0.28">2.0.28 - September 12, 2026</h2>
+<p>Fixed Gui.Move to not DPI-scale X or Y.</p>
+
 <h2 id="v2.1-alpha.31">2.1-alpha.31 - August 28, 2026</h2>
 <p><strong>Changes applicable only to alpha users:</strong></p>
-<p>Removed standalone Export declarations and default exports. Globals declared directly in a module are now implicitly exported, while imported aliases are re-exported only by <code>#Import Export</code>. A bare import now binds the module object.</p>
-<p>Fixed #Import within #Module AHK and fixed multi-level imports changing an unset value to <code>""</code>.</p>
-<p>Fixed <code>Send "{Click X Y Count}"</code> moving to the coordinates once per sequence instead of once per click.</p>
-<p>Fixed successful CaretGetPos, FileGetShortcut, MouseGetPos, PixelSearch and Run calls leaving absent output values unset instead of making them blank.</p>
-<p>Fixed a property setter not being permitted after a separate getter, and Props(v) aliasing <em>v</em>.</p>
-<p>Fixed a ListView header's ContextMenu event reporting an incorrect Item, GuiCtrl.OnMessage threads exceeding #MaxThreads or bypassing a positive thread priority, and a class being permitted to subclass itself.</p>
-<p>Fixed an IServiceProvider interface-pointer leak in ComObjQuery, a crash while destructing a boxed pointer with a nested struct, and a trailing character in an unset-return error message.</p>
-<p>Fixed RegExMatch OutputVar to be unset instead of <code>""</code> in v2.1 mode.</p>
+<p>Changed export to be implied for names defined within a module (but imported names are still not exported by default).</p>
+<p>Fixed #Import in #Module AHK.</p>
+<p>Fixed some output parameters incorrectly becoming unset when they should be "made blank".</p>
+<p>Fixed <code>Props(v)</code> to retain the value of v, not alias v.</p>
+<p>Fixed multi-level import causing unset to become "".</p>
+<p>Fixed trailing character in error message for unset return.</p>
+<p>Fixed crash when destructing boxed pointer with nested struct.</p>
+<p>Fixed GuiCtrl.OnMessage threads to not overrun the #MaxThreads limit.</p>
+<p>Fixed Thread Priority &gt; 0 to block GuiCtrl.OnMessage threads.</p>
+
+<h2 id="v2.0.27">2.0.27 - August 28, 2026</h2>
+<p>Fixed breakpoint on line containing <code>=&gt;</code> where direct parent is a block.</p>
+<p>Fixed <code>Send "{Click X Y Count}"</code> to move only once, not <em>Count</em> times.</p>
+<p>Fixed IServiceProvider interface pointer leak in ComObjQuery.</p>
+<p>Fixed setter definition to be permitted after a separate getter.</p>
+<p>Fixed Item parameter of ContextMenu event raised by a ListView's Header.</p>
+<p>Fixed class declarations to not permit a class to subclass itself.</p>
 
 <h2 id="v2.1-alpha.30">2.1-alpha.30 - May 17, 2026</h2>
 <p>Added "void" return type for DllCall, ComCall and CallbackCreate.</p>
@@ -164,11 +221,11 @@
 <p>Added Offset sub-parameter for DefineProp, to allow unions.</p>
 <p>Changed <code>StructClass.Ptr</code> to subclass <code>StructClass.base.Ptr</code> instead of <code>Struct.Ptr</code>.</p>
 <p>Changed GetOwnPropDesc to return classes for numeric types.</p>
-<p>Fixed undefined behaviour when DllCall is passed a Struct class with no fields.</p>
+<p>Fixed undefined behavior when DllCall is passed a Struct class with no fields.</p>
 <p>Fixed <code>StructClass[N].Ptr</code> (pointers to array types).</p>
 <p>Fixed <code>#Import ":N"</code> importing the wrong file when used under #Module in an #Include file.</p>
-<p>Fixed undefined behaviour when a nested struct releases the last reference to the outer struct.</p>
-<p>Fixed repeat references to struct array classes causing undefined behaviour.</p>
+<p>Fixed undefined behavior when a nested struct releases the last reference to the outer struct.</p>
+<p>Fixed repeat references to struct array classes causing undefined behavior.</p>
 <p>Fixed circular references preventing deletion of Struct.Ptr/Array classes.</p>
 
 <h2 id="v2.1-alpha.23">2.1-alpha.23 - March 22, 2026</h2>
@@ -184,7 +241,7 @@
 <p>Fixed class declarations to not permit a class to subclass itself.</p>
 
 <h2 id="v2.0.22">2.0.22 - March 22, 2026</h2>
-<p>Removed the undocumented effect that a hotkey with the &lt;/&gt; prefix had on the corresponding modifier key; e.g. <code>&lt;^a::</code> causing <code>LCtrl::</code> to fire on release, inconsistent with the <a href="KeyList.htm#modifier">documentation</a>. Always firing on press provides greater consistency and flexibility. The modifier key itself was suppressed since v2.0.20. Neutral modifiers such as <code>Ctrl::</code> always fire on release, and similar behaviour can be implemented with <a href="Variables.htm#PriorKey">A_PriorKey</a> and <code>~LCtrl up::</code>.</p>
+<p>Removed the undocumented effect that a hotkey with the &lt;/&gt; prefix had on the corresponding modifier key; e.g. <code>&lt;^a::</code> causing <code>LCtrl::</code> to fire on release, inconsistent with the <a href="KeyList.htm#modifier">documentation</a>. Always firing on press provides greater consistency and flexibility. The modifier key itself was suppressed since v2.0.20. Neutral modifiers such as <code>Ctrl::</code> always fire on release, and similar behavior can be implemented with <a href="Variables.htm#PriorKey">A_PriorKey</a> and <code>~LCtrl up::</code>.</p>
 <p>Changed error dialogs to use msftedit.dll instead of riched20.dll to fix the following issues:</p>
 <ul>
   <li>Hanging when inspected by UI Automation.</li>
@@ -195,7 +252,7 @@
 <p>Fixed detection of <code>DllCall(... "str",&amp;var:={} ...)</code> as an error.</p>
 <p>Fixed <code>CapsLock::</code> to suppress even if CapsLock is used as a prefix key.</p>
 <p>Fixed neutral Ctrl/Alt/Shift hotkeys to not suppress the key [broken by v2.0.20].</p>
-<p>Fixed fire-on-release behaviour of neutral Ctrl/Alt/Shift hotkeys when a key-up variant is turned on but disabled by #HotIf.</p>
+<p>Fixed fire-on-release behavior of neutral Ctrl/Alt/Shift hotkeys when a key-up variant is turned on but disabled by #HotIf.</p>
 <p>Fixed <code>CapsLock &amp; 1::</code> to revert CapsLock state even if another prefix key is pressed before CapsLock is released.</p>
 <p>Fixed L/R modifier key-up not being suppressed in some cases where key-down was suppressed.</p>
 <p>Fixed L/R modifier key-up to be passed through if <code class="no-highlight">~</code> is used even if key-down was suppressed.</p>
@@ -252,7 +309,7 @@
 <p>Changed <code>Import x {}</code> to add x to the global namespace even without <code>as x</code>. By contrast, <code>Import "x" {}</code> and <code>Import {} from x</code> still do not add x to the global namespace.</p>
 <p>Changed Import to check the current file's directory before the search path.</p>
 <p>Changed #Module to allow reopening modules.</p>
-<p>Fixed undefined behaviour in initialization of module search path.</p>
+<p>Fixed undefined behavior in initialization of module search path.</p>
 <p>Fixed #Module to strip quote marks around its parameter.</p>
 
 <h2 id="v2.1-alpha.19">2.1-alpha.19 - February 13, 2026</h2>
@@ -270,7 +327,7 @@
 <p>Fixed StrGet crashing when given an address and not a length. (Broken by v2.0.20)</p>
 
 <h2 id="v2.0.20">2.0.20 - February 8, 2026</h2>
-<p>Fixed potential undefined behaviour in message callbacks during script termination.</p>
+<p>Fixed potential undefined behavior in message callbacks during script termination.</p>
 <p>Fixed Run not closing the process handle.</p>
 <p>Fixed GuiFromHwnd crashing if passed another script's GUI window HWND.</p>
 <p>Fixed leading space in <code>For( a in b )</code> incorrectly raising an error.</p>
@@ -400,7 +457,7 @@
 <p>Fixed the increment/decrement operators to throw UnsetError if the var is unset, not TypeError.</p>
 <p>Fixed OwnProps to assign the property name safely in cases where a property deletes itself.</p>
 <p>Fixed breakpoints to work in arrow functions under a control flow statement without a block.</p>
-<p>Fixed debugger to break at the line of the call when stepping out of a function. (This behaviour was added in Revision 31 and broken by v1.1.30.00.)</p>
+<p>Fixed debugger to break at the line of the call when stepping out of a function. (This behavior was added in Revision 31 and broken by v1.1.30.00.)</p>
 <p>Stepping out of a function which was called as a new thread now breaks at the line which was interrupted, instead of waiting until the next line is reached.</p>
 <p>Fixed debugger to not delete temporary breakpoints which are ignored while evaluating DBGp property_get or context_get.</p>
 
@@ -426,7 +483,7 @@
 <p>Fixed built-in/wildcard imports in assume-global functions.</p>
 
 <h2 id="v2.1-alpha.11">2.1-alpha.11 - May 24, 2024</h2>
-<p>Added <a href="Modules.htm">Modules</a>, <a href="lib/_Module.htm">#Module</a>, <a href="lib/_Import.htm">#Import</a> and <a href="lib/_Import.htm#Export">Export</a>.</p>
+<p>Added <a href="Modules.htm">Modules</a>, <a href="lib/_Module.htm">#Module</a>, <a href="lib/_Import.htm">#Import</a> and Export.</p>
 
 <p><strong>Changes applicable only to alpha users:</strong></p>
 <p>Fixed leak from virtual references which return objects.</p>
@@ -442,7 +499,7 @@
 <p>Changed how KeyOpt (InputHook) applies option removal for SC-based keys.</p>
 <p>Changed WinTitles with two different ahk_id values to yield no match.</p>
 <p>Changed RegExReplace to support binary zero in Replacement.</p>
-<p>Implemented <a href="Functions.htm#virtual-reference">virtual references</a>.</p>
+<p>Implemented <a href="Functions.htm#virtual-references">virtual references</a>.</p>
 <p>Added Object.Prototype.Props(), which enumerates own and inherited properties.</p>
 <p>Improved DBGp property and context commands:</p>
 <ul>
@@ -523,7 +580,7 @@
 <p>Fixed key-up hotkeys not firing if the key repeats after modifiers change. For example, <code>F1::Send "{Ctrl down}"</code> should allow <code>F1 up::</code> to execute when the key is released even though Ctrl is down, but was not allowing it after key-repeat occurs.</p>
 <p>Fixed an error message to refer to #HotIf rather than #IfWin. [PR #327]</p>
 <p>Fixed OwnProps erroneously skipping properties with optional parameters.</p>
-<p>Fixed inconsistent behaviour of cloned dynamic properties.</p>
+<p>Fixed inconsistent behavior of cloned dynamic properties.</p>
 <ul>
   <li>OwnProps not skipping cloned properties which require parameters.</li>
   <li>Parameters not being passed recursively to parameterless properties (i.e. to allow <code>a.b[c]</code> to evaluate as <code>(a.b)[c]</code>).</li>
@@ -624,7 +681,7 @@
 <p>Added <code>Class(Name, BaseClass, Args*)</code> and <code>Class(BaseClass, Args*)</code> (see <a href="lib/Class.htm#StaticCall">Class.Call</a>).</p>
 <p>Added support for left/right modifiers in {Blind}, as in <code class="no-highlight">{Blind&gt;^}</code>.</p>
 <p>Changed remapping to utilize left/right modifiers in Blind; e.g. <code>&gt;^a::b</code> remaps RCtrl-A to B and LCtrl-RCtrl-A to LCtrl-B, instead of just B.</p>
-<p>Changed DllCall to permit CDecl to be omitted for all functions (see <a href="lib/DllCall.htm#cdecl">CDecl</a>).</p>
+<p>Changed DllCall to permit CDecl to be omitted for all functions (see <a href="lib/DllCall.htm#CDecl">CDecl</a>).</p>
 <p>Revised parsing of statements. Global, local and static variable declarations with multiple initializers are now evaluated as one, so there is no need to step over each initializer individually while debugging.</p>
 <p>Changed ListVars to show unset vars as "varname: unset".</p>
 <p>Changed Throw to be a function, <strike>permitting thrown errors to be continuable</strike> (see <a href="lib/Throw.htm#Remarks">Throw</a>).</p>
@@ -704,7 +761,7 @@
 <p>Fixed errors thrown by a ComObject wrapper not being propagated correctly if it is called via an object/COM.</p>
 <p>Fixed the Hotkey GUI control to allow setting the symbols <code class="no-highlight">^</code>, <code class="no-highlight">!</code> and <code class="no-highlight">+</code> as hotkeys.</p>
 <p>Fixed the Hotkey control to include modifiers when its value is set to a symbol.</p>
-<p>Fixed potential misbehaviour of InputHook.KeyOpt() with single chars.</p>
+<p>Fixed potential misbehavior of InputHook.KeyOpt() with single chars.</p>
 <ul>
 <li>Option removal potentially not affecting the corresponding SC.</li>
 <li>Options potentially also being applied to sc000.</li>
@@ -759,7 +816,7 @@
 <p>Fixed SetFont to permit leading spaces in the Options parameter.</p>
 <p>Fixed sending of <code class="no-highlight">{ASC nnnn}</code>.</p>
 <p>Fixed <code>a.base := a</code> to throw an error.</p>
-<p>Fixed <code>x.y := unset</code> causing crashes or undefined behaviour.</p>
+<p>Fixed <code>x.y := unset</code> causing crashes or undefined behavior.</p>
 <p>Fixed GuiControl.Move() to be relative to the GUI's client area even when the GUI is not its parent.</p>
 <p>Fixed Menu Add overwriting items which were appended by Menu Insert.</p>
 <strong>Launcher</strong>
@@ -783,7 +840,7 @@
 <p>Fixed Up/Down key handling in the Launch Config GUI.</p>
 
 <h2 id="v2.0.2">2.0.2 - January 2, 2023</h2>
-<p>Fixed Short DllCall arg type and undefined behaviour for invalid types.</p>
+<p>Fixed Short DllCall arg type and undefined behavior for invalid types.</p>
 <p>Fixed (non-string) file version number for AutoHotkey binaries.</p>
 <p>Fixed parameter type errors to show the correct parameter number.</p>
 

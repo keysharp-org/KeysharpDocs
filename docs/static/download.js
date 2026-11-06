@@ -1,10 +1,9 @@
 /*
  * Download picker enhancement.
  *
- * The picker is fully working HTML on its own: every card already links to a real installer for the
- * platform it names, at the architecture most visitors on that platform use. Those links are written
- * into the page by scripts/Set-KeysharpVersion.ps1 whenever a Keysharp release appears, so nothing
- * here has to ask a server which version is current.
+ * The picker is fully working HTML on its own: Windows and macOS cards link to installers, and the
+ * Linux card links to installation instructions. Versioned download links are written into the page
+ * by scripts/Set-KeysharpVersion.ps1 whenever a Keysharp release appears.
  *
  * This file only tailors the page to the visitor, using information the browser already has:
  *   - marks the card matching their operating system, and

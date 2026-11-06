@@ -251,6 +251,11 @@ function setupSite() {
       ['docs_data', 'docsData']
     ], caller, args);
   };
+  site.waitForDataSyntax = function(caller, args) {
+    return site.waitForData(site.urlBase + '/static/source/data_syntax.js', [
+      ['syntax_data', 'syntaxData']
+    ], caller, args);
+  };
 }
 
 function setupCache() {
@@ -581,10 +586,9 @@ function setupSiteHost() {
     };
     tools.tool.home = new function() {
       const tool = this;
-      tool.link = location.protocol + '//' + location.host;
       tool.init = function() {
         tool.element = tools.element.querySelector('.home');
-        tool.element.firstChild.href = tool.link;
+        tool.element.firstChild.href = location.protocol + '//' + location.host;
       };
     };
     tools.tool.language = new function() {
@@ -1085,6 +1089,13 @@ function setupSiteHost() {
   host.setupSidebarTabsPageIndex = function() {
     const index = this;
     index.createList = function(items, filter) {
+      /* Filter types (-1 = unfiltered):
+        0 = directive         5 = declaration
+        1 = built-in var      6 = built-in class
+        2 = built-in func     7 = built-in method/prop
+        3 = control flow      99 = Ahk2Exe compiler
+        4 = operator
+      */
       const list = [];
       const type_name = { 2: T('function'), 4: T('operator'), 6: T('class') };
       const lang = cache.docs_data.LANGUAGE;
@@ -1181,18 +1192,18 @@ function setupSiteHost() {
     };
     search.updateList = function() {
       const input = cache.update('search_input', search.edit.value);
-      const input_array = cache.update('search_input_array', convertInputToArray(input));
+      const input_array = cache.update('search_input_array', search.convertInputToArray(input));
       search.list.removeItems();
       search.edit.setMatchStateColor(null);
       if (!input_array) return;
       search.list.addItems(search.createList(input_array));
       search.list.selectItemByIndex(0);
       search.edit.setMatchStateColor(!!(search.list.items.length));
-      function convertInputToArray(input) {
-        input = input.toLowerCase().replace(/^ +| +$| +(?= )|\+/, ''); // Normalize whitespace.
-        if (input == '') return null;
-        return input.split(' ').filter(Boolean); // Split and remove undefined or empty strings.
-      };
+    };
+    search.convertInputToArray = function(input) {
+      input = input.toLowerCase().replace(/^ +| +$| +(?= )|\+/, ''); // Normalize whitespace.
+      if (input == '') return null;
+      return input.split(' ').filter(Boolean); // Split and remove undefined or empty strings.
     };
     search.createList = function(terms) {
       const list = [], PartialIndex = {}, RESULT_LIMIT = 50;
@@ -1621,13 +1632,13 @@ function setupSiteFrameContent() {
   // Add syntax highlighting for AutoHotkey code:
   content.addSyntaxColors = function(pres) {
     if (typeof highlighter == 'undefined') {
-      if (!site.waitForDataIndex(content.addSyntaxColors, arguments)) return;
+      if (!site.waitForDataSyntax(content.addSyntaxColors, arguments)) return;
       site.loadScript(site.urlBase + '/static/highlighter/highlighter.js', function() {
-        highlighter.addSyntaxColors(pres, cache.index_data, site.urlBase + '/', false);
+        highlighter.addSyntaxColors(pres, cache.syntax_data, site.urlBase + '/', false);
       });
     }
     else
-      highlighter.addSyntaxColors(pres, cache.index_data, site.urlBase + '/', false);
+      highlighter.addSyntaxColors(pres, cache.syntax_data, site.urlBase + '/', false);
   };
     // Add the independence and provenance statement at the bottom of every page:
     content.addFooter = function() {
@@ -1911,17 +1922,18 @@ function setupEditListCombo(edit, list) {
   });
   // Select an item on click:
   list.addEventListener('click', function(e) {
-    if (!e.target.closest('a')) return;
+    const item = e.target.closest('a');
+    if (!item) return;
     e.preventDefault();
-    list.selectItemByIndex(e.target._index);
+    list.selectItemByIndex(item._index);
   });
   // Open an item on double-click or touch (for mobile):
   var touchmoved;
   list.addEventListener('dblclick', function(e) {
-    if (!e.target.closest('a')) return;
-    if (touchmoved) return;
+    const item = e.target.closest('a');
+    if (!item || touchmoved) return;
     e.preventDefault();
-    list.selected = e.target;
+    list.selected = item;
     host.viewer.openURL(list.selected.href, true);
   });
   list.addEventListener('touchmove', function(e) {
@@ -1932,8 +1944,8 @@ function setupEditListCombo(edit, list) {
   });
   // Show tooltip on mouseover if an item exceeds the length of its parent:
   list.addEventListener('mouseover', function(e) {
-    if (!e.target.closest('a')) return;
-    const item = e.target;
+    const item = e.target.closest('a');
+    if (!item) return;
     if (item.offsetWidth < item.scrollWidth && !item.title) {
       item.title = item.getDisplayText();
     }
