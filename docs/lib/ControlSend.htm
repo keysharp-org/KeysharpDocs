@@ -17,7 +17,7 @@
 
 <pre class="Syntax"><span class="func">ControlSend</span> Keys <span class="optional">, ControlID, WinTitle, WinText, ExcludeTitle, ExcludeText</span>
 <span class="func">ControlSendText</span> Keys <span class="optional">, ControlID, WinTitle, WinText, ExcludeTitle, ExcludeText</span></pre>
-<p class="note"><strong>Note:</strong> On Linux, these functions reach only windows and controls created by the script. On macOS, only ControlSendText to the script's own Edit controls is supported.</p>
+<p class="note"><strong>Note:</strong> On Linux, window targets are limited to the script's own windows and controls. ControlSendText also supports <a href="#Linux_TTY">local text consoles</a>. See <a href="#Linux">Linux</a> for input timing and requirements. On macOS, only ControlSendText to the script's own Edit controls is supported.</p>
 <h2 id="Parameters">Parameters</h2>
 <dl>
 
@@ -26,12 +26,14 @@
     <p>Type: <a href="../Concepts.htm#strings">String</a></p>
     <p>The sequence of keys to send (see the <a href="Send.htm">Send</a> function for details). The rate at which characters are sent is determined by <a href="SetKeyDelay.htm">SetKeyDelay</a>.</p>
     <p>Unlike the <a href="Send.htm">Send</a> function, mouse clicks cannot be sent by ControlSend. Use <a href="ControlClick.htm">ControlClick</a> for that.</p>
+    <p>For a Linux text-console target, <em>Keys</em> must contain valid Unicode text of at most 1024 UTF-8 bytes after newline normalization. CRLF pairs and LF characters become CR; a backspace uses the console's configured erase character, and tabs remain tabs. <a href="SetKeyDelay.htm">SetKeyDelay</a> and its press duration do not apply. Empty text validates the target syntax and window criteria locally without contacting the service.</p>
   </dd>
 
   <dt>ControlID</dt>
   <dd>
     <p>Type: <a href="../Concepts.htm#strings">String</a>, <a href="../Concepts.htm#numbers">Integer</a> or <a href="../Concepts.htm#objects">Object</a></p>
     <p>If omitted, the keystrokes will be sent directly to the target window instead of one of its controls. Otherwise, specify the control's ClassNN, text or HWND, or an object with a Hwnd property. For details, see <a href="../misc/ControlID.htm">Control Identifiers</a>.</p>
+    <p>On Linux, ControlSendText also accepts an absolute local console path from <code>/dev/tty1</code> through <code>/dev/tty63</code>. This target can be inactive and must belong to a logged-in session of the same user. See <a href="#Linux_TTY">Local text consoles</a> for prerequisites. ControlSend does not support these targets.</p>
   </dd>
 
   <dt>WinTitle, WinText, ExcludeTitle, ExcludeText</dt>
@@ -39,6 +41,7 @@
     <p>Type: <a href="../Concepts.htm#strings">String</a>, <a href="../Concepts.htm#numbers">Integer</a> or <a href="../Concepts.htm#objects">Object</a></p>
     <p>If each of these is blank or omitted, the <a href="../misc/WinTitle.htm#LastFoundWindow">Last Found Window</a> will be used. Otherwise, specify for <em>WinTitle</em> a <a href="../misc/WinTitle.htm">window title or other criteria</a> to identify the target window and/or for <em>WinText</em> a substring from a single text element of the target window (as revealed by the included <a href="../Program.htm#Window_Spy">Window Spy</a> utility).</p>
     <p><em>ExcludeTitle</em> and <em>ExcludeText</em> can be used to exclude one or more windows by their title or text. Their specification is similar to <em>WinTitle</em> and <em>WinText</em>, except that <em>ExcludeTitle</em> does not recognize any criteria other than the window title.</p>
+    <p>For a Linux text-console target, all four parameters must be blank or omitted. The Last Found Window is not used.</p>
     <p>Window titles and text are case-sensitive. By default, hidden windows are not detected and hidden text elements are detected, unless changed with <a href="DetectHiddenWindows.htm">DetectHiddenWindows</a> and <a href="DetectHiddenText.htm">DetectHiddenText</a>. When using <a href="../misc/WinTitle.htm#ahk_id">pure HWNDs</a>, hidden windows are always detected. By default, a window title can contain <em>WinTitle</em> or <em>ExcludeTitle</em> anywhere inside it to be a match, unless changed with <a href="SetTitleMatchMode.htm">SetTitleMatchMode</a>.</p>
   </dd>
 
@@ -47,6 +50,7 @@
 <h2 id="Error_Handling">Error Handling</h2>
 <p>A <a href="Error.htm#TargetError">TargetError</a> is thrown if the window or control could not be found.</p>
 <p>An <a href="Error.htm#UnsupportedError">UnsupportedError</a> is thrown for another program's window or control on Linux, for ControlSend on macOS, or for a macOS ControlSendText target other than the script's own Edit controls.</p>
+<p>For Linux text-console targets, invalid paths, nonempty window criteria, invalid Unicode or excessive text length raise <a href="Error.htm#ValueError">ValueError</a>. A missing or disconnected console device raises <a href="Error.htm#TargetError">TargetError</a>; an unavailable service or authorization mechanism, or an unsupported console mode, raises <code>UnsupportedError</code>. Permission denials, including a target without a qualifying logged-in session, and operating-system or communication failures during submission raise <a href="Error.htm#OSError">OSError</a>. An error may follow partial submission, and a communication failure can leave the outcome unknown.</p>
 
 <h2 id="Remarks">Remarks</h2>
 <p>ControlSendText is similar to ControlSend, except that it sends the individual characters of the <em>Keys</em> parameter without translating <code class="no-highlight">{Enter}</code> to <kbd>Enter</kbd>, <code class="no-highlight">^c</code> to <kbd>Ctrl</kbd>+<kbd>C</kbd>, etc. For details, see <a href="Send.htm#SendText">Text mode</a>. It is also valid to use <a href="Send.htm#Raw">{Raw}</a> or <a href="Send.htm#Text">{Text}</a> with ControlSend.</p>
@@ -54,7 +58,7 @@
 <p>On Windows, this function is intended for use with controls in a non-GUI window, i.e. a window that is not created with the <a href="Gui.htm#Call">Gui</a> function. It works best with common or predefined Microsoft controls; some applications use custom or modified controls, in which case the function might not work as expected. For <a href="GuiControls.htm">GUI controls</a>, it is usually more convenient to manipulate them via their <a href="GuiControl.htm">GuiControl</a> object, assuming a suitable counterpart exists.</p>
 <p>Unlike <a href="Send.htm">Send</a>, ControlSend ignores <a href="SendMode.htm">SendMode</a>. It uses the operating system's PostMessage function to post keyboard messages.</p>
 <p>If the <em>ControlID</em> parameter is omitted, this function will attempt to send directly to the target window by sending to its topmost control (which is often the correct one) or the window itself if there are no controls. This is useful if a window does not appear to have any controls at all, or just for the convenience of not having to worry about which control to send to.</p>
-<p>By default, modifier keystrokes (Ctrl, Alt, Shift, and Win) are sent as they normally would be by the <a href="Send.htm">SendEvent</a> function. This allows command prompt and other console windows to properly detect uppercase letters, control characters, etc. It may also improve reliability in other ways.</p>
+<p>On Windows, modifier keystrokes (Ctrl, Alt, Shift, and Win) are sent as they normally would be by the <a href="Send.htm">SendEvent</a> function. This allows command prompt and other console windows to properly detect uppercase letters, control characters, etc. It may also improve reliability in other ways.</p>
 <p>However, in some cases these modifier events may interfere with the active window, especially if the user is actively typing during a ControlSend or if <kbd>Alt</kbd> is being sent (since <kbd>Alt</kbd> activates the active window's menu bar). This can be avoided by explicitly sending modifier up and down events as in this example:</p>
 <pre>ControlSend "{Alt down}f{Alt up}", "Edit1", "Untitled - Notepad"</pre>
 <p>The method above also allows the sending of modifier keystrokes (Ctrl, Alt, Shift, and Win) while the workstation is locked (protected by logon prompt).</p>
@@ -71,7 +75,14 @@ SetKeyDelay -1, 0</pre>
 <p>ControlSend is generally not capable of manipulating a window's menu bar. To work around this, use <a href="MenuSelect.htm">MenuSelect</a>. If that is not possible due to the nature of the menu bar, you could try to discover the message that corresponds to the desired menu item by following the <a href="../misc/SendMessage.htm">SendMessage Tutorial</a>.</p>
 
 <h3 id="Linux">Linux</h3>
-<p>Keystrokes are delivered as GTK events to the script's own target window or control. A window forwards them to its focused control. Sending modifiers does not press them globally. For accessibility automation, see <a href="../Platforms.htm#Linux_Controls">Controls and accessibility automation</a>.</p>
+<p>For window targets on X11 and Wayland, these functions reach only the script's own GTK windows and controls. A target window sends input to its focused control, including while the window is inactive. Sending to another program's window raises UnsupportedError. For accessibility automation, see <a href="../Platforms.htm#Linux_Controls">Controls and accessibility automation</a>.</p>
+<p>Input is posted in order to the UI thread. Allow the UI thread to process it, for example with <a href="Sleep.htm">Sleep</a>, before reading the resulting text. Modifier keys affect only the target events and do not change global keyboard state. Edit input respects read-only controls and text-input cancellation. Synthetic edit keys use GTK editing actions and Eto callbacks, so native GTK key signal observers do not receive them.</p>
+
+<h4 id="Linux_TTY">Local text consoles</h4>
+<p>ControlSendText can send text to a local virtual console without switching to it. It requires the system <code>keysharp-input</code> service and client ABI 1.2 or newer, with terminal input support, plus the <code>InputControl</code> permission. The calling user must own the active session on <code>seat0</code>, and the target must be a logged-in text-console session on that seat belonging to the same user. Desktop services and window permissions are not required. See the <a href="../howto/Install.htm#Linux">Linux installation instructions</a> for component installation and upgrades.</p>
+<p>The console must use text display mode, the normal Linux line discipline (<code>N_TTY</code>), Unicode keyboard mode and UTF-8 terminal input mode (<code>IUTF8</code>). A console running a graphical session, a login prompt, another user's session, <code>/dev/tty0</code>, aliases, and pseudo-terminals such as <code>/dev/pts/3</code> are not supported.</p>
+<p>Backspace requires an enabled terminal erase character; otherwise the request raises UnsupportedError before submitting text. Other characters are subject to the terminal's normal input processing. A newline can submit a command to a shell.</p>
+<p>Text is submitted to the console's input queue, so the terminal's line discipline and foreground program determine how it is interpreted. Completion means bytes were submitted, not that the program consumed them; a full terminal input buffer can discard text. If an error occurs after part of the text was submitted, that prefix cannot be recalled. Do not retry the whole call automatically.</p>
 <h3 id="macOS">macOS</h3>
 <p>ControlSendText inserts text at the selection of the script's own single-line, multi-line or password Edit control. A read-only Edit ignores the text.</p>
 
@@ -106,6 +117,13 @@ MyGui.Show()
 ControlSend "This is a line of text in the edit control.{Enter}", "Edit1", MyGui
 ControlSendText "Notice that {Enter} is not sent as an Enter keystroke with ControlSendText.", "Edit1", MyGui
 </pre>
+</div>
+
+<div class="ex" id="ExTTY">
+<p><a class="ex_number" href="#ExTTY"></a> On Linux, types text at the prompt on TTY3 while the current session remains active. First log in on TTY3 as the same user and meet the <a href="#Linux_TTY">console prerequisites</a>. The example omits a newline, so it does not submit the command line.</p>
+<pre>#ErrorStdOut
+#Warn All, StdOut
+ControlSendText "hello", "/dev/tty3"</pre>
 </div>
 
 </body>
